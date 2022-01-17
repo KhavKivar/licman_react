@@ -1,26 +1,25 @@
 import Grid from '@mui/material/Grid';
-import Card from '@mui/material/Card';
+
 import TextField from '@mui/material/TextField';
 import Paper from '@mui/material/Paper';
 import styled from 'styled-components';
 import Button from '@mui/material/Button';
 import SendIcon from '@mui/icons-material/Send';
-import InputLabel from '@mui/material/InputLabel';
+
 import InputAdornment from '@mui/material/InputAdornment';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import FormControl from '@mui/material/FormControl';
+
 import { forwardRef, useState } from 'react';
 import axios from "axios";
-import Input from "@material-ui/core/Input";
+
+
 import { useNavigate } from 'react-router-dom';
-import AccountCircle from '@mui/icons-material/AccountCircle';
-import { Controller, useForm } from "react-hook-form";
+
 import NumberFormat from 'react-number-format';
-import Box from '@mui/material/Box';
+
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import API from '../services/api'
-import IconButton from '@mui/material/IconButton';
+
 import { motion } from "framer-motion";
 import { useSelector, useDispatch } from 'react-redux'
 
@@ -112,7 +111,7 @@ const NumberFormatCustom = forwardRef(function NumberFormatCustom(props, ref) {
                     },
                 });
             }}
-            thousandSeparator
+            
             isNumericString
             prefix="$"
             thousandSeparator={'.'} decimalSeparator={false}
@@ -137,7 +136,7 @@ const NumberFormatCustomWithoutPrefix = forwardRef(function NumberFormatCustom(p
                     },
                 });
             }}
-            thousandSeparator
+            
             isNumericString
 
             thousandSeparator={'.'} decimalSeparator={false}
@@ -162,7 +161,6 @@ const NumberFormatCustomDecimal = forwardRef(function NumberFormatCustom(props, 
                     },
                 });
             }}
-            thousandSeparator
             isNumericString
             thousandSeparator={'.'} decimalSeparator={','}
             allowNegative={false}
@@ -193,7 +191,7 @@ export default function Registro() {
 
     const enviar = () => {
         //Activar Errores
-        var action = {};
+       
         if(codigo == null){
             error.id = { error: true, message: 'Este campo no puede ser vacio' }
         }if(tipo == null){
@@ -347,16 +345,16 @@ export default function Registro() {
                                         console.log(newValue);
                                         var isllchange = false;
 
-                                        if (newValue == null || newValue == '') {
+                                        if (newValue === null || newValue === '') {
                                             isllchange = true;
                                             setError({ ...error, id: { error: true, message: 'Este campo no puede ser vacio' } })
                                             console.log({ ...error, id: { error: true, message: 'Este campo no puede ser vacio' } });
                                         }
-                                        if (!(newValue == null || newValue == '') && (String(newValue.inputValue).match(/^\d+$/) == null && String(newValue).match(/^\d+$/) == null)) {
+                                        if (!(newValue === null || newValue === '') && (String(newValue.inputValue).match(/^\d+$/) == null && String(newValue).match(/^\d+$/) == null)) {
                                             isllchange = true;
                                             setError({ ...error, id: { error: true, message: 'Este campo solo permite numeros enteros' } })
                                         }
-                                        if (!(newValue == null || newValue == '') && codigoOpciones.filter(x => x.id == newValue).length > 0) {
+                                        if (!(newValue === null || newValue === '') && codigoOpciones.filter(x => x.id === newValue).length > 0) {
                                             isllchange = true;
                                             setError({ ...error, id: { error: true, message: 'El codigo ya existe' } })
                                         }
@@ -399,7 +397,7 @@ export default function Registro() {
                                     getOptionDisabled={(option) => {
 
                                         for (const x of codigoOpciones) {
-                                            if (x.id == option.id) {
+                                            if (x.id === option.id) {
                                                 return true;
                                             }
                                         }
@@ -437,7 +435,7 @@ export default function Registro() {
                                         console.log(newValue);
 
 
-                                        if (newValue == null || newValue == '') {
+                                        if (newValue === null || newValue === '') {
 
                                             setError({ ...error, tipo: { error: true, message: 'Este campo no puede ser vacio' } })
                                         } else {
@@ -507,7 +505,7 @@ export default function Registro() {
                                         console.log(newValue);
 
 
-                                        if (newValue == null || newValue == '') {
+                                        if (newValue === null || newValue === '') {
                                             setError({ ...error, marca: { error: true, message: 'Este campo no puede ser vacio' } })
                                         } else {
                                             setError({ ...error, marca: { error: false, message: '' } });
@@ -575,7 +573,7 @@ export default function Registro() {
                                     value={modelo}
                                     onChange={(event, newValue) => {
                                         console.log(newValue);
-                                        if (newValue == null || newValue == '') {
+                                        if (newValue === null || newValue === '') {
                                             setError({ ...error, modelo: { error: true, message: 'Este campo no puede ser vacio' } })
                                         } else {
                                             setError({ ...error, modelo: { error: false, message: '' } });
@@ -648,7 +646,7 @@ export default function Registro() {
                                     value={serie}
                                     onChange={(event, newValue) => {
                                         console.log(newValue);
-                                        if (newValue == null || newValue == '') {
+                                        if (newValue === null || newValue === '') {
                                             setError({ ...error, serie: { error: true, message: 'Este campo no puede ser vacio' } })
                                         } else {
                                             setError({ ...error, serie: { error: false, message: '' } });
@@ -750,7 +748,7 @@ export default function Registro() {
                             <ColumnElement>
 
                                 <TextField fullWidth value={horometro}
-                                    label="Horometro" variant="outlined"
+                                    label="Horometro" 
                                     id="formatted-numberformat-input"
                                     variant="outlined"
                                     onChange={(event) => {
