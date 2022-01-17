@@ -40,7 +40,7 @@ const Container = styled.div`
 const SideBarContainer = styled.div`
 background-color: var(--black);
 width: 3.5rem;
-height: 88vh;
+height: 85vh;
 margin-top: 1rem;
 border-radius:  0 30px 30px 0;
 padding: 1rem 0;

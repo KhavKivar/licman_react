@@ -62,11 +62,13 @@ const ContainerRegistro = styled.div`
     width: 90%;
     margin-left: auto;
     margin-right: auto;
+    max-height: 80vh;
  
 `;
 
 
 const ColumnSpace = styled.div`
+  
     flex-direction: column;
      display: flex;
      gap: 1rem;
