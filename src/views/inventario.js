@@ -117,12 +117,12 @@ export default function Inventario() {
             { title: 'Tipo', field: 'tipo' },
             { title: 'Marca', field: 'marca' },
             { title: 'Modelo', field: 'modelo' },
-            { title: 'Serie', field: 'serie' },
-            { title: 'Capacidad', field: 'capacidad', searchable: false },
-            { title: 'Altura', field: 'altura', searchable: false },
+            { title: 'Serie', field: 'serie',hidden:true },
+            { title: 'Capacidad', field: 'capacidad', searchable: false,hidden:true  },
+            { title: 'Altura', field: 'altura', searchable: false,hidden:true  },
             { title: 'Mastil', field: 'mastil' },
             { title: 'Año', field: 'ano', searchable: false },
-            { title: 'Horometro', field: 'horometro', type: "numeric", searchable: false },
+            { title: 'Horometro', field: 'horometro',  searchable: false },
             { title: 'Precio neto', field: 'precio_neto', type: "currency" }
 
 

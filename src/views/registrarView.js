@@ -59,9 +59,10 @@ const ContainerRegistro = styled.div`
     gap:2rem;
     padding:1.5rem;
     padding-bottom: 3rem;
-    width: 90%;
+   
     margin-left: auto;
     margin-right: auto;
+   
 
  
 `;
@@ -356,7 +357,7 @@ export default function Registro() {
 
             <Grid >
                 <Paper elevation={3} >
-                    <div style={{ float: "left", position: "absolute", margin: "0.9rem" }}>
+                    <div style={{ float: "left", position: "absolute", marginLeft: "1.5rem",marginTop:"1rem" }}>
                         <BackButton onClick={backFunc} variant="contained" startIcon={<ArrowBackIcon />}>
                             Volver
                         </BackButton>
@@ -447,11 +448,11 @@ export default function Registro() {
 
                                         freeSolo
                                         renderInput={(params) => (
-                                            <TextField  {...params}  error={error.id.error} label="Numero interno" />
+                                            <TextField    {...params}  error={error.id.error} label="Numero interno" />
                                         )}
                                     />
                                    
-                                    :  <TextField disabled defaultValue={params.id} label="Numero interno" />
+                                    :  <TextField   disabled defaultValue={params.id} label="Numero interno" />
                                 }
                                  {error.id.error && <ErrorDisplay> <span>{error.id.message}</span></ErrorDisplay>}
                                 </ColumnElement>
