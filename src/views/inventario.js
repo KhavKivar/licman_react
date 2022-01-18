@@ -128,7 +128,7 @@ export default function Inventario() {
 
           ]}
           data={editable}
-        
+          onChangeColumnHidden={(column,hidden) => {console.log(column);}}
           options={{
             rowStyle: (data, index) => index % 2 == 0 ? { background: "#f5f5f5" } : null,
             searchFieldStyle: {},

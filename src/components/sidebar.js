@@ -66,7 +66,7 @@ left:0;
 width: ${(props => props.clicked ? "17rem" : "3.5rem")};
 transition: all 0.35 ease;
 border-radius: 0 30px 30px 0;
-position:relative;
+position:${(props=>props.clicked ?"absolute":"relative")};
 z-index: 10;
 `;
 
