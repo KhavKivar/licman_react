@@ -18,7 +18,7 @@ import Homef from '../views/home'
 import Inventario from '../views/inventario'
 import Movimiento from '../views/movimientos'
 import Alerta from '../views/alertas'
-
+import Detalle from '../views/detalle';
 
 import { NavLink, Link } from "react-router-dom";
 import SideBarTop from './sidebartop';
@@ -60,13 +60,14 @@ flex-direction: column;
 align-items: center;
 background-color: var(--black);
 padding: 2rem 0;
-position: absolute;
+
 top:5rem;
 left:0;
 width: ${(props => props.clicked ? "17rem" : "3.5rem")};
 transition: all 0.35 ease;
 border-radius: 0 30px 30px 0;
-
+position:absolute;
+z-index: 10;
 `;
 
 
@@ -158,7 +159,10 @@ export default function SideBar() {
               <Route exact path="/" element={<Homef></Homef>} />
               <Route path="/home" element={<Homef></Homef>} />
               <Route path="/inventario" element={<Inventario />}> </Route>
+             
+              <Route path="/inventario/detalle" element={<Detalle />}> </Route>
               <Route path="/registro" element={<Registro />}> </Route>
+              <Route path="/registro/:id" element={<Registro />}> </Route>
               <Route path="/movimientos" element={<Movimiento />} />
               <Route path="/alerta" element={<Alerta />} />
 

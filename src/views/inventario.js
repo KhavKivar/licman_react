@@ -8,14 +8,19 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
+import { ExportCsv, ExportPdf } from '@material-table/exporters';
+
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
+import AddBox from '@mui/icons-material/AddBox';
 
 import { motion } from "framer-motion";
+import { forwardRef } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 import CreateIcon from '@mui/icons-material/Create';
 import { useSelector, useDispatch } from 'react-redux'
-import MaterialTable from 'material-table';
-
+import MaterialTable from '@material-table/core';
+import "./invstyle.css";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -69,8 +74,14 @@ const ButtonRegistro = styled(Button)`
 
 
 
+
+const tableIcons = {
+  Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
+
+};
+
 export default function Inventario() {
- 
+
 
   const navigate = useNavigate();
   const openRegistro = () => {
@@ -80,7 +91,8 @@ export default function Inventario() {
 
   const rows = useSelector((state) => state.inventario.data);
 
- 
+  const editable = rows.map(o => ({ ...o }));
+
 
   return (
 
@@ -97,16 +109,85 @@ export default function Inventario() {
     >
 
       <div>
-        <div style={{marginBottom: 15}}>
-      <ButtonRegistro startIcon={<CreateIcon />} sx={{
-        
-        
-        backgroundColor:"var(--black)",fontFamily:'"Poppins", sans-serif'
-    
-    }} onClick={openRegistro} size ='medium' variant="contained">Registrar equipo</ButtonRegistro>
-      </div>
+      
+        <MaterialTable
+          title="Tabla de inventario"
+          columns={[
+            { title: 'Numero interno', field: 'id' },
+            { title: 'Tipo', field: 'tipo' },
+            { title: 'Marca', field: 'marca' },
+            { title: 'Modelo', field: 'modelo' },
+            { title: 'Serie', field: 'serie' },
+            { title: 'Capacidad', field: 'capacidad', searchable: false },
+            { title: 'Altura', field: 'altura', searchable: false },
+            { title: 'Mastil', field: 'mastil' },
+            { title: 'Año', field: 'ano', searchable: false },
+            { title: 'Horometro', field: 'horometro', type: "numeric", searchable: false },
+            { title: 'Precio neto', field: 'precio_neto', type: "currency" }
 
-      <TableContainer component={Paper}>
+
+          ]}
+          data={editable}
+        
+          options={{
+            rowStyle: (data, index) => index % 2 == 0 ? { background: "#f5f5f5" } : null,
+            searchFieldStyle: {},
+            headerStyle: { background: "var(--black)", color: "white", fontFamily: '"Poppins", sans-serif',fontSize: "1rem" },
+            columnsButton: true,
+            exportMenu: [{
+              label: 'Exportar a PDF',
+              exportFunc: (cols, datas) => ExportPdf(cols, datas, 'myPdfFileName')
+            }, {
+              label: 'Exportar a CSV',
+              exportFunc: (cols, datas) => ExportCsv(cols, datas, 'myCsvFileName')
+            }],
+            actionsColumnIndex: -1
+          }}
+          
+          actions={[
+
+            {
+              icon: ()=> <div style={{paddingTop:4}}><AddBox></AddBox></div>,
+              tooltip: 'Añadir equipo',
+              isFreeAction: true,
+              onClick: (event,rowData) => {
+                navigate('/registro');
+              }
+            },
+
+            {
+              icon: ()=> <CreateIcon></CreateIcon>,
+              tooltip: 'Editar Equipo',
+              onClick: (event,rowData) => {
+                
+                navigate('/registro/'+rowData.id);
+              }
+            },
+            rowData => ({
+              icon: () => <ManageSearchIcon />,
+              tooltip: 'Inspecionar',
+              onClick: (event, rowData) => {
+                navigate('/inventario/detalle');
+            
+              }
+            })
+
+
+          ]}
+
+           >
+
+
+        </MaterialTable>
+
+
+      </div>
+    </motion.div>
+  );
+}
+
+/*
+ <TableContainer component={Paper}>
         <Table sx={{ minWidth: 100 }} aria-label="customized table">
           <TableHead>
             <TableRow>
@@ -145,7 +226,4 @@ export default function Inventario() {
         </Table>
       </TableContainer>
 
-      </div>
-    </motion.div>
-  );
-}
+*/

@@ -1,0 +1,14 @@
+
+
+.MuiTableSortLabel-root.MuiTableSortLabel-active,
+.MuiTableSortLabel-root:hover,
+.MuiTableSortLabel-icon {
+  color: white !important;
+}
+.MuiTypography-root{
+    font-family:'Poppins',sans-serif !important;
+}
+
+.MuiToolbar-root{
+  background-color:var(--dark);
+}

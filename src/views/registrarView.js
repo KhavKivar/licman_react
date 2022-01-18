@@ -12,7 +12,7 @@ import { forwardRef, useState } from 'react';
 import axios from "axios";
 
 
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import NumberFormat from 'react-number-format';
 
@@ -24,7 +24,7 @@ import { motion } from "framer-motion";
 import { useSelector, useDispatch } from 'react-redux'
 
 
-import { addEquipo } from '../features/inventarioSlice'
+import { addEquipo,editEquipo } from '../features/inventarioSlice'
 
 
 const ButtonSend = styled(Button)`
@@ -113,7 +113,7 @@ const NumberFormatCustom = forwardRef(function NumberFormatCustom(props, ref) {
                     },
                 });
             }}
-            
+
             isNumericString
             prefix="$"
             thousandSeparator={'.'} decimalSeparator={false}
@@ -138,7 +138,7 @@ const NumberFormatCustomWithoutPrefix = forwardRef(function NumberFormatCustom(p
                     },
                 });
             }}
-            
+
             isNumericString
 
             thousandSeparator={'.'} decimalSeparator={false}
@@ -185,80 +185,104 @@ export default function Registro() {
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const params = useParams();
+
+    const equipo = inventarioList.find(function (post,index){
+        if(post.id == params.id){
+            return true;
+        }
+    }
+    );
 
 
-
-
-
+   
+   
 
     const enviar = () => {
         //Activar Errores
-       
-        if(codigo == null){
+
+        if (codigo == null || codigo == '') {
             error.id = { error: true, message: 'Este campo no puede ser vacio' }
-        }if(tipo == null){
-            error.tipo =  { error: true, message: 'Este campo no puede ser vacio' };
+        } if (tipo == null || tipo == '') {
+            error.tipo = { error: true, message: 'Este campo no puede ser vacio' };
         }
-        if(marca ==null){
+        if (marca == null || marca == '') {
             error.marca = { error: true, message: 'Este campo no puede ser vacio' }
-            
-        }if(modelo ==null){
+
+        } if (modelo == null || modelo == '') {
             error.modelo = { error: true, message: 'Este campo no puede ser vacio' }
-        }if(serie == null){
+        } if (serie == null || serie == '') {
             error.serie = { error: true, message: 'Este campo no puede ser vacio' }
         }
         setError({ ...error })
-        console.log({ ...error});
+        console.log({ ...error });
 
-        for(const x in error){
-            if(error[x].error){
+        for (const x in error) {
+            if (error[x].error) {
                 return;
-            } 
+            }
         }
 
-       
-        
+
+
         const postData = {
-            id:  parseInt(codigo.id),
-            tipo: tipo.id,
-            marca: marca.id,
-            modelo: modelo.id,
+            tipo: tipo.id != null ? tipo.id : tipo,
+            marca: marca.id !=null ? marca.id:marca,
+            modelo: modelo.id !=null? modelo.id:modelo,
             serie: serie,
-            capacidad: capacidad != ''?capacidad:'0',
-            altura: altura != '' ? altura:'0',
-            mastil: mastil != null ? mastil.id :'',
-            ano: ano != '' ?parseInt(ano):0,
-            horometro: horometro != '' ?parseInt(horometro):0,
-            precio_neto: precio !='' ?parseInt(precio):0,
+            capacidad: capacidad != '' ? capacidad : '0',
+            altura: altura != '' ? altura : '0',
+            mastil: mastil.id != null ? mastil.id : mastil !=null ? mastil : "",
+            ano: ano != '' ? parseInt(ano) : 0,
+            horometro: horometro != '' ? parseInt(horometro) : 0,
+            precio_neto: precio != '' ? parseInt(precio) : 0,
         };
 
-        console.log(postData);
+       
 
-        
-        dispatch(addEquipo(postData));
-        
+        if(params.id == null){
+            postData.id = parseInt(codigo.id);
+            console.log(postData);
+            dispatch(addEquipo(postData));
+            axios.post(API.baseURL + '/api/equipo/', JSON.stringify(postData), {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then((response) => {
+                console.log(response.data);
+            });
+        }else{
+          
+          
+            console.log('/api/equipo/id/'+codigo);
+            axios.patch(API.baseURL + '/api/equipo/id/'+codigo, JSON.stringify(postData), {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then((response) => {
+                console.log(response.data);
+            });
 
-        
-        axios.post(API.baseURL + '/api/equipo/', JSON.stringify(postData), {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then((response) => {
-            console.log(response.data);
-        });
+            console.log(postData);
+            postData.id = parseInt(params.id);
+            dispatch(editEquipo(postData));
+        }
+     
         navigate('/inventario');
-        
+
     };
 
 
 
-  
+
 
 
 
     const backFunc = () => {
         navigate('/inventario');
     }
+
+
 
     const filter = createFilterOptions();
 
@@ -278,7 +302,7 @@ export default function Registro() {
     const serieArray = [...new Set(inventarioList.map(x => x.serie))]
     const serieOpciones = []
 
-    const mastilOpciones = [{id:"Triple"},{id:"Doble"}]
+    const mastilOpciones = [{ id: "Triple" }, { id: "Doble" }]
 
     for (const element of codigoArray) {
         codigoOpciones.push({ id: element });
@@ -299,496 +323,498 @@ export default function Registro() {
 
 
 
-    const [codigo, setCodigo] = useState(null);
+    const [codigo, setCodigo] = useState(params.id);
+
     const [error, setError] = useState({ id: { error: false, message: '' }, tipo: { error: false, message: '' }, marca: { error: false, message: '' }, modelo: { error: false, message: '' }, serie: { error: false, message: '' } });
 
-    const [tipo, setTipo] = useState(null);
-    const [marca, setMarca] = useState(null);
-    const [modelo, setModelo] = useState(null);
-    const [serie, setSerie] = useState(null);
+    const [tipo, setTipo] = useState(equipo !=null? equipo.tipo: '');
+    const [marca, setMarca] = useState(equipo !=null? equipo.marca: '');
+    const [modelo, setModelo] = useState(equipo !=null? equipo.modelo: '');
+    const [serie, setSerie] = useState(equipo !=null? equipo.serie: '');
 
 
-    const [capacidad, setCapacidad] = useState('');
-    const [altura, setAltura] = useState('');
-    const [mastil, setMastil] = useState('');
-    const [ano, setAno] = useState('');
-    const [horometro, setHorometro] = useState('');
-    const [precio, setPrecio] = useState('');
+    const [capacidad, setCapacidad] = useState(equipo !=null? equipo.capacidad: '');
+    const [altura, setAltura] = useState(equipo !=null? equipo.altura: '');
+    const [mastil, setMastil] = useState(equipo !=null? equipo.mastil: '');
+    const [ano, setAno] = useState(equipo !=null? equipo.ano: '');
+    const [horometro, setHorometro] = useState(equipo !=null? equipo.horometro: '');
+    const [precio, setPrecio] = useState(equipo !=null? equipo.precio_neto: '');
 
 
     return (
         <motion.div
-        initial={{ y: 800 }}
-        animate={{
-          y: 0,
-          transition: { duration: 0.5, type: "spring" },
-        }}
-        exit={{
-          y: -500,
-          transition: { duration: 0.5, type: "spring", ease: "easeInOut" },
-        }}
-      >
+            initial={{ y: 800 }}
+            animate={{
+                y: 0,
+                transition: { duration: 0.5, type: "spring" },
+            }}
+            exit={{
+                y: -500,
+                transition: { duration: 0.5, type: "spring", ease: "easeInOut" },
+            }}
+        >
 
-        <Grid >
-            <Paper elevation={3} >
-                <div style={{ float: "left", position: "absolute", margin: "0.9rem" }}>
-                    <BackButton onClick={backFunc} variant="contained" startIcon={<ArrowBackIcon />}>
-                        Volver
-                    </BackButton>
-                </div>
-                <ContainerRegistro>
-                    <Text> Registro</Text>
-                    <ColumnSpace>
-                        <RowTextField>
-                            <ColumnElement>
-                                <Autocomplete
-                                    value={codigo}
-                                    onChange={(event, newValue) => {
-                                        console.log(newValue);
-                                        var isllchange = false;
+            <Grid >
+                <Paper elevation={3} >
+                    <div style={{ float: "left", position: "absolute", margin: "0.9rem" }}>
+                        <BackButton onClick={backFunc} variant="contained" startIcon={<ArrowBackIcon />}>
+                            Volver
+                        </BackButton>
+                    </div>
+                    <ContainerRegistro>
+                        <Text> Registro</Text>
+                        <ColumnSpace>
+                            <RowTextField>
+                                <ColumnElement>
+                                   {params.id == null ?  <Autocomplete
+                                        value={codigo}
+                                        onChange={(event, newValue) => {
+                                           
+                                            var isllchange = false;
 
-                                        if (newValue === null || newValue === '') {
-                                            isllchange = true;
-                                            setError({ ...error, id: { error: true, message: 'Este campo no puede ser vacio' } })
-                                            console.log({ ...error, id: { error: true, message: 'Este campo no puede ser vacio' } });
-                                        }
-                                        if (!(newValue === null || newValue === '') && (String(newValue.inputValue).match(/^\d+$/) == null && String(newValue).match(/^\d+$/) == null)) {
-                                            isllchange = true;
-                                            setError({ ...error, id: { error: true, message: 'Este campo solo permite numeros enteros' } })
-                                        }
-                                        if (!(newValue === null || newValue === '') && codigoOpciones.filter(x => x.id === newValue).length > 0) {
-                                            isllchange = true;
-                                            setError({ ...error, id: { error: true, message: 'El codigo ya existe' } })
-                                        }
-
-                                        if (!isllchange) {
-                                            setError({ ...error, id: { error: false, message: '' } });
-                                        }
-
-                                        console.log(error);
-                                        if (typeof newValue === 'string') {
-                                            setCodigo({
-                                                id: newValue,
-                                            });
-                                        } else if (newValue && newValue.inputValue) {
-                                            setCodigo({
-                                                id: newValue.inputValue,
-                                            });
-                                        } else {
-                                            setCodigo(newValue);
-                                        }
-                                    }}
-                                    filterOptions={(options, params) => {
-                                        const filtered = filter(options, params);
-                                        const { inputValue } = params;
-                                        const isExisting = options.some((option) => inputValue === option.id);
-                                        if (inputValue !== '' && !isExisting) {
-                                            filtered.push({
-                                                inputValue,
-                                                id: `Añadir ${inputValue}`,
-                                            });
-                                        }
-
-                                        return filtered;
-                                    }}
-                                    selectOnFocus
-                                    clearOnBlur
-                                    handleHomeEndKeys
-                                    id="codigo"
-                                    options={codigoOpciones}
-                                    getOptionDisabled={(option) => {
-
-                                        for (const x of codigoOpciones) {
-                                            if (x.id === option.id) {
-                                                return true;
+                                            if (newValue === null || newValue === '') {
+                                                isllchange = true;
+                                                setError({ ...error, id: { error: true, message: 'Este campo no puede ser vacio' } })
+                                                
                                             }
+                                            if (!(newValue === null || newValue === '') && (String(newValue.inputValue).match(/^\d+$/) == null && String(newValue).match(/^\d+$/) == null)) {
+                                                isllchange = true;
+                                                setError({ ...error, id: { error: true, message: 'Este campo solo permite numeros enteros' } })
+                                            }
+                                            if (!(newValue === null || newValue === '') && codigoOpciones.filter(x => x.id === newValue).length > 0) {
+                                                isllchange = true;
+                                                setError({ ...error, id: { error: true, message: 'El codigo ya existe' } })
+                                            }
+
+                                            if (!isllchange) {
+                                                setError({ ...error, id: { error: false, message: '' } });
+                                            }
+
+                                          
+                                            if (typeof newValue === 'string') {
+                                                setCodigo({
+                                                    id: newValue,
+                                                });
+                                            } else if (newValue && newValue.inputValue) {
+                                                setCodigo({
+                                                    id: newValue.inputValue,
+                                                });
+                                            } else {
+                                                setCodigo(newValue);
+                                            }
+                                        }}
+                                        filterOptions={(options, params) => {
+                                            const filtered = filter(options, params);
+                                            const { inputValue } = params;
+                                            const isExisting = options.some((option) => inputValue === option.id);
+                                            if (inputValue !== '' && !isExisting) {
+                                                filtered.push({
+                                                    inputValue,
+                                                    id: `Añadir ${inputValue}`,
+                                                });
+                                            }
+
+                                            return filtered;
+                                        }}
+                                        selectOnFocus
+                                        clearOnBlur
+                                        handleHomeEndKeys
+                                        id="codigo"
+                                        options={codigoOpciones}
+                                        getOptionDisabled={(option) => {
+
+                                            for (const x of codigoOpciones) {
+                                                if (x.id === option.id) {
+                                                    return true;
+                                                }
+                                            }
+                                            return false;
                                         }
-                                        return false;
-                                    }
-                                    }
-                                    getOptionLabel={(option) => {
-                                        // Value selected with enter, right from the input
-                                        if (typeof option === 'string') {
-                                            return option;
                                         }
-                                        // Add "xxx" option created dynamically
-                                        if (option.inputValue) {
-                                            return option.inputValue;
-                                        }
-                                        // Regular option
-                                        return option.id;
-                                    }}
-                                    renderOption={(props, option) => <li {...props}>{option.id}</li>}
+                                        getOptionLabel={(option) => {
+                                            // Value selected with enter, right from the input
+                                            if (typeof option === 'string') {
+                                                return option;
+                                            }
+                                            // Add "xxx" option created dynamically
+                                            if (option.inputValue) {
+                                                return option.inputValue;
+                                            }
+                                            // Regular option
+                                            return option.id;
+                                        }}
+                                        renderOption={(props, option) => <li {...props}>{option.id}</li>}
 
-                                    freeSolo
-                                    renderInput={(params) => (
-                                        <TextField {...params} error={error.id.error} label="Codigo" />
-                                    )}
-                                />
+                                        freeSolo
+                                        renderInput={(params) => (
+                                            <TextField  {...params}  error={error.id.error} label="Numero interno" />
+                                        )}
+                                    />
+                                   
+                                    :  <TextField disabled defaultValue={params.id} label="Numero interno" />
+                                }
+                                 {error.id.error && <ErrorDisplay> <span>{error.id.message}</span></ErrorDisplay>}
+                                </ColumnElement>
+                                <ColumnElement>
 
-                                {error.id.error && <ErrorDisplay> <span>{error.id.message}</span></ErrorDisplay>}
-
-                            </ColumnElement>
-                            <ColumnElement>
-
-                                <Autocomplete
-                                    value={tipo}
-                                    onChange={(event, newValue) => {
-                                        console.log(newValue);
+                                    <Autocomplete
+                                        value={tipo}
+                                        onChange={(event, newValue) => {
+                                           
 
 
-                                        if (newValue === null || newValue === '') {
+                                            if (newValue === null || newValue === '') {
 
-                                            setError({ ...error, tipo: { error: true, message: 'Este campo no puede ser vacio' } })
+                                                setError({ ...error, tipo: { error: true, message: 'Este campo no puede ser vacio' } })
+                                            } else {
+                                                setError({ ...error, tipo: { error: false, message: '' } });
+                                            }
+
+                                            
+                                            if (typeof newValue === 'string') {
+                                                setTipo({
+                                                    id: newValue,
+                                                });
+                                            } else if (newValue && newValue.inputValue) {
+                                                setTipo({
+                                                    id: newValue.inputValue,
+                                                });
+                                            } else {
+                                                setTipo(newValue);
+                                            }
+                                        }}
+                                        filterOptions={(options, params) => {
+                                            const filtered = filter(options, params);
+                                            const { inputValue } = params;
+                                            const isExisting = options.some((option) => inputValue === option.id);
+                                            if (inputValue !== '' && !isExisting) {
+                                                filtered.push({
+                                                    inputValue,
+                                                    id: `Añadir ${inputValue}`,
+                                                });
+                                            }
+
+                                            return filtered;
+                                        }}
+                                        selectOnFocus
+                                        clearOnBlur
+                                        handleHomeEndKeys
+                                        id="tipo"
+                                        options={tipoOpciones}
+
+                                        getOptionLabel={(option) => {
+                                            // Value selected with enter, right from the input
+                                            if (typeof option === 'string') {
+                                                return option;
+                                            }
+                                            // Add "xxx" option created dynamically
+                                            if (option.inputValue) {
+                                                return option.inputValue;
+                                            }
+                                            // Regular option
+                                            return option.id;
+                                        }}
+                                        renderOption={(props, option) => <li {...props}>{option.id}</li>}
+
+                                        freeSolo
+                                        renderInput={(params) => (
+                                            <TextField {...params} error={error.tipo.error} label="Tipo" />
+                                        )}
+                                    />
+
+                                    {error.tipo.error && <ErrorDisplay> <span>{error.tipo.message}</span></ErrorDisplay>}
+                                </ColumnElement>
+                            </RowTextField>
+                            <RowTextField>
+                                <ColumnElement>
+                                    <Autocomplete
+                                        value={marca}
+                                        onChange={(event, newValue) => {
+                                           
+
+
+                                            if (newValue === null || newValue === '') {
+                                                setError({ ...error, marca: { error: true, message: 'Este campo no puede ser vacio' } })
+                                            } else {
+                                                setError({ ...error, marca: { error: false, message: '' } });
+                                            }
+
+                                          
+                                            if (typeof newValue === 'string') {
+                                                setMarca({
+                                                    id: newValue,
+                                                });
+                                            } else if (newValue && newValue.inputValue) {
+                                                setMarca({
+                                                    id: newValue.inputValue,
+                                                });
+                                            } else {
+                                                setMarca(newValue);
+                                            }
+                                        }}
+                                        filterOptions={(options, params) => {
+                                            const filtered = filter(options, params);
+                                            const { inputValue } = params;
+                                            const isExisting = options.some((option) => inputValue === option.id);
+                                            if (inputValue !== '' && !isExisting) {
+                                                filtered.push({
+                                                    inputValue,
+                                                    id: `Añadir ${inputValue}`,
+                                                });
+                                            }
+
+                                            return filtered;
+                                        }}
+                                        selectOnFocus
+                                        clearOnBlur
+                                        handleHomeEndKeys
+                                        id="marca"
+                                        options={marcaOpciones}
+
+                                        getOptionLabel={(option) => {
+                                            // Value selected with enter, right from the input
+                                            if (typeof option === 'string') {
+                                                return option;
+                                            }
+                                            // Add "xxx" option created dynamically
+                                            if (option.inputValue) {
+                                                return option.inputValue;
+                                            }
+                                            // Regular option
+                                            return option.id;
+                                        }}
+                                        renderOption={(props, option) => <li {...props}>{option.id}</li>}
+
+                                        freeSolo
+                                        renderInput={(params) => (
+                                            <TextField {...params} error={error.marca.error} label="Marca" />
+                                        )}
+                                    />
+
+                                    {error.marca.error && <ErrorDisplay> <span>{error.marca.message}</span></ErrorDisplay>}
+
+
+                                </ColumnElement>
+                                <ColumnElement>
+
+                                    <Autocomplete
+                                        value={modelo}
+                                        onChange={(event, newValue) => {
+                                           
+                                            if (newValue === null || newValue === '') {
+                                                setError({ ...error, modelo: { error: true, message: 'Este campo no puede ser vacio' } })
+                                            } else {
+                                                setError({ ...error, modelo: { error: false, message: '' } });
+                                            }
+
+                                          
+                                            if (typeof newValue === 'string') {
+                                                setModelo({
+                                                    id: newValue,
+                                                });
+                                            } else if (newValue && newValue.inputValue) {
+                                                setModelo({
+                                                    id: newValue.inputValue,
+                                                });
+                                            } else {
+                                                setModelo(newValue);
+                                            }
+                                        }}
+                                        filterOptions={(options, params) => {
+                                            const filtered = filter(options, params);
+                                            const { inputValue } = params;
+                                            const isExisting = options.some((option) => inputValue === option.id);
+                                            if (inputValue !== '' && !isExisting) {
+                                                filtered.push({
+                                                    inputValue,
+                                                    id: `Añadir ${inputValue}`,
+                                                });
+                                            }
+
+                                            return filtered;
+                                        }}
+                                        selectOnFocus
+                                        clearOnBlur
+                                        handleHomeEndKeys
+                                        id="modelo"
+                                        options={modeloOpciones}
+
+                                        getOptionLabel={(option) => {
+                                            // Value selected with enter, right from the input
+                                            if (typeof option === 'string') {
+                                                return option;
+                                            }
+                                            // Add "xxx" option created dynamically
+                                            if (option.inputValue) {
+                                                return option.inputValue;
+                                            }
+                                            // Regular option
+                                            return option.id;
+                                        }}
+                                        renderOption={(props, option) => <li {...props}>{option.id}</li>}
+
+                                        freeSolo
+                                        renderInput={(params) => (
+                                            <TextField {...params} error={error.modelo.error} label="Modelo" />
+                                        )}
+                                    />
+
+                                    {error.modelo.error && <ErrorDisplay> <span>{error.modelo.message}</span></ErrorDisplay>}
+
+                                </ColumnElement>
+
+
+
+                            </RowTextField>
+
+
+                            <RowTextField>
+                                <ColumnElement>
+                                    <TextField fullWidth id="outlined-basic" value={serie} onChange={(event) => {
+                                        if (event.target.value == null || event.target.value == '') {
+                                            setError({ ...error, serie: { error: true, message: 'Este campo no puede ser vacio' } })
                                         } else {
-                                            setError({ ...error, tipo: { error: false, message: '' } });
+                                            setError({ ...error, serie: { error: false, message: '' } });
                                         }
-
-                                        console.log(error);
-                                        if (typeof newValue === 'string') {
-                                            setTipo({
-                                                id: newValue,
-                                            });
-                                        } else if (newValue && newValue.inputValue) {
-                                            setTipo({
-                                                id: newValue.inputValue,
-                                            });
-                                        } else {
-                                            setTipo(newValue);
-                                        }
+                                        setSerie(event.target.value)
                                     }}
-                                    filterOptions={(options, params) => {
-                                        const filtered = filter(options, params);
-                                        const { inputValue } = params;
-                                        const isExisting = options.some((option) => inputValue === option.id);
-                                        if (inputValue !== '' && !isExisting) {
-                                            filtered.push({
-                                                inputValue,
-                                                id: `Añadir ${inputValue}`,
-                                            });
-                                        }
+                                        label="Serie" variant="outlined" error={error.serie.error} />
 
-                                        return filtered;
-                                    }}
-                                    selectOnFocus
-                                    clearOnBlur
-                                    handleHomeEndKeys
-                                    id="tipo"
-                                    options={tipoOpciones}
+                                    {error.serie.error && <ErrorDisplay> <span>{error.serie.message}</span></ErrorDisplay>}
 
-                                    getOptionLabel={(option) => {
-                                        // Value selected with enter, right from the input
-                                        if (typeof option === 'string') {
-                                            return option;
-                                        }
-                                        // Add "xxx" option created dynamically
-                                        if (option.inputValue) {
-                                            return option.inputValue;
-                                        }
-                                        // Regular option
-                                        return option.id;
-                                    }}
-                                    renderOption={(props, option) => <li {...props}>{option.id}</li>}
+                                </ColumnElement>
+                                <ColumnElement>
+                                    <Autocomplete
+                                        value={mastil}
+                                        onChange={(event, newValue) => {
 
-                                    freeSolo
-                                    renderInput={(params) => (
-                                        <TextField {...params} error={error.tipo.error} label="Tipo" />
-                                    )}
-                                />
+                                            if (typeof newValue === 'string') {
+                                                setMastil({
+                                                    id: newValue,
+                                                });
+                                            } else if (newValue && newValue.inputValue) {
+                                                setMastil({
+                                                    id: newValue.inputValue,
+                                                });
+                                            } else {
+                                                setMastil(newValue);
+                                            }
+                                        }}
+                                        filterOptions={(options, params) => {
+                                            const filtered = filter(options, params);
+                                            const { inputValue } = params;
+                                            const isExisting = options.some((option) => inputValue === option.id);
+                                            if (inputValue !== '' && !isExisting) {
+                                                filtered.push({
+                                                    inputValue,
+                                                    id: `Añadir ${inputValue}`,
+                                                });
+                                            }
 
-                                {error.tipo.error && <ErrorDisplay> <span>{error.tipo.message}</span></ErrorDisplay>}
-                            </ColumnElement>
-                        </RowTextField>
-                        <RowTextField>
-                            <ColumnElement>
-                                <Autocomplete
-                                    value={marca}
-                                    onChange={(event, newValue) => {
-                                        console.log(newValue);
+                                            return filtered;
+                                        }}
+                                        selectOnFocus
+                                        clearOnBlur
+                                        handleHomeEndKeys
+                                        id="mastil"
+                                        options={mastilOpciones}
 
+                                        getOptionLabel={(option) => {
+                                            // Value selected with enter, right from the input
+                                            if (typeof option === 'string') {
+                                                return option;
+                                            }
+                                            // Add "xxx" option created dynamically
+                                            if (option.inputValue) {
+                                                return option.inputValue;
+                                            }
+                                            // Regular option
+                                            return option.id;
+                                        }}
+                                        renderOption={(props, option) => <li {...props}>{option.id}</li>}
 
-                                        if (newValue === null || newValue === '') {
-                                            setError({ ...error, marca: { error: true, message: 'Este campo no puede ser vacio' } })
-                                        } else {
-                                            setError({ ...error, marca: { error: false, message: '' } });
-                                        }
+                                        freeSolo
+                                        renderInput={(params) => (
+                                            <TextField {...params} label="Mastil" />
+                                        )}
+                                    />
 
-                                        console.log(error);
-                                        if (typeof newValue === 'string') {
-                                            setMarca({
-                                                id: newValue,
-                                            });
-                                        } else if (newValue && newValue.inputValue) {
-                                            setMarca({
-                                                id: newValue.inputValue,
-                                            });
-                                        } else {
-                                            setMarca(newValue);
-                                        }
-                                    }}
-                                    filterOptions={(options, params) => {
-                                        const filtered = filter(options, params);
-                                        const { inputValue } = params;
-                                        const isExisting = options.some((option) => inputValue === option.id);
-                                        if (inputValue !== '' && !isExisting) {
-                                            filtered.push({
-                                                inputValue,
-                                                id: `Añadir ${inputValue}`,
-                                            });
-                                        }
+                                </ColumnElement>
+                            </RowTextField>
+                            <RowTextField>
+                                <ColumnElement>
+                                    <TextField fullWidth id="outlined-basic"
+                                        onChange={(event) => {
+                                            setAltura(event.target.value)
+                                        }}
+                                        value={altura}
+                                        InputProps={{
+                                            endAdornment: <InputAdornment position="start">mm</InputAdornment>,
+                                            inputComponent: NumberFormatCustomDecimal,
+                                        }}
+                                        label="Altura" variant="outlined" />
 
-                                        return filtered;
-                                    }}
-                                    selectOnFocus
-                                    clearOnBlur
-                                    handleHomeEndKeys
-                                    id="marca"
-                                    options={marcaOpciones}
+                                </ColumnElement>
+                                <ColumnElement>
+                                    <TextField value={capacidad} fullWidth
+                                        onChange={(event) => {
+                                            setCapacidad(event.target.value)
+                                        }}
+                                        InputProps={{
+                                            endAdornment: <InputAdornment position="start">kg</InputAdornment>,
+                                            inputComponent: NumberFormatCustomDecimal,
+                                        }}
+                                        id="outlined-basic"
+                                        label="Capacidad" variant="outlined" />
 
-                                    getOptionLabel={(option) => {
-                                        // Value selected with enter, right from the input
-                                        if (typeof option === 'string') {
-                                            return option;
-                                        }
-                                        // Add "xxx" option created dynamically
-                                        if (option.inputValue) {
-                                            return option.inputValue;
-                                        }
-                                        // Regular option
-                                        return option.id;
-                                    }}
-                                    renderOption={(props, option) => <li {...props}>{option.id}</li>}
+                                </ColumnElement>
 
-                                    freeSolo
-                                    renderInput={(params) => (
-                                        <TextField {...params} error={error.marca.error} label="Marca" />
-                                    )}
-                                />
+                            </RowTextField>
 
-                                {error.marca.error && <ErrorDisplay> <span>{error.marca.message}</span></ErrorDisplay>}
+                            <RowTextField>
+                                <ColumnElement>
 
+                                    <TextField fullWidth value={horometro}
+                                        label="Horometro"
+                                        id="formatted-numberformat-input"
+                                        variant="outlined"
+                                        onChange={(event) => {
+                                            setHorometro(event.target.value)
+                                        }}
+                                        InputProps={{
+                                            inputComponent: NumberFormatCustomWithoutPrefix,
+                                        }} />
+                                </ColumnElement>
+                                <ColumnElement>
+                                    <TextField value={ano} onChange={(event) => {
+                                        setAno(event.target.value)
+                                    }} fullWidth id="outlined-basic"
+                                        label="Año" variant="outlined" />
+                                </ColumnElement>
 
-                            </ColumnElement>
-                            <ColumnElement>
+                            </RowTextField>
 
-                                <Autocomplete
-                                    value={modelo}
-                                    onChange={(event, newValue) => {
-                                        console.log(newValue);
-                                        if (newValue === null || newValue === '') {
-                                            setError({ ...error, modelo: { error: true, message: 'Este campo no puede ser vacio' } })
-                                        } else {
-                                            setError({ ...error, modelo: { error: false, message: '' } });
-                                        }
-
-                                        console.log(error);
-                                        if (typeof newValue === 'string') {
-                                            setModelo({
-                                                id: newValue,
-                                            });
-                                        } else if (newValue && newValue.inputValue) {
-                                            setModelo({
-                                                id: newValue.inputValue,
-                                            });
-                                        } else {
-                                            setModelo(newValue);
-                                        }
-                                    }}
-                                    filterOptions={(options, params) => {
-                                        const filtered = filter(options, params);
-                                        const { inputValue } = params;
-                                        const isExisting = options.some((option) => inputValue === option.id);
-                                        if (inputValue !== '' && !isExisting) {
-                                            filtered.push({
-                                                inputValue,
-                                                id: `Añadir ${inputValue}`,
-                                            });
-                                        }
-
-                                        return filtered;
-                                    }}
-                                    selectOnFocus
-                                    clearOnBlur
-                                    handleHomeEndKeys
-                                    id="modelo"
-                                    options={modeloOpciones}
-
-                                    getOptionLabel={(option) => {
-                                        // Value selected with enter, right from the input
-                                        if (typeof option === 'string') {
-                                            return option;
-                                        }
-                                        // Add "xxx" option created dynamically
-                                        if (option.inputValue) {
-                                            return option.inputValue;
-                                        }
-                                        // Regular option
-                                        return option.id;
-                                    }}
-                                    renderOption={(props, option) => <li {...props}>{option.id}</li>}
-
-                                    freeSolo
-                                    renderInput={(params) => (
-                                        <TextField {...params} error={error.modelo.error} label="Modelo" />
-                                    )}
-                                />
-
-                                {error.modelo.error && <ErrorDisplay> <span>{error.modelo.message}</span></ErrorDisplay>}
-
-                            </ColumnElement>
-
-
-
-                        </RowTextField>
-
-
-                        <RowTextField>
-                            <ColumnElement>
-                               <TextField fullWidth id="outlined-basic" value={serie} onChange={(event) => {
-                                   if(event.target.value == null || event.target.value ==''){
-                                    setError({ ...error, serie: { error: true, message: 'Este campo no puede ser vacio' } })
-                                   }else{
-                                    setError({ ...error, serie: { error: false, message: '' } });
-                                   }
-                                    setSerie(event.target.value)
+                            <TextField
+                                value={precio}
+                                onChange={(event) => {
+                                    setPrecio(event.target.value)
                                 }}
-                                label="Serie" variant="outlined" error={error.serie.error} />
+                                label="Precio neto"
+                                name="numberformat"
+                                id="formatted-numberformat-input"
+                                variant="outlined"
 
-                                {error.serie.error && <ErrorDisplay> <span>{error.serie.message}</span></ErrorDisplay>}
+                                InputProps={{
+                                    inputComponent: NumberFormatCustom,
+                                }}
 
-                            </ColumnElement>
-                            <ColumnElement>
-                            <Autocomplete
-                                    value={mastil}
-                                    onChange={(event, newValue) => {
-                                      
-                                        if (typeof newValue === 'string') {
-                                            setMastil({
-                                                id: newValue,
-                                            });
-                                        } else if (newValue && newValue.inputValue) {
-                                            setMastil({
-                                                id: newValue.inputValue,
-                                            });
-                                        } else {
-                                            setMastil(newValue);
-                                        }
-                                    }}
-                                    filterOptions={(options, params) => {
-                                        const filtered = filter(options, params);
-                                        const { inputValue } = params;
-                                        const isExisting = options.some((option) => inputValue === option.id);
-                                        if (inputValue !== '' && !isExisting) {
-                                            filtered.push({
-                                                inputValue,
-                                                id: `Añadir ${inputValue}`,
-                                            });
-                                        }
+                            />
+                        </ColumnSpace>
+                        <ButtonSend size='large' onClick={enviar} variant="contained" endIcon={<SendIcon />} >Enviar</ButtonSend>
+                    </ContainerRegistro>
 
-                                        return filtered;
-                                    }}
-                                    selectOnFocus
-                                    clearOnBlur
-                                    handleHomeEndKeys
-                                    id="mastil"
-                                    options={mastilOpciones}
-
-                                    getOptionLabel={(option) => {
-                                        // Value selected with enter, right from the input
-                                        if (typeof option === 'string') {
-                                            return option;
-                                        }
-                                        // Add "xxx" option created dynamically
-                                        if (option.inputValue) {
-                                            return option.inputValue;
-                                        }
-                                        // Regular option
-                                        return option.id;
-                                    }}
-                                    renderOption={(props, option) => <li {...props}>{option.id}</li>}
-
-                                    freeSolo
-                                    renderInput={(params) => (
-                                        <TextField {...params}  label="Mastil" />
-                                    )}
-                                />
-                               
-                            </ColumnElement>
-                        </RowTextField>
-                        <RowTextField>
-                            <ColumnElement>
-                                <TextField fullWidth id="outlined-basic"
-                                    onChange={(event) => {
-                                        setAltura(event.target.value)
-                                    }}
-                                    value={altura}
-                                    InputProps={{
-                                        endAdornment: <InputAdornment position="start">mm</InputAdornment>,
-                                        inputComponent: NumberFormatCustomDecimal,
-                                    }}
-                                    label="Altura" variant="outlined" />
-
-                            </ColumnElement>
-                            <ColumnElement>
-                                <TextField value={capacidad} fullWidth
-                                    onChange={(event) => {
-                                        setCapacidad(event.target.value)
-                                    }}
-                                    InputProps={{
-                                        endAdornment: <InputAdornment position="start">kg</InputAdornment>,
-                                        inputComponent: NumberFormatCustomDecimal,
-                                    }}
-                                    id="outlined-basic"
-                                    label="Capacidad" variant="outlined" />
-
-                            </ColumnElement>
-
-                        </RowTextField>
-
-                        <RowTextField>
-                            <ColumnElement>
-
-                                <TextField fullWidth value={horometro}
-                                    label="Horometro" 
-                                    id="formatted-numberformat-input"
-                                    variant="outlined"
-                                    onChange={(event) => {
-                                        setHorometro(event.target.value)
-                                    }}
-                                    InputProps={{
-                                        inputComponent: NumberFormatCustomWithoutPrefix,
-                                    }} />
-                            </ColumnElement>
-                            <ColumnElement>
-                                <TextField value={ano} onChange={(event) => {
-                                    setAno(event.target.value)
-                                }} fullWidth id="outlined-basic"
-                                    label="Año" variant="outlined" />
-                            </ColumnElement>
-
-                        </RowTextField>
-
-                        <TextField
-                            value={precio}
-                            onChange={(event) => {
-                                setPrecio(event.target.value)
-                            }}
-                            label="Precio neto"
-                            name="numberformat"
-                            id="formatted-numberformat-input"
-                            variant="outlined"
-
-                            InputProps={{
-                                inputComponent: NumberFormatCustom,
-                            }}
-
-                        />
-                    </ColumnSpace>
-                    <ButtonSend size='large' onClick={enviar} variant="contained" endIcon={<SendIcon />} >Enviar</ButtonSend>
-                </ContainerRegistro>
-
-            </Paper>
-        </Grid>
+                </Paper>
+            </Grid>
         </motion.div>
     );
 
