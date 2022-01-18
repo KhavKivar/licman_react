@@ -223,18 +223,18 @@ export default function Registro() {
             tipo: tipo.id,
             marca: marca.id,
             modelo: modelo.id,
-            serie: serie.id,
-            capacidad: capacidad,
-            altura: altura,
-            mastil: mastil,
-            ano: parseInt(ano),
-            horometro: parseInt(horometro),
-            precio_neto: parseInt(precio),
+            serie: serie,
+            capacidad: capacidad != ''?capacidad:'0',
+            altura: altura != '' ? altura:'0',
+            mastil: mastil != null ? mastil.id :'',
+            ano: ano != '' ?parseInt(ano):0,
+            horometro: horometro != '' ?parseInt(horometro):0,
+            precio_neto: precio !='' ?parseInt(precio):0,
         };
 
         console.log(postData);
 
-
+        
         dispatch(addEquipo(postData));
         
 
@@ -278,7 +278,7 @@ export default function Registro() {
     const serieArray = [...new Set(inventarioList.map(x => x.serie))]
     const serieOpciones = []
 
-
+    const mastilOpciones = [{id:"Triple"},{id:"Doble"}]
 
     for (const element of codigoArray) {
         codigoOpciones.push({ id: element });
@@ -644,27 +644,34 @@ export default function Registro() {
 
                         <RowTextField>
                             <ColumnElement>
-                                <Autocomplete
-                                    value={serie}
-                                    onChange={(event, newValue) => {
-                                        console.log(newValue);
-                                        if (newValue === null || newValue === '') {
-                                            setError({ ...error, serie: { error: true, message: 'Este campo no puede ser vacio' } })
-                                        } else {
-                                            setError({ ...error, serie: { error: false, message: '' } });
-                                        }
+                               <TextField fullWidth id="outlined-basic" value={serie} onChange={(event) => {
+                                   if(event.target.value == null || event.target.value ==''){
+                                    setError({ ...error, serie: { error: true, message: 'Este campo no puede ser vacio' } })
+                                   }else{
+                                    setError({ ...error, serie: { error: false, message: '' } });
+                                   }
+                                    setSerie(event.target.value)
+                                }}
+                                label="Serie" variant="outlined" error={error.serie.error} />
 
-                                        console.log(error);
+                                {error.serie.error && <ErrorDisplay> <span>{error.serie.message}</span></ErrorDisplay>}
+
+                            </ColumnElement>
+                            <ColumnElement>
+                            <Autocomplete
+                                    value={mastil}
+                                    onChange={(event, newValue) => {
+                                      
                                         if (typeof newValue === 'string') {
-                                            setSerie({
+                                            setMastil({
                                                 id: newValue,
                                             });
                                         } else if (newValue && newValue.inputValue) {
-                                            setSerie({
+                                            setMastil({
                                                 id: newValue.inputValue,
                                             });
                                         } else {
-                                            setSerie(newValue);
+                                            setMastil(newValue);
                                         }
                                     }}
                                     filterOptions={(options, params) => {
@@ -683,8 +690,8 @@ export default function Registro() {
                                     selectOnFocus
                                     clearOnBlur
                                     handleHomeEndKeys
-                                    id="marca"
-                                    options={serieOpciones}
+                                    id="mastil"
+                                    options={mastilOpciones}
 
                                     getOptionLabel={(option) => {
                                         // Value selected with enter, right from the input
@@ -702,18 +709,10 @@ export default function Registro() {
 
                                     freeSolo
                                     renderInput={(params) => (
-                                        <TextField {...params} error={error.serie.error} label="Serie" />
+                                        <TextField {...params}  label="Mastil" />
                                     )}
                                 />
-
-                                {error.serie.error && <ErrorDisplay> <span>{error.serie.message}</span></ErrorDisplay>}
-
-                            </ColumnElement>
-                            <ColumnElement>
-                                <TextField fullWidth id="outlined-basic" value={mastil} onChange={(event) => {
-                                    setMastil(event.target.value)
-                                }}
-                                    label="Mastil" variant="outlined" />
+                               
                             </ColumnElement>
                         </RowTextField>
                         <RowTextField>
@@ -724,7 +723,7 @@ export default function Registro() {
                                     }}
                                     value={altura}
                                     InputProps={{
-                                        endAdornment: <InputAdornment position="start">m</InputAdornment>,
+                                        endAdornment: <InputAdornment position="start">mm</InputAdornment>,
                                         inputComponent: NumberFormatCustomDecimal,
                                     }}
                                     label="Altura" variant="outlined" />
