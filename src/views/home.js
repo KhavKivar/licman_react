@@ -1,6 +1,6 @@
 
 
-import MotionHoc from "./motionhoc";
+import MotionHoc from "../services/motionhoc";
 const HomeComponent = () =>{
     return <h1>Home</h1>;
  

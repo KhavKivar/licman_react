@@ -18,13 +18,13 @@ import NumberFormat from 'react-number-format';
 
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
-import API from '../services/api'
+import API from '../../services/api'
 
 import { motion } from "framer-motion";
 import { useSelector, useDispatch } from 'react-redux'
 
 
-import { addEquipo,editEquipo } from '../features/inventarioSlice'
+import { addEquipo,editEquipo } from '../../features/inventarioSlice'
 
 
 const ButtonSend = styled(Button)`
@@ -38,7 +38,7 @@ const ButtonSend = styled(Button)`
     }
 `;
 const Text = styled.div`
-    font-size: 2.5rem;
+    font-size: 2rem;
     text-align: center;
 `;
 
@@ -56,9 +56,9 @@ const ContainerRegistro = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: space-around;
-    gap:2rem;
+    gap:1.5rem;
     padding:1.5rem;
-    padding-bottom: 3rem;
+    padding-bottom: 1rem;
    
     margin-left: auto;
     margin-right: auto;
@@ -79,7 +79,7 @@ const ColumnElement = styled.div`
 flex-direction: column;
  display: flex;
  gap: 1rem;
- width: 48%;
+ width: 49%;
 `;
 
 const ErrorDisplay = styled.div`
@@ -187,9 +187,12 @@ export default function Registro() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const params = useParams();
+    
+  
 
     const equipo = inventarioList.find(function (post,index){
-        if(post.id == params.id){
+        if(post.idEquipo == params.id){
+           
             return true;
         }
     }
@@ -242,7 +245,7 @@ export default function Registro() {
        
 
         if(params.id == null){
-            postData.id = parseInt(codigo.id);
+            postData.idEquipo = parseInt(codigo.id);
             console.log(postData);
             dispatch(addEquipo(postData));
             axios.post(API.baseURL + '/api/equipo/', JSON.stringify(postData), {
@@ -265,7 +268,7 @@ export default function Registro() {
             });
 
             console.log(postData);
-            postData.id = parseInt(params.id);
+            postData.idEquipo = parseInt(params.id);
             dispatch(editEquipo(postData));
         }
      
@@ -287,7 +290,9 @@ export default function Registro() {
 
     const filter = createFilterOptions();
 
-    const codigoArray = inventarioList.map(x => x.id).map(String);
+
+    const codigoArray = inventarioList.map(x => x.idEquipo).map(String);
+
     const codigoOpciones = []
 
     const tipoArray = [...new Set(inventarioList.map(x => x.tipo))]
@@ -357,13 +362,13 @@ export default function Registro() {
 
             <Grid >
                 <Paper elevation={3} >
-                    <div style={{ float: "left", position: "absolute", marginLeft: "1.5rem",marginTop:"1rem" }}>
+                    <div style={{ float: "left", position: "absolute", marginLeft: "1.5rem",marginTop:"1.4rem" }}>
                         <BackButton onClick={backFunc} variant="contained" startIcon={<ArrowBackIcon />}>
                             Volver
                         </BackButton>
                     </div>
                     <ContainerRegistro>
-                        <Text> Registro</Text>
+                        <Text> Registro de equipo</Text>
                         <ColumnSpace>
                             <RowTextField>
                                 <ColumnElement>

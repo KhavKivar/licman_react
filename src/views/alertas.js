@@ -1,5 +1,5 @@
 
-import MotionHoc from "./motionhoc";
+import MotionHoc from "../services/motionhoc";
 const AlertaComponent = () =>{
     return <h1>Alerta</h1>;
  

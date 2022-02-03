@@ -15,16 +15,17 @@ import logo from '../logo.svg'
 
 import { Routes, Route } from 'react-router-dom';
 import Homef from '../views/home'
-import Inventario from '../views/inventario'
-import Movimiento from '../views/movimientos'
+import Inventario from '../views/InventarioUI/inventario'
+import Movimiento from '../views/movimiento'
 import Alerta from '../views/alertas'
-import Detalle from '../views/detalle';
+import TablaActa from '../views/InventarioUI/table_actas';
+
 
 import { NavLink, Link } from "react-router-dom";
 import SideBarTop from './sidebartop';
 import "./content.css";
 
-import Registro from '../views/registrarView';
+import Registro from '../views/InventarioUI/registrarView';
 
 const Container = styled.div`
 
@@ -160,7 +161,8 @@ export default function SideBar() {
               <Route path="/home" element={<Homef></Homef>} />
               <Route path="/inventario" element={<Inventario />}> </Route>
              
-              <Route path="/inventario/detalle" element={<Detalle />}> </Route>
+              <Route path="/inventario/detalle/:id" element={<TablaActa />}> </Route>
+
               <Route path="/registro" element={<Registro />}> </Route>
               <Route path="/registro/:id" element={<Registro />}> </Route>
               <Route path="/movimientos" element={<Movimiento />} />

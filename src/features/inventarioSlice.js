@@ -13,10 +13,10 @@ export const inventarioSlice = createSlice({
     },
     editEquipo:(state,action)=>{
       console.log(action.payload);
-      const indexEquipo = state.data.findIndex(x=>x.id == parseInt(action.payload.id));
+      const indexEquipo = state.data.findIndex(x=>x.idEquipo == parseInt(action.payload.idEquipo));
       if(indexEquipo >= 0){
   
-        state.data[indexEquipo].id =  action.payload.id;
+        
         state.data[indexEquipo] = action.payload;
 
      

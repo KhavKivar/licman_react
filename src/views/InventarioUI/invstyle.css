@@ -10,5 +10,19 @@
 }
 
 .MuiToolbar-root{
-  background-color:var(--dark);
+  background-color:var(--black);
+
+  color: white;
+}
+.MuiButtonBase-root{
+  color:white;
+}
+.MuiIconButton-root{
+  color: white;
+}
+.MuiIconButton-colorInherit{
+  color: white;
+}
+.MuiSvgIcon-root{
+  color: white;
 }
