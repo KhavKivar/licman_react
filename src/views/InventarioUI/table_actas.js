@@ -18,6 +18,8 @@ import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import IconButton from '@mui/material/IconButton';
 import { autocompleteClasses } from '@mui/material';
 import { motion } from "framer-motion";
+import {  validate, clean, format, getCheckDigit } from 'rut.js'
+
 
 import MotionHoc from "../../services/motionhoc";
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -95,8 +97,11 @@ const TablaActaComponent = ()=> {
                             return x.tipo =="acta_equipo" ? "Acta de equipo": "Acta electrica"
 
                     } },
-                    { title: 'Rut cliente', field: 'rut' },
+                    { title: 'Rut cliente', field: 'rut' ,render:x=>{
+                        return format(x.rut);
+                    }},
                     { title: 'Nombre cliente', field: 'nombre' },
+                    
                     { title: 'Fecha', field: 'ts',render:x=>{
                       
                         return x.ts.split("T")[0]+" "+x.ts.split("T")[1].substr(0,5);
@@ -136,11 +141,11 @@ const TablaActaComponent = ()=> {
                     },
                  
                     {
-                        icon: () => <ManageSearchIcon sx ={{color:"black"}}></ManageSearchIcon>,
+                        icon: () => <ManageSearchIcon sx ={{color:"black !important"}}></ManageSearchIcon>,
                        
-                        tooltip: 'Inspeccionar',
+                        tooltip: 'Ver acta',
                         onClick: (event,rowData) => {
-
+                            navigate('/acta/'+rowData.idInspeccion);
                           
                         }
                       },

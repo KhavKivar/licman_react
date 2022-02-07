@@ -111,7 +111,9 @@ const InventarioComponent= ()=> {
     });
 
   } 
-
+  function numberWithCommas(x) {
+    return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ".");
+}
   return (
 
 
@@ -125,12 +127,21 @@ const InventarioComponent= ()=> {
             { title: 'Marca', field: 'marca' },
             { title: 'Modelo', field: 'modelo' },
             { title: 'Serie', field: 'serie',hidden:true },
-            { title: 'Capacidad', field: 'capacidad', searchable: false,hidden:true  },
-            { title: 'Altura', field: 'altura', searchable: false,hidden:true  },
+            { title: 'Capacidad', field: 'capacidad', searchable: false,hidden:true,render:(row)=>{
+              return row.capacidad.replace(".",",")
+            }  },
+            { title: 'Altura', field: 'altura', searchable: false,render:(row)=>{
+              return row.altura.replace(".",",");
+            }  },
             { title: 'Mastil', field: 'mastil' },
             { title: 'Año', field: 'ano', searchable: false },
-            { title: 'Horometro', field: 'horometro',  searchable: false },
-            { title: 'Precio neto', field: 'precio_neto', type: "currency" }
+            { title: 'Horometro', field: 'horometro',  searchable: false ,render:(row)=>{
+              return row.horometro.toLocaleString('de-DE')
+            }},
+            { title: 'Precio neto', field: 'precio_neto', type: "numeric",render:(row) =>{
+
+              return "$"+row.precio_neto.toLocaleString('de-DE')
+            } }
 
 
           ]}
@@ -138,7 +149,7 @@ const InventarioComponent= ()=> {
           onChangeColumnHidden={(column,hidden) => {console.log(column);}}
           options={{
             rowStyle: (data, index) => index % 2 == 0 ? { background: "#f5f5f5" } : null,
-            searchFieldStyle: {color:"white",
+            searchFieldStyle: {color:"white"
             
           },
               
@@ -177,7 +188,7 @@ const InventarioComponent= ()=> {
             },
 
             {
-              icon: ()=> <CreateIcon sx ={{color:"black"}}></CreateIcon>,
+              icon: ()=> <CreateIcon sx ={{color:"black !important"}}></CreateIcon>,
               tooltip: 'Editar Equipo',
               onClick: (event,rowData) => {
                 
@@ -185,7 +196,7 @@ const InventarioComponent= ()=> {
               }
             },
             rowData => ({
-              icon: () => <ManageSearchIcon sx ={{color:"black"}}/>,
+              icon: () => <ManageSearchIcon sx ={{color:"black !important"}}/>,
               tooltip: 'Inspecionar',
               onClick: (event, rowData) => {
                 navigate('/inventario/detalle/'+rowData.idEquipo);

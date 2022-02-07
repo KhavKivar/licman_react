@@ -24,12 +24,12 @@ const Button = styled.button`
         transition: all 0.3s ease;
     }
     &::before{
-        top: ${(props) => props.clicked ? "1.5" : "1.3rem"};
+        top: ${(props) => props.clicked ? "" : "1.4rem"};
         transform: ${(props) => props.clicked ? "rotate(135deg)" : "rotate(0)"};
     }
 
     &::after{
-        top: ${(props) => props.clicked ? "1.2" : "1.8rem"};
+        top: ${(props) => props.clicked ? "" : "1.9rem"};
         transform: ${(props) => props.clicked ? "rotate(-135deg)" : "rotate(0)"};
 
     }

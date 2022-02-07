@@ -20,6 +20,7 @@ import Movimiento from '../views/movimiento'
 import Alerta from '../views/alertas'
 import TablaActa from '../views/InventarioUI/table_actas';
 
+import Acta from '../views/acta';
 
 import { NavLink, Link } from "react-router-dom";
 import SideBarTop from './sidebartop';
@@ -62,7 +63,7 @@ align-items: center;
 background-color: var(--black);
 padding: 2rem 0;
 
-top:5rem;
+top:  ${(props => props.clicked ? "6rem" : "5rem")};
 left:0;
 width: ${(props => props.clicked ? "17rem" : "3.5rem")};
 transition: all 0.35 ease;
@@ -165,8 +166,11 @@ export default function SideBar() {
 
               <Route path="/registro" element={<Registro />}> </Route>
               <Route path="/registro/:id" element={<Registro />}> </Route>
+              <Route path="/acta/:id" element={<Acta />} />
+
               <Route path="/movimientos" element={<Movimiento />} />
               <Route path="/alerta" element={<Alerta />} />
+
 
             </Routes>
 

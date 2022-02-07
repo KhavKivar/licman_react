@@ -14,15 +14,12 @@
 
   color: white;
 }
-.MuiButtonBase-root{
-  color:white;
-}
-.MuiIconButton-root{
+
+.MuiInputBase-root .MuiSvgIcon-root{
   color: white;
 }
-.MuiIconButton-colorInherit{
-  color: white;
-}
-.MuiSvgIcon-root{
+
+
+.MuiToolbar-root .MuiBox-root .MuiSvgIcon-root{
   color: white;
 }

@@ -79,7 +79,7 @@ const MovimientoComponent = () => {
             },
          
             {
-                icon: () => <ManageSearchIcon sx ={{color:"black"}}></ManageSearchIcon>,
+                icon: () => <ManageSearchIcon sx ={{color:"black !important"}}></ManageSearchIcon>,
                
                 tooltip: 'Inspeccionar',
                 onClick: (event,rowData) => {
