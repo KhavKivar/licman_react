@@ -1,30 +1,23 @@
-import Grid from '@mui/material/Grid';
-
-import TextField from '@mui/material/TextField';
-import Paper from '@mui/material/Paper';
-import styled from 'styled-components';
-import Button from '@mui/material/Button';
-import SendIcon from '@mui/icons-material/Send';
-
-import InputAdornment from '@mui/material/InputAdornment';
-
-import { forwardRef, useState } from 'react';
-import axios from "axios";
-
-
-import { useNavigate, useParams } from 'react-router-dom';
-
-import NumberFormat from 'react-number-format';
-
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import SendIcon from '@mui/icons-material/Send';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
-import API from '../../services/api'
-
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import InputAdornment from '@mui/material/InputAdornment';
+import Paper from '@mui/material/Paper';
+import TextField from '@mui/material/TextField';
+import axios from "axios";
 import { motion } from "framer-motion";
-import { useSelector, useDispatch } from 'react-redux'
+import { forwardRef, useState } from 'react';
+import NumberFormat from 'react-number-format';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
+import styled from 'styled-components';
+import { addEquipo, editEquipo } from '../../features/inventarioSlice';
+import API from '../../services/api';
 
 
-import { addEquipo,editEquipo } from '../../features/inventarioSlice'
+
 
 
 const ButtonSend = styled(Button)`
@@ -59,12 +52,8 @@ const ContainerRegistro = styled.div`
     gap:1.5rem;
     padding:1.5rem;
     padding-bottom: 1rem;
-   
     margin-left: auto;
     margin-right: auto;
-   
-
- 
 `;
 
 
@@ -189,10 +178,11 @@ export default function Registro() {
     const params = useParams();
     
   
+  
 
+    
     const equipo = inventarioList.find(function (post,index){
         if(post.idEquipo == params.id){
-           
             return true;
         }
     }
@@ -826,305 +816,3 @@ export default function Registro() {
 
 }
 
-/*
-
-   <form >
-                        <ColumnSpace>
-                            <RowTextField>
-                                <ColumnElement>
-                                    <Controller
-                                        name="id"
-                                        control={control}
-                                        rules={{
-                                            required: true,
-                                            pattern: {
-                                                value: /^\d+$/,
-                                            },
-                                            validate:(value)=>{
-                                                return !codigoOpciones.includes(value) 
-                                            },
-                                        }}
-
-                                        render={({ field, fieldState }) =>
-                                            <Autocomplete
-                                                {...field}
-                                                freeSolo
-                                                value = {codigo}
-                                                handleHomeEndKeys
-                                                clearOnBlur
-                                                selectOnFocus
-                                                options={codigoOpciones}
-                                                onChange={(event, newValue) => {
-                                                   if(newValue != null && newValue.includes("Añadir")){
-                                                        console.log(newValue);
-                                                        setCodigo( newValue.replace("Añadir ", ""));
-
-                                                   }else{
-                                                    setCodigo( newValue);
-                                                   }
-                                                  }}
-                                                filterOptions={(options, params) => {
-                                                const filtered = filter(options , params);
-                                        
-                                                const { inputValue } = params;
-                                                // Suggest the creation of a new value
-                                                const isExisting = options.some((option) => inputValue === option);
-                                                if (inputValue !== '' && !isExisting) {
-                                                    filtered.push(
-                                                         "Añadir "+inputValue,
-                                                    );
-                                                }
-                                        
-                                                return filtered;
-                                                }}
-
-                                                getOptionDisabled={(option) =>
-                                                    codigoOpciones.includes(option)
-                                                }
-                                               
-                                                renderInput={(params) => <TextField     {...params} error={!!fieldState.error}
-                                                    label="Codigo" />}
-                                               
-                                            />
-
-                                        }
-                                    />
-
-                                    {errors.id && errors.id.type === "required" && <ErrorDisplay> <span>Este campo no puede ser vacio</span></ErrorDisplay>}
-                                    {errors.id && errors.id.type === "pattern" && <ErrorDisplay> <span>Este campo solo permite numeros enteros</span></ErrorDisplay>}
-
-                                    {errors.id && errors.id.type === "validate" && <ErrorDisplay> <span>EL codigo ya existe</span></ErrorDisplay>}
-                                </ColumnElement>
-                                <ColumnElement>
-                                    <Controller
-                                        name="tipo"
-                                        control={control}
-                                        rules={{ required: true }}
-                                        render={({ field, fieldState }) =>
-                                            <Autocomplete
-                                                {...field}
-                                                freeSolo
-                                                options={tipoOpciones}
-                                                renderInput={(params) => <TextField     {...params} error={!!fieldState.error}
-                                                    label="Tipo" />}
-                                                onChange={(_, data) => field.onChange(data)}
-                                            />
-
-                                        }
-                                    />
-
-
-
-                                </ColumnElement>
-                            </RowTextField>
-                            <RowTextField>
-
-                                <ColumnElement>
-                                    <Controller
-                                        name="marca"
-                                        control={control}
-                                        rules={{ required: true }}
-                                        render={({ field, fieldState }) =>
-                                            <Autocomplete
-                                                {...field}
-                                                freeSolo
-                                                options={marcaOpciones}
-                                                renderInput={(params) => <TextField     {...params} error={!!fieldState.error}
-                                                    label="Marca" />}
-                                                onChange={(_, data) => field.onChange(data)}
-                                            />
-
-                                        }
-                                    />
-
-                                    {errors.marca && errors.marca.type === "required" && <ErrorDisplay> <span>Este campo no puede ser vacio</span></ErrorDisplay>}
-                                </ColumnElement>
-
-                                <ColumnElement>
-
-                                    <Controller
-                                        name="modelo"
-                                        control={control}
-                                        rules={{ required: true }}
-                                        render={({ field, fieldState }) =>
-                                            <Autocomplete
-                                                {...field}
-                                                freeSolo
-                                                options={modeloOpciones}
-                                                renderInput={(params) => <TextField     {...params} error={!!fieldState.error}
-                                                    label="Modelo" />}
-                                                onChange={(_, data) => field.onChange(data)}
-                                            />
-
-                                        }
-                                    />
-
-
-                                    {errors.modelo && errors.modelo.type === "required" && <ErrorDisplay> <span>Este campo no puede ser vacio</span></ErrorDisplay>}
-                                </ColumnElement>
-                            </RowTextField>
-
-                            <RowTextField>
-
-                                <ColumnElement>
-                                    <Controller
-                                        name="serie"
-                                        control={control}
-                                        rules={{ required: true }}
-                                        render={({ field, fieldState }) =>
-                                            <Autocomplete
-                                                {...field}
-                                                freeSolo
-                                                options={serieOpciones}
-                                                renderInput={(params) => <TextField     {...params} error={!!fieldState.error}
-                                                    label="Serie" />}
-                                                onChange={(_, data) => field.onChange(data)}
-                                            />
-
-                                        }
-                                    />
-                                    {errors.serie && errors.serie.type === "required" && <ErrorDisplay> <span>Este campo no puede ser vacio</span></ErrorDisplay>}
-                                </ColumnElement>
-
-                                <ColumnElement>
-                                    <Controller
-                                        name="capacidad"
-                                        control={control}
-                                        rules={{
-
-                                        }}
-                                        render={({ field }) =>
-                                            <TextField fullWidth
-
-                                                InputProps={{
-                                                    endAdornment: <InputAdornment position="start">kg</InputAdornment>,
-                                                    inputComponent: NumberFormatCustomDecimal,
-                                                }}
-
-                                                id="outlined-basic"
-                                                label="Capacidad" variant="outlined" {...field} />
-                                        }
-                                    />
-
-                                </ColumnElement>
-                            </RowTextField>
-
-                            <RowTextField>
-                                <ColumnElement>
-                                    <Controller
-                                        name="altura"
-                                        control={control}
-                                        rules={{
-
-                                        }}
-                                        render={({ field }) =>
-                                            <TextField fullWidth id="outlined-basic"
-                                                InputProps={{
-                                                    endAdornment: <InputAdornment position="start">m</InputAdornment>,
-                                                    inputComponent: NumberFormatCustomDecimal,
-                                                }}
-                                                label="Altura" variant="outlined" {...field} />
-                                        }
-                                    />
-
-                                </ColumnElement>
-
-                                <ColumnElement>
-                                    <Controller
-                                        name="mastil"
-                                        control={control}
-                                        rules={{}}
-                                        render={({ field }) =>
-                                            <TextField fullWidth id="outlined-basic"
-
-
-
-                                                label="Mastil" variant="outlined" {...field} />
-                                        }
-
-
-                                    />
-                                </ColumnElement>
-                            </RowTextField>
-
-
-                            <RowTextField>
-                                <ColumnElement>
-                                    <Controller
-                                        name="horometro"
-                                        control={control}
-                                        rules={{
-
-                                        }}
-                                        render={({ field }) =>
-                                            <TextField fullWidth
-                                                label="Horometro" variant="outlined"
-                                                id="formatted-numberformat-input"
-                                                variant="outlined"
-
-                                                InputProps={{
-                                                    inputComponent: NumberFormatCustomWithoutPrefix,
-                                                }} {...field} />
-                                        }
-                                    />
-
-                                </ColumnElement>
-                                <ColumnElement>
-                                    <Controller
-                                        name="ano"
-                                        control={control}
-                                        rules={{
-
-                                            pattern: {
-                                                value: /^\d+$/,
-
-                                            }
-
-                                        }}
-                                        render={({ field }) =>
-                                            <TextField fullWidth id="outlined-basic"
-                                                label="Año" variant="outlined" {...field} />
-                                        }
-                                    />
-                                    {errors.ano && errors.ano.type === "pattern" && <ErrorDisplay> <span>Este campo solo permite numeros enteros</span></ErrorDisplay>}
-                                </ColumnElement>
-                            </RowTextField>
-
-
-
-                            <Controller
-
-                                name="precio_neto"
-                                control={control}
-                                rules={{
-                                    pattern: {
-                                        value: /^\d+$/,
-
-                                    }
-
-                                }}
-
-                                render={({ field }) =>
-                                    <TextField
-                                        label="Precio neto"
-                                        name="numberformat"
-                                        id="formatted-numberformat-input"
-                                        variant="outlined"
-                                        {...field}
-                                        InputProps={{
-                                            inputComponent: NumberFormatCustom,
-                                        }}
-
-                                    />
-                                }
-                            />
-
-
-
-
-                        </ColumnSpace>
-
-                    </form>
-
-
-*/

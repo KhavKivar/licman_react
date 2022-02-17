@@ -9,19 +9,14 @@ export const inventarioSlice = createSlice({
         state.data = action.payload;
     },
     addEquipo:(state,action)=>{
-        state.data.push(action.payload);
+        state.data.unshift(action.payload);
     },
     editEquipo:(state,action)=>{
       console.log(action.payload);
       const indexEquipo = state.data.findIndex(x=>x.idEquipo == parseInt(action.payload.idEquipo));
-      if(indexEquipo >= 0){
-  
-        
+      if(indexEquipo >= 0){        
         state.data[indexEquipo] = action.payload;
-
-     
       }
-      
     }
   },
 })

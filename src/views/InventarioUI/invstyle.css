@@ -15,7 +15,14 @@
   color: white;
 }
 
-.MuiInputBase-root .MuiSvgIcon-root{
+
+.MuiToolbar-root .MuiInput-underline::before {
+  color: white !important;
+ border-color: white !important;
+ border-bottom-color: white  !important;
+}
+
+.MuiToolbar-root .MuiInputBase-root .MuiSvgIcon-root{
   color: white;
 }
 

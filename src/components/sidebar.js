@@ -1,32 +1,31 @@
 
-import styled from 'styled-components';
-import React, { useState } from 'react';
-
-
-
+import Assignment from '@mui/icons-material/Assignment';
 import Home from '@mui/icons-material/Home';
-import Assignment from '@mui/icons-material/Assignment'
-import CampaignIcon from '@mui/icons-material/Campaign';
+import SettingsIcon from '@mui/icons-material/Settings';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
-
-
-
-import logo from '../logo.svg'
-
-import { Routes, Route } from 'react-router-dom';
-import Homef from '../views/home'
-import Inventario from '../views/InventarioUI/inventario'
-import Movimiento from '../views/movimiento'
-import Alerta from '../views/alertas'
-import TablaActa from '../views/InventarioUI/table_actas';
-
+import React, { useState } from 'react';
+import { NavLink, Route, Routes } from 'react-router-dom';
+import styled from 'styled-components';
+import logo from '../logo.svg';
 import Acta from '../views/acta';
-
-import { NavLink, Link } from "react-router-dom";
-import SideBarTop from './sidebartop';
-import "./content.css";
-
+import AddMov from '../views/addmov';
+import Homef from '../views/home';
+import Inventario from '../views/InventarioUI/inventario';
 import Registro from '../views/InventarioUI/registrarView';
+import TablaActa from '../views/InventarioUI/table_actas';
+import Movimiento from '../views/movimiento';
+import TabConfig from '../views/Settings/TabTabla';
+import ShowPdf from '../views/showpdf';
+import "./content.css";
+import SideBarTop from './sidebartop';
+
+
+
+
+
+
+
+
 
 const Container = styled.div`
 
@@ -150,9 +149,9 @@ export default function SideBar() {
                 <Text clicked={click} >Movimientos</Text>
               </Item >
 
-              <Item onClick={() => setClick(false)} exact="true" activeclassname="active" to="/alerta">
-                <CampaignIcon />
-                <Text clicked={click} >Alertas</Text>
+              <Item onClick={() => setClick(false)} exact="true" activeclassname="active" to="/config">
+                <SettingsIcon />
+                <Text clicked={click} >Configuraciones</Text>
               </Item>
             </SlickBar>
           </SideBarContainer>
@@ -161,6 +160,8 @@ export default function SideBar() {
               <Route exact path="/" element={<Homef></Homef>} />
               <Route path="/home" element={<Homef></Homef>} />
               <Route path="/inventario" element={<Inventario />}> </Route>
+
+              <Route path="/inventario/search/:value" element={<Inventario />}> </Route>
              
               <Route path="/inventario/detalle/:id" element={<TablaActa />}> </Route>
 
@@ -168,8 +169,15 @@ export default function SideBar() {
               <Route path="/registro/:id" element={<Registro />}> </Route>
               <Route path="/acta/:id" element={<Acta />} />
 
+              <Route path="/movimientos/registro" element={<AddMov />} />
+              <Route path="/movimientos/registro/:id" element={<AddMov />} />
+
+
+              <Route path="/movimientos/showPdf/:id" element={<ShowPdf />} />
+
+
               <Route path="/movimientos" element={<Movimiento />} />
-              <Route path="/alerta" element={<Alerta />} />
+              <Route path="/config" element={<TabConfig />} />
 
 
             </Routes>

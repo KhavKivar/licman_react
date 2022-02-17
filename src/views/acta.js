@@ -1,37 +1,31 @@
-import * as React from 'react';
-import PropTypes from 'prop-types';
-import SwipeableViews from 'react-swipeable-views';
-import { useTheme } from '@mui/material/styles';
-import AppBar from '@mui/material/AppBar';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import { useNavigate, useParams } from 'react-router-dom';
-import MotionHoc from "../services/motionhoc";
-
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import BiotechIcon from '@mui/icons-material/Biotech';
-import ElectricalServicesIcon from '@mui/icons-material/ElectricalServices';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
-import SpeedIcon from '@mui/icons-material/Speed';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useSelector, useDispatch } from 'react-redux'
 import EditIcon from '@mui/icons-material/Edit';
+import ElectricalServicesIcon from '@mui/icons-material/ElectricalServices';
+import SpeedIcon from '@mui/icons-material/Speed';
+import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Checkbox from '@mui/material/Checkbox';
+import Divider from '@mui/material/Divider';
+import FormControl from '@mui/material/FormControl';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormGroup from '@mui/material/FormGroup';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import Divider from '@mui/material/Divider';
-import InboxIcon from '@mui/icons-material/Inbox';
-import DraftsIcon from '@mui/icons-material/Drafts';
-import Checkbox from '@mui/material/Checkbox';
+import { useTheme } from '@mui/material/styles';
+import Tab from '@mui/material/Tab';
+import Tabs from '@mui/material/Tabs';
+import PropTypes from 'prop-types';
+import * as React from 'react';
+import { useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
+import SwipeableViews from 'react-swipeable-views';
+import { format } from 'rut.js';
+import MotionHoc from "../services/motionhoc";
 
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormControl from '@mui/material/FormControl';
-import FormLabel from '@mui/material/FormLabel';
 
 
 
@@ -47,7 +41,7 @@ function TabPanel(props) {
             {...other}
         >
             {value === index && (
-                <Box sx={{ paddingTop:0.5,paddingLeft:3,paddingRight:3,paddingBottom:2 }}>
+                <Box sx={{ paddingTop: 0.5, paddingLeft: 3, paddingRight: 3, paddingBottom: 2 }}>
                     {children}
                 </Box>
             )}
@@ -76,48 +70,54 @@ const ActaComponent = () => {
     const actaList = useSelector((state) => state.acta.data);
 
     const acta = actaList.find((x) => x.idInspeccion == params.id);
-    console.log("das" + acta);
+
 
 
     const handleChange = (event, newValue) => {
         if (newValue == 0) {
             console.log(newValue);
             navigate(-1);
+        } else {
+
+
+            setValue(newValue);
         }
-        setValue(newValue);
     };
 
     const handleChangeIndex = (index) => {
 
         setValue(index);
     };
-    const generateRow = (key, value, initial, param,obj) => {
+    const generateRow = (key, value, initial, param, obj) => {
         return (
-            <>        <ListItem disablePadding>
+            <>        <ListItem sx={{ key: key }} disablePadding>
                 <ListItemText primary={key} />
                 {param != undefined && <>Cantidad: {param} </>}
                 {obj != undefined && <>{obj[0]} {obj[1]} </>}
-                <FormControl component="fieldset">
+                <FormControl component="fieldset" >
                     <FormGroup aria-label="position" row>
-                        
+
                         <FormControlLabel
+
                             value="top"
                             control={<Checkbox disableRipple={true} checked={value == 'bueno' ? true : false} />}
-                            label={ initial ? "Bueno" : "" }
+                            label={initial ? "Bueno" : ""}
                             labelPlacement="top"
-                            sx={{ color: initial ? "black" : "white",paddingRight: initial ? 0:2 }}
+                            sx={{ color: initial ? "black" : "white", paddingRight: initial ? 0 : 2 }}
                         />
                         <FormControlLabel
+
                             value="top"
                             control={<Checkbox disableRipple={true} checked={value == 'regular' ? true : false} />}
-                            label={ initial ? "Regular  " : "" }
+                            label={initial ? "Regular  " : ""}
                             labelPlacement="top"
-                            sx={{ color: initial ? "black" : "white" ,paddingRight: initial ? 0:1.3}}
+                            sx={{ color: initial ? "black" : "white", paddingRight: initial ? 0 : 1.3 }}
                         />
                         <FormControlLabel
+
                             value="top"
                             control={<Checkbox disableRipple={true} checked={value == 'malo' ? true : false} />}
-                            label={ initial ? "Malo  " : "" }
+                            label={initial ? "Malo  " : ""}
                             labelPlacement="top"
                             sx={{ color: initial ? "black" : "white" }}
                         />
@@ -128,7 +128,7 @@ const ActaComponent = () => {
         );
     }
     const generatedItemList = (index) => {
-        console.log(acta.tipo)
+
         var itemMap;
         var newFieldsMap;
         var itemSpecial = {
@@ -147,10 +147,10 @@ const ActaComponent = () => {
 
         if (acta.tipo == "acta_equipo") {
             newFieldsMap = {
-                "Carro y su respaldo de carga":["Respaldo de carga: ", acta.carga == 1? "SI":"NO"],
-                "Arnes de cilindro de gas":["Cilindro de gas: ",acta.cilindroDeGas == 1? "SI":"NO"],
-        
-              };
+                "Carro y su respaldo de carga": ["Respaldo de carga: ", acta.carga == 1 ? "SI" : "NO"],
+                "Arnes de cilindro de gas": ["Cilindro de gas: ", acta.cilindroDeGas == 1 ? "SI" : "NO"],
+
+            };
             itemMap = {
                 1: {
                     "Alarma de retroceso": acta.alarmaRetroceso,
@@ -245,13 +245,13 @@ const ActaComponent = () => {
             }
         } else {
             newFieldsMap = {
-                "Carro y su respaldo de carga":["Respaldo de carga: ", acta.carga == 1? "Si":"NO"],
-                "Serie cargador":["Serie: ",acta.serieCargardorText],
-                "Bateria":["Observaciones: ",acta.bateriaObservaciones],
-                "Cargador voltaje y amperaje":["Voltaje: ",acta.cargadorVoltajeInfo+"V"],
-                "Enchufes":["Tipo enchufe: ", acta.enchufeInfo.split("-")[0]+"V "+ "polo "+acta.enchufeInfo.split("-")[1] ],
-              };
-        
+                "Carro y su respaldo de carga": ["Respaldo de carga: ", acta.carga == 1 ? "Si" : "NO"],
+                "Serie cargador": ["Serie: ", acta.serieCargardorText],
+                "Bateria": ["Observaciones: ", acta.bateriaObservaciones],
+                "Cargador voltaje y amperaje": ["Voltaje: ", acta.cargadorVoltajeInfo + "V"],
+                "Enchufes": ["Tipo enchufe: ", acta.enchufeInfo.split("-")[0] + "V " + "polo " + acta.enchufeInfo.split("-")[1]],
+            };
+
             itemMap = {
                 1: {
                     'Alarma retroceso':
@@ -346,23 +346,23 @@ const ActaComponent = () => {
 
         let rows = [];
 
-     
+
         var initial = true;
-    
-        for (var i in itemMap[index]) {   
-           
-            let row = generateRow(i, itemMap[index][i], initial, i in itemSpecial ? itemSpecial[i]:undefined,
-                i in newFieldsMap ? newFieldsMap[i]:undefined
-                );
+
+        for (var i in itemMap[index]) {
+
+            let row = generateRow(i, itemMap[index][i], initial, i in itemSpecial ? itemSpecial[i] : undefined,
+                i in newFieldsMap ? newFieldsMap[i] : undefined
+            );
 
             rows.push(row);
             initial = false;
-            
+
 
 
         }
 
-        return (<List>
+        return (<List key={index}>
             {rows}
 
         </List>);
@@ -371,7 +371,7 @@ const ActaComponent = () => {
     return (
         <Box sx={{ bgcolor: 'white' }}>
             <AppBar position="static">
-                <Tabs
+                <Tabs TabIndicatorProps={{ style: { background: 'white' } }}
                     sx={{ bgcolor: "var(--black)" }}
 
 
@@ -392,53 +392,75 @@ const ActaComponent = () => {
                     <Tab icon={<EditIcon>   </EditIcon>} iconPosition="start" label="Firma y observaciones" {...a11yProps(6)} />
                 </Tabs>
             </AppBar>
+
+            {acta == undefined ? <></>:
             <SwipeableViews
                 axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                 index={value}
                 onChangeIndex={handleChangeIndex}
             >
-                <TabPanel value={value} index={0} dir={theme.direction}>
-
+                <TabPanel key={0} value={value} index={0} dir={theme.direction}>
                 </TabPanel>
-                <TabPanel value={value} index={1} dir={theme.direction}>
+                <TabPanel key={1} value={value} index={1} dir={theme.direction}>
                     {generatedItemList(1)}
                 </TabPanel>
-                <TabPanel value={value} index={2} dir={theme.direction}>
+                <TabPanel key={2} value={value} index={2} dir={theme.direction}>
                     {generatedItemList(2)}
                 </TabPanel>
-                <TabPanel value={value} index={3} dir={theme.direction}>
+                <TabPanel key={3} value={value} index={3} dir={theme.direction}>
                     {generatedItemList(3)}
                 </TabPanel>
-                <TabPanel value={value} index={4} dir={theme.direction}>
+                <TabPanel key={4} value={value} index={4} dir={theme.direction}>
                     {generatedItemList(4)}
                 </TabPanel>
-                <TabPanel value={value} index={5} dir={theme.direction}>
+                <TabPanel key={5} value={value} index={5} dir={theme.direction}>
                     {generatedItemList(5)}
                 </TabPanel>
-                <TabPanel value={value} index={6} dir={theme.direction}>
-                    <div>         
-                             
-                        <h2>Firma:</h2>
-                        <div style={{paddingBottom:20,paddingTop:20}}>
+                <TabPanel key={6} value={value} index={6} dir={theme.direction}>
+                    <div style={{ paddingBottom: 20, paddingTop: 20 }}>
                         <Box
-                        component="img"
-                        sx={{
-                       
-                            maxHeight: { xs: 233, md: 167 },
-                            maxWidth: { xs: 350, md: 250 },
-                        }}
-                        alt="Firma"
-                        src={acta.firmaURL}
-                    />
+                            component="img"
+                            sx={{
+
+                                maxHeight: { xs: 233, md: 167 },
+                                maxWidth: { xs: 350, md: 250 },
+                            }}
+                            alt="Firma"
+                            src={acta.firmaURL}
+                        />
                     </div>
-                    <h2>Observaciones:</h2>
-                    {acta.observacion}
-                    <h3>Altura de levante: {acta.alturaLevante} mm</h3>
-                    
-               </div>
+                    <List>
+                        <ListItem disablePadding>
+                            <ListItemText primary={"Rut Cliente"} ></ListItemText>
+                            { format(acta.rut)}
+                        </ListItem>
+                        <Divider></Divider>
+                        <ListItem disablePadding>
+                            <ListItemText primary={"Nombre Cliente"} ></ListItemText>
+                            {acta.nombre}
+                        </ListItem>
+                        <Divider></Divider>
+                        <ListItem disablePadding>
+                            <ListItemText primary={"Observaciones"} ></ListItemText>
+                            {acta.observacion}
+                        </ListItem>
+                        <Divider></Divider>
+                        <ListItem disablePadding>
+                            <ListItemText primary={"Altura de levante"} ></ListItemText>
+                            {acta.alturaLevante} mm
+                        </ListItem>
+                        <Divider></Divider>
+                        <ListItem disablePadding>
+                            <ListItemText primary={"Horometro registrado"} ></ListItemText>
+                            {acta.horometroActual}
+                        </ListItem>
+
+                    </List>
+                 
 
                 </TabPanel>
             </SwipeableViews>
+            }
         </Box>
     );
 }
