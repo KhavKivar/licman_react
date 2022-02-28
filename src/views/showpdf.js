@@ -59,7 +59,7 @@ export default function ShowPdf() {
             nombreCliente = cliente.find(x => x.rut == mov.rut).nombre;
             idEquipo = actas.find(x => x.idInspeccion == mov.idInspeccion).idEquipo;
             url = mov.urlGuiaDespacho;
-            console.log(mov);
+           
         }
 
 
@@ -75,7 +75,7 @@ export default function ShowPdf() {
 
     function onDocumentLoadSuccess({ numPages }) {
         setNumPages(numPages);
-        setPageNumber(1);
+        
     }
 
     function changePage(offset) {
@@ -90,7 +90,7 @@ export default function ShowPdf() {
         changePage(1);
     }
 
-    console.log(url);
+    
     const backFunc = () => {
         navigate(-1);
     }
@@ -194,7 +194,7 @@ export default function ShowPdf() {
                                 variant="contained" disabled={pageNumber >= numPages} onClick={nextPage}>  Siguiente</Button>
                             </div>
                             <Button 
-                             sx={{background:"var(--black)"}} 
+                             sx={{background:"var(--black)"}}   
                              onClick={downloadDocument}
                             startIcon={<DownloadIcon></DownloadIcon>} variant="contained">Descargar</Button>
                         </div>

@@ -16,7 +16,7 @@ import API from '../services/api';
 import ApiObjectCall from '../services/callServices';
 import MotionHoc from "../services/motionhoc";
 
-
+import CircularProgress from '@mui/material/CircularProgress';
 
 const rows = [{
     fecha_entrada: "03/01/2021", transporte: "MARCO", empresa_envio: "DVP", retiro: "X", cambio: "O",
@@ -40,8 +40,9 @@ const MovimientoComponent = () => {
 
 
     for (var i in editable) {
-        if (actas != null) {
-
+        if (actas.length >0 && cliente.length > 0) {
+            console.log(actas);
+            console.log(cliente)
             editable[i].idEquipo = actas.find(x => x.idInspeccion == editable[i].idInspeccion).idEquipo;
             editable[i].empresa = cliente.find(x => x.rut == editable[i].rut).nombre;
             rowsWithPower.push(editable[i]);
@@ -69,6 +70,13 @@ const MovimientoComponent = () => {
 
 
     return (<>
+{  cliente.length == 0 || actas.length==0  ? 
+       
+       <div style={{  lineHeight: "500px",textAlign:"center"}}>
+       <CircularProgress /> 
+       </div>
+       :
+
 
         <MaterialTable
             localization={{
@@ -241,6 +249,7 @@ const MovimientoComponent = () => {
 
 
         </MaterialTable>
+}
         {openMessage && <div style={{ position: "absolute", right: "80px", bottom: "0px", paddingBottom: 20 }}>
             <Alert severity="success">
                 <AlertTitle>Exito</AlertTitle>
@@ -248,7 +257,9 @@ const MovimientoComponent = () => {
 
             </Alert>
         </div>}
+
     </>
+    
     );
 }
 

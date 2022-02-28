@@ -13,8 +13,12 @@
   background-color:var(--black);
 
   color: white;
+  border-radius: 5px 5px 0px 0px;
 }
 
+.MuiTablePagination-toolbar{
+  border-radius: 0px 0px 5px 5px !important;
+}
 
 .MuiToolbar-root .MuiInput-underline::before {
   color: white !important;
@@ -29,4 +33,6 @@
 
 .MuiToolbar-root .MuiBox-root .MuiSvgIcon-root{
   color: white;
+
 }
+

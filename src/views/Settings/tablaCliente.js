@@ -13,13 +13,19 @@ import API from '../../services/api';
 import ApiObjectCall from '../../services/callServices';
 import AddBox from '@mui/icons-material/AddBox';
 import { forwardRef } from 'react';
+import Select from 'react-select';
+import { setInventarioValue, setSettingValue } from '../../features/generalStateSlice';
+import ContentPasteIcon from '@mui/icons-material/ContentPaste';
+import Assignment from '@mui/icons-material/Assignment';
+import ViewColumnIcon from '@mui/icons-material/ViewColumn';
+import PersonIcon from '@mui/icons-material/Person';
+import ImageIcon from '@mui/icons-material/Image';
 
-
-
-
-
-
-
+const options = [
+    { value: 'Clientes', label: 'Clientes' },
+    { value: 'Imagenes', label: 'Imagenes' },
+  
+  ]
 
 const TablaCliente = () => {
     const navigate = useNavigate();
@@ -40,14 +46,24 @@ const TablaCliente = () => {
         ApiObjectCall(dispatch);
         setTimeout(() => { setOpenMessage(false) }, 3000);
       }
+    const tabSelect = useSelector((state) => state.generalState.settingValue);
+
+      
+  const handleChange = (e) => {
+    dispatch(setSettingValue(e));
+
+  }
 
 
+      
     return (
         <>
         <MaterialTable
+        
             title="Lista de clientes"
             icons={{
-                Add: forwardRef((props, ref) => <AddBox sx={{ marginBottom: 0.7 }}{...props} ref={ref} />),
+                Add: forwardRef((props, ref) => <AddBox sx={{ marginBottom: 1 }}{...props} ref={ref} />),
+                ViewColumn: forwardRef((props, ref) => <ViewColumnIcon sx={{ marginTop: 0.6 }}   {...props} ref={ref} />)
               }}
             
             columns={[
@@ -130,12 +146,13 @@ const TablaCliente = () => {
 
                   
                 },
+              
 
                 headerStyle: {
 
                     background: "var(--black)", color: "white", fontFamily: '"Poppins", sans-serif', fontSize: "1rem"
                 },
-                columnsButton: true,
+            
                 actionsColumnIndex: -1,
 
 
@@ -145,17 +162,35 @@ const TablaCliente = () => {
 
             actions={[
 
+           
+
                 {
+                    icon: () => <div style={{ width: 250, height: 45, margin: "auto",marginLeft:10 }} > <Select
+                      getOptionLabel={e => (
+      
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                          {e.label == "Clientes" ? <PersonIcon
+                            sx={{ color: "var(--black) !important", opacity: tabSelect.value == e.label ? 1 : 0.5 }}></PersonIcon> : <ImageIcon sx={{ color: "var(--black) !important", opacity: tabSelect.value == e.label ? 1 : 0.5 }} ></ImageIcon>}
+                          <span style={{ marginLeft: 5, color: "var(--black)", opacity: tabSelect.value == e.label ? 1 : 0.5 }}>{e.label}</span>
+                        </div>
+                      )}
+      
+                      value={tabSelect} onChange={handleChange} options={options} /></div>,
+                    tooltip: '',
+                    isFreeAction: true,
+                    onClick: (event, rowData) => {
+      
+                    }
+                  },
+
+                  {
                     icon: () => <div style={{ paddingBottom: 5 }}><ReplayIcon sx={{ color: "white" }}></ReplayIcon></div>,
                     tooltip: 'Actualizar',
                     isFreeAction: true,
                     onClick: (event, rowData) => {
                         updateState();
                     }
-                },
-
-
-
+                }
 
 
 
