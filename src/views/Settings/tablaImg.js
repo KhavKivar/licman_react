@@ -25,8 +25,8 @@ import ImageIcon from '@mui/icons-material/Image';
 const options = [
     { value: 'Clientes', label: 'Clientes' },
     { value: 'Imagenes', label: 'Imagenes' },
-  
-  ]
+
+]
 
 
 
@@ -49,17 +49,17 @@ const TablaImg = () => {
 
 
     const editable = rows.map(o => ({ ...o }));
-    const [openMessage, setOpenMessage] = React.useState(false);
+    const [openMessage, setOpenMessage] = React.useState({ show: false, error: false, message: '' });
     const updateState = () => {
-        setOpenMessage(true);
+        setOpenMessage({ show: true, error: false, message: '' });
         ApiObjectCall(dispatch);
-        setTimeout(() => { setOpenMessage(false) }, 3000);
+        setTimeout(() => { setOpenMessage({ show: false, error: false, message: '' }) }, 3000);
     }
     const handleChange = (e) => {
         dispatch(setSettingValue(e));
-    
-      }
-      const tabSelect = useSelector((state) => state.generalState.settingValue);
+
+    }
+    const tabSelect = useSelector((state) => state.generalState.settingValue);
 
 
     return (
@@ -98,39 +98,66 @@ const TablaImg = () => {
                 editable={{
                     onRowAdd: (newData) => {
                         return new Promise((resolve, reject) => {
-
                             axios.post(API.baseURL + "/api/modelo/", newData).then((response) => {
-
                                 console.log(response.data);
-                            });
-                            dispatch(addModelo(newData));
-                            resolve();
-                        });
+                                if (response.status == 200) {
+                                    dispatch(addModelo(newData));
+                                    resolve();
+                                }
+                            }).catch((error) => {
+                                setTimeout(() => { setOpenMessage({ show: false, error: false, message: '' }) }, 3000);
+                                if (error.message == 'Network Error') {
+                                    setOpenMessage({ show: true, error: true, message: "Servidor caido" });
+                                }
+                                if (error.response.data != null) {
+                                    setOpenMessage({ show: true, error: true, message: error.response.data.message.sqlMessage });
+                                }
+                                resolve();
+                            });;
+                        })
                     },
                     onRowUpdate: (newData, oldData) => {
                         return new Promise((resolve, reject) => {
                             axios.patch(API.baseURL + "/api/modelo/id/" + oldData.modelo, {
                                 url: newData.url
-
                             }).then((response) => {
-
                                 console.log(response.data);
+                                if (response.status == 200) {
+                                    dispatch(editModelo(newData));
+                                    resolve();
+                                }
+                            }).catch((error) => {
+                                setTimeout(() => { setOpenMessage({ show: false, error: false, message: '' }) }, 3000);
+                                if (error.message == 'Network Error') {
+                                    setOpenMessage({ show: true, error: true, message: "Servidor caido" });
+                                }
+                                if (error.response.data != null) {
+                                    setOpenMessage({ show: true, error: true, message: error.response.data.message.sqlMessage });
+                                }
+                                resolve();
                             });
-                            dispatch(editModelo(newData));
-                            resolve();
-                        });
+
+                        })
                     },
                     onRowDelete: (oldData) => {
                         return new Promise((resolve, reject) => {
                             axios.delete(API.baseURL + "/api/modelo/id/" + oldData.modelo).then((response) => {
-
                                 console.log(response.data);
-                            });
-                            dispatch(removeModelo(oldData));
+                                if (response.status == 200) {
+                                    dispatch(removeModelo(oldData));
+                                    resolve();
+                                }
+                            }).catch((error) => {
+                            setTimeout(() => { setOpenMessage({ show: false, error: false, message: '' }) }, 3000);
+                            if (error.message == 'Network Error') {
+                                setOpenMessage({ show: true, error: true, message: "Servidor caido" });
+                            }
+                            if (error.response.data != null) {
+                                setOpenMessage({ show: true, error: true, message: error.response.data.message.sqlMessage });
+                            }
                             resolve();
-
+                        });
                         })
-
                     }
 
 
@@ -146,31 +173,31 @@ const TablaImg = () => {
 
                         background: "var(--black)", color: "white", fontFamily: '"Poppins", sans-serif', fontSize: "1rem"
                     },
-                 
+
                     actionsColumnIndex: -1,
                 }}
                 actions={[
-              
-                
+
+
                     {
-                        icon: () => <div style={{ width: 250, height: 45, margin: "auto",marginLeft:10 }} > <Select
-                          getOptionLabel={e => (
-          
-                            <div style={{ display: 'flex', alignItems: 'center' }}>
-                              {e.label == "Clientes" ? <PersonIcon
-                                sx={{ color: "var(--black) !important", opacity: tabSelect.value == e.label ? 1 : 0.5 }}></PersonIcon> : <ImageIcon sx={{ color: "var(--black) !important", opacity: tabSelect.value == e.label ? 1 : 0.5 }} ></ImageIcon>}
-                              <span style={{ marginLeft: 5, color: "var(--black)", opacity: tabSelect.value == e.label ? 1 : 0.5 }}>{e.label}</span>
-                            </div>
-                          )}
-          
-                          value={tabSelect} onChange={handleChange} options={options} /></div>,
+                        icon: () => <div style={{ width: 250, height: 45, margin: "auto", marginLeft: 10 }} > <Select
+                            getOptionLabel={e => (
+
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                    {e.label == "Clientes" ? <PersonIcon
+                                        sx={{ color: "var(--black) !important", opacity: tabSelect.value == e.label ? 1 : 0.5 }}></PersonIcon> : <ImageIcon sx={{ color: "var(--black) !important", opacity: tabSelect.value == e.label ? 1 : 0.5 }} ></ImageIcon>}
+                                    <span style={{ marginLeft: 5, color: "var(--black)", opacity: tabSelect.value == e.label ? 1 : 0.5 }}>{e.label}</span>
+                                </div>
+                            )}
+
+                            value={tabSelect} onChange={handleChange} options={options} /></div>,
                         tooltip: '',
                         isFreeAction: true,
                         onClick: (event, rowData) => {
-          
+
                         }
-                      },
-                      {
+                    },
+                    {
                         icon: () => <div style={{ paddingBottom: 5 }}><ReplayIcon sx={{ color: "white" }}></ReplayIcon></div>,
                         tooltip: 'Actualizar',
                         isFreeAction: true,
@@ -187,13 +214,22 @@ const TablaImg = () => {
             </MaterialTable>
 
 
-            {openMessage && <div style={{ position: "absolute", right: "80px", bottom: "0px", paddingBottom: 20 }}>
-                <Alert severity="success">
-                    <AlertTitle>Exito</AlertTitle>
-                    Se han actualizado las variables — <strong>con exito!</strong>
+            {openMessage.show == true ? openMessage.error ?
+                <div style={{ position: "absolute", right: "80px", bottom: "0px", paddingBottom: 20 }}>
+                    <Alert severity="error">
+                        <AlertTitle>Error</AlertTitle>
+                        {openMessage.message}
+                    </Alert>
+                </div>
+                : <div style={{ position: "absolute", right: "80px", bottom: "0px", paddingBottom: 20 }}>
+                    <Alert severity="success">
+                        <AlertTitle>Exito</AlertTitle>
+                        Se han actualizado las variables — <strong>con exito!</strong>
 
-                </Alert>
-            </div>}</>
+                    </Alert>
+                </div>
+                : <></>
+            }</>
     );
 }
 

@@ -17,11 +17,18 @@ export const inventarioSlice = createSlice({
       if(indexEquipo >= 0){        
         state.data[indexEquipo] = action.payload;
       }
+    },
+    deleteEquipo:(state,action)=>{
+      const indexEquipo = state.data.findIndex(x=>x.idEquipo == parseInt(action.payload));
+      if(indexEquipo >= 0){        
+        state.data.splice(indexEquipo,1);
+        
+      }
     }
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { initState,addEquipo,editEquipo} = inventarioSlice.actions
+export const { initState,addEquipo,editEquipo,deleteEquipo} = inventarioSlice.actions
 
 export default inventarioSlice.reducer

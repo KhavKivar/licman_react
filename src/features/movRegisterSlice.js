@@ -24,7 +24,7 @@ export const movRegisterSlice = createSlice({
       state.transporte =action.payload.transporte =='marco' ? '10':'20';
       state.tipo = action.payload.tipo =='ENVIO' ? '10':'20';
       state.cambio =  action.payload.cambio == null ? "": action.payload.cambio.toString();
-      state.fechaTermino= action.payload.fechaRetiro == null ? "":action.payload.fechaRetiro;
+      state.fechaTermino= action.payload.fechaRetiro == null ? null:action.payload.fechaRetiro;
       state.selectedFile=null;
 
     },

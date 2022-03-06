@@ -23,10 +23,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import Select from 'react-select';
 import { setInventarioValue } from '../../features/generalStateSlice';
+
+import {deleteEquipo} from '../../features/inventarioSlice';
 import ApiObjectCall from '../../services/callServices';
 import ActaGeneral from './acta_general';
 import "./invstyle.css";
-
+import axios from "axios";
+import API from '../../services/api';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 
 
@@ -142,6 +146,9 @@ const InventarioComponent = () => {
 
 
   const [openMessage, setOpenMessage] = React.useState(false);
+  const [openMessageFail,setOpenMessageFail] = React.useState(false);
+  const [openMessageOkdelete,setOpenMessageOkdelete] = React.useState(false);
+
   const updateState = () => {
     setOpenMessage(true);
     ApiObjectCall(dispatch);
@@ -223,7 +230,7 @@ const InventarioComponent = () => {
               }
             },
             {
-              title: 'Altura', field: 'altura', searchable: false, render: (row) => {
+              title: 'Altura', field: 'altura',hidden:true, searchable: false, render: (row) => {
                 return row.altura != null ? row.altura.toLocaleString('de-DE') + " mm" : ""
               }
             },
@@ -245,6 +252,32 @@ const InventarioComponent = () => {
           ]}
           data={editable}
           onChangeColumnHidden={(column, hidden) => { console.log(column); }}
+          editable={{
+           
+        
+            onRowDelete: (oldData) => {
+                return new Promise((resolve, reject) => {
+
+                    axios.delete(API.baseURL + "/api/equipo/id/"+oldData.idEquipo).then((response) => {
+                        if(response.status == 200){
+                          setOpenMessageOkdelete(true);
+                          dispatch(deleteEquipo(oldData.idEquipo));
+                        
+                          setTimeout(() => { setOpenMessageOkdelete(false) }, 3000);
+                          resolve();
+                        }
+                    }).catch((e)=>{ 
+                      setOpenMessageFail(true);
+                      setTimeout(() => { setOpenMessageFail(false) }, 3000);
+                      resolve();
+                    });
+
+                })
+
+            }
+
+
+        }}
           options={{
 
             rowStyle: (data, index) => index % 2 == 0 ? { background: "#f5f5f5" } : null,
@@ -307,23 +340,26 @@ const InventarioComponent = () => {
 
               }
             },
-
             {
+              icon: () => <VisibilityIcon sx={{ color: "black !important" }} />,
+              tooltip: 'Inspecionar',
+              onClick: (event, rowData) => {
+                navigate('/inventario/detalle/' + rowData.idEquipo);
+
+              }
+            },
+           
+            
+
+            rowData => ( {
               icon: () => <CreateIcon sx={{ color: "black !important" }}></CreateIcon>,
               tooltip: 'Editar Equipo',
               onClick: (event, rowData) => {
 
                 navigate('/registro/' + rowData.idEquipo);
               }
-            },
-            rowData => ({
-              icon: () => <ManageSearchIcon sx={{ color: "black !important" }} />,
-              tooltip: 'Inspecionar',
-              onClick: (event, rowData) => {
-                navigate('/inventario/detalle/' + rowData.idEquipo);
-
-              }
             })
+
 
 
           ]}
@@ -336,7 +372,18 @@ const InventarioComponent = () => {
           <Alert severity="success">
             <AlertTitle>Exito</AlertTitle>
             Se han actualizado las variables — <strong>con exito!</strong>
-
+          </Alert>
+        </div>}
+        {openMessageFail && <div style={{ position: "absolute", right: "80px", bottom: "0px", paddingBottom: 20 }}>
+          <Alert severity="error">
+            <AlertTitle>Error</AlertTitle>
+            Error al eliminar el <strong>equipo!</strong>
+          </Alert>
+        </div>}
+        {openMessageOkdelete && <div style={{ position: "absolute", right: "80px", bottom: "0px", paddingBottom: 20 }}>
+          <Alert severity="success">
+            <AlertTitle>Exito</AlertTitle>
+            Se ha  eliminado el equipo — <strong> con exito!</strong>
           </Alert>
         </div>}
 

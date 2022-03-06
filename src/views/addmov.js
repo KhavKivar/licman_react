@@ -39,6 +39,11 @@ import { addMovimiento, editMovimiento } from '../features/movimientoSlice';
 import { cleanInput, setActa, setActaList, setCambio, setCodigo, setFechaTermino, setGuiaDespacho, setObv, setRut, setRutInputValue, setSelectFile, setTipo, setTransporte } from '../features/movRegisterSlice';
 import API from '../services/api';
 import MotionHoc from "../services/motionhoc";
+import ReportProblemIcon from '@mui/icons-material/ReportProblem';
+import CircularProgress from '@mui/material/CircularProgress';
+import CheckIcon from '@mui/icons-material/Check';
+import DangerousIcon from '@mui/icons-material/Dangerous';
+import Card from '@mui/material/Card';
 
 
 
@@ -62,6 +67,8 @@ const myBucket = new AWS.S3({
 })
 
 
+
+
 const ButtonSend = styled(Button)`
     && {
         
@@ -72,6 +79,42 @@ const ButtonSend = styled(Button)`
         }
     }
 `;
+
+const ButtonLoading = styled(Button)`
+    && {
+        
+        background-color: #e0e0e0;
+        color: var(--black);
+        :hover{
+            background-color:#e0e0e0;
+        }
+    }
+`;
+
+const ButtonSuccess = styled(Button)`
+    && {
+        
+        background-color: #4CAF50;
+        color: white;
+        :hover{
+            background-color:#4CAF50;
+        }
+    }
+`;
+
+
+const ButtonError = styled(Button)`
+    && {
+        
+        background-color: #FF5252;
+        color: white;
+        :hover{
+            background-color:#FF5252;
+        }
+    }
+`;
+
+
 const Text = styled.div`
     font-size: 2rem;
     text-align: center;
@@ -84,6 +127,12 @@ gap: 1.5rem;
 justify-content: space-between;
 flex-wrap: wrap;
 `;
+const TextWarning = styled.div`
+    font-size: 1.4rem;
+    padding:0.5rem;
+    color:white;
+`;
+
 
 
 
@@ -235,8 +284,10 @@ const AddMovComponent = () => {
     const equipoList = useSelector((state) => state.inventario.data);
     const movList = useSelector((state) => state.movimiento.data);
     const actaList = useSelector((state) => state.acta.data);
-
+    const delay = ms => new Promise(res => setTimeout(res, ms));
     const [openInput, setopenInput] = useState(false);
+    const [buttonState,setButtonState] = useState({state:"init"});
+    const [errorServer, seterrorServer] = useState({ error: false, message: '' });
 
     const handleFileInput = (e) => {
         if (e.target.files[0] == null || e.target.files[0] == '') {
@@ -409,9 +460,12 @@ const AddMovComponent = () => {
             telefono:telefono
         }
         axios.post(API.baseURL + "/api/cliente/",objCliente ).then((response) => {
-            console.log(response.data);
-            sendLogic();
-            dispatch(addCliente(objCliente));
+            if(response.status==200){
+                console.log(response.data);
+                sendLogic();
+                dispatch(addCliente(objCliente));
+            }
+           
         });
 
        
@@ -423,24 +477,51 @@ const AddMovComponent = () => {
             headers: {
                 'Content-Type': 'application/json'
             }
-        }).then((response) => {
-            dispatch(editMovimiento(response.data));
-            dispatch(cleanInput());
-            navigate("/movimientos");
-            console.log(response.data);
+        }).then(async (response)  => {
+            if(response.status == 200){
+                setButtonState({state:"done"});
+                await delay(800);
+                dispatch(editMovimiento(response.data));
+                dispatch(cleanInput());
+                navigate("/movimientos");
+                console.log(response.data);
+            }
+           
+        }).catch(async(error) => {
+            setButtonState({state:"fail"});
+            console.log(error.message);
+            if (error.message == 'Network Error') {
+                seterrorServer({ error: true, message: "Servidor caido" });
+            }
+            if (error.response.data != null) {
+                seterrorServer({ error: true, message: error.response.data.message.sqlMessage });
+            }
         });
     }
-    function sendObj(obj) {
+     function sendObj(obj) {
         axios.post(API.baseURL + '/api/movimiento/', JSON.stringify(obj), {
             headers: {
                 'Content-Type': 'application/json'
             }
-        }).then((response) => {
-            dispatch(addMovimiento(response.data));
-            dispatch(cleanInput());
-            navigate("/movimientos");
-            console.log(response.data);
-        });
+        }).then(async(response) => {
+            if(response.status ==200){
+                setButtonState({state:"done"});
+                await delay(800);
+                dispatch(addMovimiento(response.data));
+                dispatch(cleanInput());
+                navigate("/movimientos");
+                console.log(response.data);
+            }
+        }).catch((error) => {
+                setButtonState({state:"fail"});
+                console.log(error.message);
+                if (error.message == 'Network Error') {
+                    seterrorServer({ error: true, message: "Servidor caido" });
+                }
+                if (error.response.data != null) {
+                    seterrorServer({ error: true, message: error.response.data.message.sqlMessage });
+                }
+            });
 
     }
     const sendLogic = () => {
@@ -464,7 +545,6 @@ const AddMovComponent = () => {
             uploadFile(selectedFile, key);
             movimientoObject.urlGuiaDespacho = url;
         }
-
         if (edit) {
             sendObjEdit(movimientoObject);
         } else {
@@ -472,7 +552,7 @@ const AddMovComponent = () => {
 
         }
     }
-    const Enviar = () => {
+    const Enviar = async () => {
         handleErrors();
 
         for (const x in error) {
@@ -482,11 +562,14 @@ const AddMovComponent = () => {
         }
 
         //check if rut exist
-
         const rutCh = rut.id != null ? rut.id : rut;
+        setButtonState({state:"loading"});
+        await delay(400);
+
         if (OpcionesRut.find(x => x.id == rutCh) == undefined) {
             handleClickOpen();
         } else {
+
             sendLogic();
         }
 
@@ -511,6 +594,11 @@ const AddMovComponent = () => {
                 </div>
                 <ContainerRegistro>
                     <Text> {edit ? "Edicion de movimiento" : "Registro de movimiento"}</Text>
+                    {errorServer.error ? <Card sx={{ backgroundColor: "red", marginBottom: 1 }}
+                        >
+                            
+                        <div style={{display:"flex",alignItems:"center",paddingLeft:5}}> <ReportProblemIcon sx={{color:"white"}}></ReportProblemIcon> 
+                          <TextWarning>{errorServer.message}</TextWarning> </div></Card >: <></>}
                     <Dialog
                         open={open}
                         onClose={handleClose}
@@ -916,8 +1004,18 @@ const AddMovComponent = () => {
 
 
                     </ColumnSpace>
-
-                    <ButtonSend size='large' onClick={Enviar} variant="contained" endIcon={<SendIcon />} >Enviar</ButtonSend>
+                            
+                    { buttonState.state=='init'?  <ButtonSend size='large' 
+                      onClick={Enviar} variant="contained" endIcon={<SendIcon></SendIcon>} >Enviar</ButtonSend>:
+                            buttonState.state == 'loading'?
+                            <ButtonLoading variant ="contained"
+                            startIcon={<CircularProgress sx={{color:"var(--black)"}}
+                           size={20  } />}    >Cargando...</ButtonLoading>
+                            :  buttonState.state =='done' ?
+                             <ButtonSuccess size='large'  variant="contained" startIcon ={<CheckIcon></CheckIcon>}> Enviado </ButtonSuccess>:
+                             <ButtonError size='large' onClick={Enviar}   variant="contained" startIcon ={<DangerousIcon></DangerousIcon>}> Error</ButtonError>
+                      }
+                   
                 </ContainerRegistro>
             </Paper>
         </Grid>

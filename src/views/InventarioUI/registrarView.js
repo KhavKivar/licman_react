@@ -15,8 +15,13 @@ import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { addEquipo, editEquipo } from '../../features/inventarioSlice';
 import API from '../../services/api';
-
-
+import Card from '@mui/material/Card';
+import Box from '@mui/material/Box';
+import LoadingButton from '@mui/lab/LoadingButton';
+import ReportProblemIcon from '@mui/icons-material/ReportProblem';
+import CircularProgress from '@mui/material/CircularProgress';
+import CheckIcon from '@mui/icons-material/Check';
+import DangerousIcon from '@mui/icons-material/Dangerous';
 
 
 
@@ -30,9 +35,49 @@ const ButtonSend = styled(Button)`
         }
     }
 `;
+
+const ButtonLoading = styled(Button)`
+    && {
+        
+        background-color: #e0e0e0;
+        color: var(--black);
+        :hover{
+            background-color:#e0e0e0;
+        }
+    }
+`;
+
+const ButtonSuccess = styled(Button)`
+    && {
+        
+        background-color: #4CAF50;
+        color: white;
+        :hover{
+            background-color:#4CAF50;
+        }
+    }
+`;
+
+
+const ButtonError = styled(Button)`
+    && {
+        
+        background-color: #FF5252;
+        color: white;
+        :hover{
+            background-color:#FF5252;
+        }
+    }
+`;
+
 const Text = styled.div`
     font-size: 2rem;
     text-align: center;
+`;
+const TextWarning = styled.div`
+    font-size: 1.4rem;
+    padding:0.5rem;
+    color:white;
 `;
 
 const RowTextField = styled.div`
@@ -49,9 +94,9 @@ const ContainerRegistro = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: space-around;
-    gap:1.5rem;
+    gap:0.7rem;
     padding:1.5rem;
-    padding-bottom: 1rem;
+    
     margin-left: auto;
     margin-right: auto;
 `;
@@ -86,8 +131,12 @@ const BackButton = styled(Button)`
     :hover{
         background-color:  var(--black);
     }
-}
+}   
 `;
+function formatNumber(number){
+    return new Intl.NumberFormat("de-DE").format(number);
+}
+
 const NumberFormatCustom = forwardRef(function NumberFormatCustom(props, ref) {
     const { onChange, ...other } = props;
 
@@ -109,6 +158,13 @@ const NumberFormatCustom = forwardRef(function NumberFormatCustom(props, ref) {
             thousandSeparator={'.'} decimalSeparator={false}
             allowNegative={false}
             allowLeadingZeros={false}
+            isAllowed={(value)=>{
+                console.log(value);
+                if(value.value>2147483646){
+                    return false;
+                }
+                return true;
+            }}
         />
     );
 });
@@ -128,12 +184,17 @@ const NumberFormatCustomWithoutPrefix = forwardRef(function NumberFormatCustom(p
                     },
                 });
             }}
-
             isNumericString
-
             thousandSeparator={'.'} decimalSeparator={false}
             allowNegative={false}
             allowLeadingZeros={false}
+            isAllowed={(value)=>{
+                console.log(value);
+                if(value.value>2147483646){
+                    return false;
+                }
+                return true;
+            }}
         />
     );
 });
@@ -146,17 +207,29 @@ const NumberFormatCustomDecimal = forwardRef(function NumberFormatCustom(props, 
             {...other}
             getInputRef={ref}
             onValueChange={(values) => {
+                
+
                 onChange({
                     target: {
                         name: props.name,
                         value: values.value,
                     },
                 });
+
+
             }}
             isNumericString
             thousandSeparator={'.'} decimalSeparator={','}
             allowNegative={false}
             allowLeadingZeros={false}
+            decimalScale={2} 
+            isAllowed={(value)=>{
+                console.log(value);
+                if(value.value>99999999999){
+                    return false;
+                }
+                return true;
+            }}
         />
     );
 });
@@ -176,24 +249,25 @@ export default function Registro() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const params = useParams();
-    
-  
-  
 
-    
-    const equipo = inventarioList.find(function (post,index){
-        if(post.idEquipo == params.id){
+
+
+
+
+    const equipo = inventarioList.find(function (post, index) {
+        if (post.idEquipo == params.id) {
             return true;
         }
     }
     );
 
+    const delay = ms => new Promise(res => setTimeout(res, ms));
 
-   
-   
 
-    const enviar = () => {
+
+    const enviar = async () => {
         //Activar Errores
+        
 
         if (codigo == null || codigo == '') {
             error.id = { error: true, message: 'Este campo no puede ser vacio' }
@@ -207,62 +281,92 @@ export default function Registro() {
             error.modelo = { error: true, message: 'Este campo no puede ser vacio' }
         } if (serie == null || serie == '') {
             error.serie = { error: true, message: 'Este campo no puede ser vacio' }
+        }if(ano < 999){
+            error.ano = { error: true, message: 'Año invalido' }
         }
         setError({ ...error })
-        console.log({ ...error });
+
 
         for (const x in error) {
             if (error[x].error) {
                 return;
             }
         }
-
-
+        setButtonState({state:"loading"});
+        await delay(400);
+       
+       
+       
 
         const postData = {
             tipo: tipo.id != null ? tipo.id : tipo,
-            marca: marca.id !=null ? marca.id:marca,
-            modelo: modelo.id !=null? modelo.id:modelo,
+            marca: marca.id != null ? marca.id : marca,
+            modelo: modelo.id != null ? modelo.id : modelo,
             serie: serie,
             capacidad: capacidad != '' ? capacidad : '0',
             altura: altura != '' ? altura : '0',
-            mastil: mastil.id != null ? mastil.id : mastil !=null ? mastil : "",
+            mastil: mastil.id != null ? mastil.id : mastil != null ? mastil : "",
             ano: ano != '' ? parseInt(ano) : 0,
             horometro: horometro != '' ? parseInt(horometro) : 0,
             precio_neto: precio != '' ? parseInt(precio) : 0,
         };
 
-       
 
-        if(params.id == null){
+
+        if (params.id == null) {
             postData.idEquipo = parseInt(codigo.id);
-            console.log(postData);
-            dispatch(addEquipo(postData));
             axios.post(API.baseURL + '/api/equipo/', JSON.stringify(postData), {
                 headers: {
                     'Content-Type': 'application/json'
                 }
-            }).then((response) => {
-                console.log(response.data);
+            }).then(async(response) => {
+                if (response.status == 200) {
+                    setButtonState({state:"done"});
+                    await delay(800);
+                    dispatch(addEquipo(postData));
+                    console.log(response.data);
+                    navigate('/inventario');
+                }
+            }).catch((error) => {
+                setButtonState({state:"fail"});
+                console.log(error.message);
+                if (error.message == 'Network Error') {
+                    seterrorServer({ error: true, message: "Servidor caido" });
+                }
+                if (error.response.data != null) {
+                    seterrorServer({ error: true, message: error.response.data.message.sqlMessage });
+                }
             });
-        }else{
-          
-          
-            console.log('/api/equipo/id/'+codigo);
-            axios.patch(API.baseURL + '/api/equipo/id/'+codigo, JSON.stringify(postData), {
+        } else {
+            axios.patch(API.baseURL + '/api/equipo/id/' + codigo, JSON.stringify(postData), {
                 headers: {
                     'Content-Type': 'application/json'
                 }
-            }).then((response) => {
-                console.log(response.data);
+            }).then(async(response) => {
+                if (response.status == 200) {
+                    setButtonState({state:"done"});
+                    await delay(800);
+                    postData.idEquipo = parseInt(params.id);
+                    dispatch(editEquipo(postData));
+                    navigate('/inventario');
+                }
+            }).catch((error) => {
+                setButtonState({state:"fail"});
+                console.log(error.message);
+                if (error.message == 'Network Error') {
+                    seterrorServer({ error: true, message: "Servidor caido" });
+                }
+                if (error.response.data != null) {
+                    console.log("Entro");
+                    seterrorServer({ error: true, message: error.response.data.message.sqlMessage });
+                }
             });
 
-            console.log(postData);
-            postData.idEquipo = parseInt(params.id);
-            dispatch(editEquipo(postData));
+
+
         }
-     
-        navigate('/inventario');
+
+
 
     };
 
@@ -321,20 +425,27 @@ export default function Registro() {
 
     const [codigo, setCodigo] = useState(params.id);
 
-    const [error, setError] = useState({ id: { error: false, message: '' }, tipo: { error: false, message: '' }, marca: { error: false, message: '' }, modelo: { error: false, message: '' }, serie: { error: false, message: '' } });
+    const [errorServer, seterrorServer] = useState({ error: false, message: '' });
 
-    const [tipo, setTipo] = useState(equipo !=null? equipo.tipo: '');
-    const [marca, setMarca] = useState(equipo !=null? equipo.marca: '');
-    const [modelo, setModelo] = useState(equipo !=null? equipo.modelo: '');
-    const [serie, setSerie] = useState(equipo !=null? equipo.serie: '');
+    const [error, setError] = useState({ id: { error: false, message: '' }, tipo: { error: false, message: '' }, marca: { error: false, message: '' }, modelo: { error: false, message: '' }, serie: { error: false, message: '' }
+     ,ano: { error: false, message: '' }
+    });
+
+    const [tipo, setTipo] = useState(equipo != null ? equipo.tipo : '');
+    const [marca, setMarca] = useState(equipo != null ? equipo.marca : '');
+    const [modelo, setModelo] = useState(equipo != null ? equipo.modelo : '');
+    const [serie, setSerie] = useState(equipo != null ? equipo.serie : '');
 
 
-    const [capacidad, setCapacidad] = useState(equipo !=null? equipo.capacidad: '');
-    const [altura, setAltura] = useState(equipo !=null? equipo.altura: '');
-    const [mastil, setMastil] = useState(equipo !=null? equipo.mastil: '');
-    const [ano, setAno] = useState(equipo !=null? equipo.ano: '');
-    const [horometro, setHorometro] = useState(equipo !=null? equipo.horometro: '');
-    const [precio, setPrecio] = useState(equipo !=null? equipo.precio_neto: '');
+    const [capacidad, setCapacidad] = useState(equipo != null ? equipo.capacidad : '');
+    const [altura, setAltura] = useState(equipo != null ? equipo.altura : '');
+    const [mastil, setMastil] = useState(equipo != null ? equipo.mastil : '');
+    const [ano, setAno] = useState(equipo != null ? equipo.ano : '');
+    const [horometro, setHorometro] = useState(equipo != null ? equipo.horometro : '');
+    const [precio, setPrecio] = useState(equipo != null ? equipo.precio_neto : '');
+
+    const [buttonState,setButtonState] = useState({state:"init"});
+
 
 
     return (
@@ -344,7 +455,7 @@ export default function Registro() {
                 y: 0,
                 transition: { duration: 0.5, type: "spring" },
             }}
-            exit={{
+            exit    ={{
                 y: -500,
                 transition: { duration: 0.5, type: "spring", ease: "easeInOut" },
             }}
@@ -352,26 +463,30 @@ export default function Registro() {
 
             <Grid >
                 <Paper elevation={3} >
-                    <div style={{ float: "left", position: "absolute", marginLeft: "1.5rem",marginTop:"1.4rem" }}>
+                    <div style={{ float: "left", position: "absolute", marginLeft: "1.5rem", marginTop: "1.4rem" }}>
                         <BackButton onClick={backFunc} variant="contained" startIcon={<ArrowBackIcon />}>
                             Volver
                         </BackButton>
                     </div>
                     <ContainerRegistro>
                         <Text> Registro de equipo</Text>
+                        {errorServer.error ? <Card sx={{ backgroundColor: "red", marginBottom: 1 }}
+                        >
+                            
+                        <div style={{display:"flex",alignItems:"center",paddingLeft:5}}> <ReportProblemIcon sx={{color:"white"}}></ReportProblemIcon>   <TextWarning>{errorServer.message}</TextWarning> </div></Card >: <></>}
                         <ColumnSpace>
                             <RowTextField>
                                 <ColumnElement>
-                                   {params.id == null ?  <Autocomplete
+                                    {params.id == null ? <Autocomplete
                                         value={codigo}
                                         onChange={(event, newValue) => {
-                                           
+
                                             var isllchange = false;
 
                                             if (newValue === null || newValue === '') {
                                                 isllchange = true;
                                                 setError({ ...error, id: { error: true, message: 'Este campo no puede ser vacio' } })
-                                                
+
                                             }
                                             if (!(newValue === null || newValue === '') && (String(newValue.inputValue).match(/^\d+$/) == null && String(newValue).match(/^\d+$/) == null)) {
                                                 isllchange = true;
@@ -386,7 +501,7 @@ export default function Registro() {
                                                 setError({ ...error, id: { error: false, message: '' } });
                                             }
 
-                                          
+
                                             if (typeof newValue === 'string') {
                                                 setCodigo({
                                                     id: newValue,
@@ -443,20 +558,20 @@ export default function Registro() {
 
                                         freeSolo
                                         renderInput={(params) => (
-                                            <TextField    {...params}  error={error.id.error} label="Numero interno" />
+                                            <TextField    {...params} error={error.id.error} label="Numero interno" />
                                         )}
                                     />
-                                   
-                                    :  <TextField   disabled defaultValue={params.id} label="Numero interno" />
-                                }
-                                 {error.id.error && <ErrorDisplay> <span>{error.id.message}</span></ErrorDisplay>}
+
+                                        : <TextField disabled defaultValue={params.id} label="Numero interno" />
+                                    }
+                                    {error.id.error && <ErrorDisplay> <span>{error.id.message}</span></ErrorDisplay>}
                                 </ColumnElement>
                                 <ColumnElement>
 
                                     <Autocomplete
                                         value={tipo}
                                         onChange={(event, newValue) => {
-                                           
+
 
 
                                             if (newValue === null || newValue === '') {
@@ -466,7 +581,7 @@ export default function Registro() {
                                                 setError({ ...error, tipo: { error: false, message: '' } });
                                             }
 
-                                            
+
                                             if (typeof newValue === 'string') {
                                                 setTipo({
                                                     id: newValue,
@@ -526,7 +641,7 @@ export default function Registro() {
                                     <Autocomplete
                                         value={marca}
                                         onChange={(event, newValue) => {
-                                           
+
 
 
                                             if (newValue === null || newValue === '') {
@@ -535,7 +650,7 @@ export default function Registro() {
                                                 setError({ ...error, marca: { error: false, message: '' } });
                                             }
 
-                                          
+
                                             if (typeof newValue === 'string') {
                                                 setMarca({
                                                     id: newValue,
@@ -596,14 +711,14 @@ export default function Registro() {
                                     <Autocomplete
                                         value={modelo}
                                         onChange={(event, newValue) => {
-                                           
+
                                             if (newValue === null || newValue === '') {
                                                 setError({ ...error, modelo: { error: true, message: 'Este campo no puede ser vacio' } })
                                             } else {
                                                 setError({ ...error, modelo: { error: false, message: '' } });
                                             }
 
-                                          
+
                                             if (typeof newValue === 'string') {
                                                 setModelo({
                                                     id: newValue,
@@ -740,14 +855,18 @@ export default function Registro() {
                             <RowTextField>
                                 <ColumnElement>
                                     <TextField fullWidth id="outlined-basic"
-                                        onChange={(event) => {
+                                        onChange={(event) => { 
+                                          
                                             setAltura(event.target.value)
                                         }}
                                         value={altura}
+                                        type="text"
                                         InputProps={{
                                             endAdornment: <InputAdornment position="start">mm</InputAdornment>,
                                             inputComponent: NumberFormatCustomDecimal,
+                                            
                                         }}
+                                        
                                         label="Altura" variant="outlined" />
 
                                 </ColumnElement>
@@ -758,7 +877,7 @@ export default function Registro() {
                                         }}
                                         InputProps={{
                                             endAdornment: <InputAdornment position="start">kg</InputAdornment>,
-                                            inputComponent: NumberFormatCustomDecimal,
+                                            inputComponent: NumberFormatCustomWithoutPrefix,
                                         }}
                                         id="outlined-basic"
                                         label="Capacidad" variant="outlined" />
@@ -782,10 +901,24 @@ export default function Registro() {
                                         }} />
                                 </ColumnElement>
                                 <ColumnElement>
-                                    <TextField value={ano} onChange={(event) => {
-                                        setAno(event.target.value)
+                                    <TextField value={ano}
+                                    error={error.ano.error}
+                                    onChange={(event) => {
+                                        const newValue=event.target.value;
+                                         if (newValue<999) {
+                                            setError({ ...error, ano: { error: true, message: 'Año invalido' } })
+                                        } else {
+                                            setError({ ...error, ano: { error: false, message: '' } });
+                                        }
+
+                                        
+                                        if(event.target.value.length < 5){
+                                            setAno(event.target.value);
+                                        }
+                                       
                                     }} fullWidth id="outlined-basic"
                                         label="Año" variant="outlined" />
+                                   {error.ano.error && <ErrorDisplay> <span>{error.ano.message}</span></ErrorDisplay>}      
                                 </ColumnElement>
 
                             </RowTextField>
@@ -806,7 +939,17 @@ export default function Registro() {
 
                             />
                         </ColumnSpace>
-                        <ButtonSend size='large' onClick={enviar} variant="contained" endIcon={<SendIcon />} >Enviar</ButtonSend>
+                       
+                      { buttonState.state=='init'?  <ButtonSend size='large' 
+                      onClick={enviar} variant="contained" endIcon={<SendIcon></SendIcon>} >Enviar</ButtonSend>:
+                            buttonState.state == 'loading'?
+                            <ButtonLoading variant ="contained"
+                            startIcon={<CircularProgress sx={{color:"var(--black)"}}
+                           size={20  } />}    >Cargando...</ButtonLoading>
+                            :  buttonState.state =='done' ?
+                             <ButtonSuccess size='large'  variant="contained" startIcon ={<CheckIcon></CheckIcon>}> Enviado </ButtonSuccess>:
+                             <ButtonError size='large' onClick={enviar}   variant="contained" startIcon ={<DangerousIcon></DangerousIcon>}> Error</ButtonError>
+                      }
                     </ContainerRegistro>
 
                 </Paper>
@@ -814,5 +957,10 @@ export default function Registro() {
         </motion.div>
     );
 
+
 }
 
+/*   <ButtonLoading variant ="contained"
+                              startIcon={<CircularProgress sx={{color:"var(--black)"}}
+                             size={20  } />}    >Cargando...</ButtonLoading>:
+                             <ButtonSucess startIcon ={CheckIcon}> Success.. </ButtonSucess>*/

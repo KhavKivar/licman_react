@@ -4,29 +4,48 @@ import { PieChart, Pie, Sector } from 'recharts';
 import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import MotionHoc from "../services/motionhoc";
 import Box from '@mui/material/Box';
+import styled from 'styled-components';
 
+const TextTitle = styled.h2`
+    margin-bottom:15px;
+    color:var(--black);
+   
+`;
 
+const Row = styled.div`
+    display:flex;
+    gap:1.5rem;
+    flex-wrap: wrap;
+    
+`;
 
 const data = [
     {
-        name: 'Empresa 1',
-        mov: 1000
+        name: 'ETV 214',
+        mov: 30
 
     },
     {
-        name: 'Empresa 2',
-        mov: 2000
-    },
-    {
-        name: 'Empresa 3',
-        mov: 3000
+        name: 'BK 1545',
+        mov: 40
 
     },
     {
-        name: 'Empresa 4',
-        mov: 1000
+        name: 'EJC 214',
+        mov: 50
 
     },
+    {
+        name: 'EJD 220',
+        mov: 70
+
+    },
+    {
+        name: 'ERC 214',
+        mov: 100
+
+    },
+
 ];
 const data2 = [
     { name: 'Empresa 1', value: 200 },
@@ -35,6 +54,10 @@ const data2 = [
     { name: 'Empresa 4', value: 100 },
     { name: 'Empresa 5', value: 100 },
     { name: 'Empresa 6', value: 100 },
+    { name: 'Empresa 7', value: 100 },
+    { name: 'Empresa 8', value: 100 },
+    { name: 'Empresa 9', value: 100 },
+    { name: 'Empresa 10', value: 100 },
 ];
 
 const renderActiveShape = (props) => {
@@ -84,53 +107,59 @@ const renderActiveShape = (props) => {
 };
 
 const HomeComponent = () => {
-    const [state_pie,setStatePie] = useState({activeIndex:0});
+    const [state_pie, setStatePie] = useState({ activeIndex: 0 });
 
-     const onPieEnter = (_, index) => {
+    const onPieEnter = (_, index) => {
         setStatePie({
-          activeIndex: index,
+            activeIndex: index,
         });
-      };
+    };
     return (
-        <Box sx={{ backgroundColor: "white" }}>
-            <div style={{ display: "flex",flexWrap:"wrap" }}>
-           
-                <PieChart width={600} height={600}>
-                    <Pie
-                        activeIndex={state_pie.activeIndex}
-                        activeShape={renderActiveShape}
-                        data={data2}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={60}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="value"
-                        onMouseEnter={onPieEnter}
-                    />
-                </PieChart>
-            
+        <Box sx={{ backgroundColor: "#EEEEEE", borderRadius: '1%', padding: "30px" }}>
 
-                <BarChart
-                    width={500}
-                    height={500}
-                    data={data}
-                    margin={{
-                        top: 5,
-                        right: 30,
-                        left: 20,
-                        bottom: 5,
-                    }}
-                >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="mov" fill="#8884d8" />
+            <Row>
+                <Box sx={{ backgroundColor: "white", borderRadius: '1%', padding: "10px" }}>
+                    <TextTitle>Top 5 modelos mas solicitados</TextTitle>
+                  
+                    <BarChart
+                        width={500}
+                        height={500}
+                        data={data}
+                        margin={{
+                           
+                            right: 30,
+                            left: 20,
+                            bottom: 5,
+                        }}
+                    >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="mov" fill="#8884d8" />
 
-                </BarChart>
-            </div>
+                    </BarChart>
+                </Box>
+                <Box sx={{ backgroundColor: "white", borderRadius: '1%', padding: "10px" }}>
+                    <TextTitle>Top 10 clientes</TextTitle>
+                    <PieChart width={630} height={400}>
+                        <Pie
+                            activeIndex={state_pie.activeIndex}
+                            activeShape={renderActiveShape}
+                            data={data2}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={60}
+                            outerRadius={80}
+                            fill="#8884d8"
+                            dataKey="value"
+                            onMouseEnter={onPieEnter}
+                        />
+                    </PieChart>
+                </Box>
+
+            </Row>
         </Box>
     );
 

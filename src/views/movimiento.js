@@ -50,7 +50,6 @@ const MovimientoComponent = () => {
             editable[i].idEquipo = "";
             editable[i].empresa ="";
             rowsWithPower.push(editable[i]);
-
         }
     }
 
@@ -70,12 +69,8 @@ const MovimientoComponent = () => {
 
 
     return (<>
-{  cliente.length == 0 || actas.length==0  ? 
-       
-       <div style={{  lineHeight: "500px",textAlign:"center"}}>
-       <CircularProgress /> 
-       </div>
-       :
+
+      
 
 
         <MaterialTable
@@ -249,7 +244,7 @@ const MovimientoComponent = () => {
 
 
         </MaterialTable>
-}
+
         {openMessage && <div style={{ position: "absolute", right: "80px", bottom: "0px", paddingBottom: 20 }}>
             <Alert severity="success">
                 <AlertTitle>Exito</AlertTitle>
