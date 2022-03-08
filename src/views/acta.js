@@ -451,6 +451,11 @@ const ActaComponent = () => {
                         </ListItem>
                         <Divider></Divider>
                         <ListItem disablePadding>
+                            <ListItemText primary={"Mastil"} ></ListItemText>
+                            {acta.mastilEquipo} 
+                        </ListItem>
+                        <Divider></Divider>
+                        <ListItem disablePadding>
                             <ListItemText primary={"Horometro registrado"} ></ListItemText>
                             {acta.horometroActual}
                         </ListItem>

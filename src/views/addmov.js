@@ -507,6 +507,7 @@ const AddMovComponent = () => {
             if(response.status ==200){
                 setButtonState({state:"done"});
                 await delay(800);
+                console.log(response.data);
                 dispatch(addMovimiento(response.data));
                 dispatch(cleanInput());
                 navigate("/movimientos");
@@ -863,12 +864,15 @@ const AddMovComponent = () => {
 
 
                                     getOptionDisabled={(option) => {
-
+                                        let contador = 0;
                                         for (const x of movList) {
-
                                             if (x.idInspeccion.toString() == option.label) {
-                                                return true;
+                                                contador +=1;
+                                                
                                             }
+                                        }
+                                        if(contador  >1){
+                                            return true;
                                         }
                                         return false;
                                     }

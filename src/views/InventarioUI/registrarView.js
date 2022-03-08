@@ -307,7 +307,7 @@ export default function Registro() {
             altura: altura != '' ? altura : '0',
             mastil: mastil.id != null ? mastil.id : mastil != null ? mastil : "",
             ano: ano != '' ? parseInt(ano) : 0,
-            horometro: horometro != '' ? parseInt(horometro) : 0,
+            horometro: horometro != '' ? parseFloat(horometro) : 0,
             precio_neto: precio != '' ? parseInt(precio) : 0,
         };
 
@@ -897,7 +897,7 @@ export default function Registro() {
                                             setHorometro(event.target.value)
                                         }}
                                         InputProps={{
-                                            inputComponent: NumberFormatCustomWithoutPrefix,
+                                            inputComponent: NumberFormatCustomDecimal,
                                         }} />
                                 </ColumnElement>
                                 <ColumnElement>
