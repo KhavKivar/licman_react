@@ -852,17 +852,30 @@ const AddMovComponent = () => {
                                     disableClearable
                                     forcePopupIcon={false}
                                     onChange={(event, newValue, reason) => {
+                                       
                                         if (newValue == null || newValue == '') {
                                             setError({ ...error, acta: { error: true, message: 'Este campo no puede ser vacio' } })
                                         } else {
                                             setError({ ...error, acta: { error: false, message: '' } });
                                         }
+                                         
+                                        for(const x of movList){
+                                            console.log(newValue.label);
+                                            if(x.idInspeccion == newValue.label  && x.tipo == 'ENVIO' && tipo == 20 ){
+                                                dispatch(setRut(x.rut));
+                                                dispatch(setTransporte( x.transporte == "marco" ? 10:20));
+                                               
+                                                dispatch(setCambio(x.cambio));
+                                               dispatch(setFechaTermino(x.fechaTermino));
+                                               dispatch(setObv(x.observaciones));
+                                               dispatch(setGuiaDespacho(x.idGuiaDespacho));
+                                            }
+                                            
+                                        }
                                         dispatch(setActa(newValue));
                                     }}
                                     value={acta}
                                     options={actaListState}
-
-
                                     getOptionDisabled={(option) => {
                                         let contador = 0;
                                         for (const x of movList) {
@@ -878,7 +891,7 @@ const AddMovComponent = () => {
                                     }
                                     }
 
-                                    renderInput={(params) => <TextField {...params}
+                                    renderInput={(params) => <TextField  {...params} 
                                         InputProps={{
 
 
@@ -895,7 +908,7 @@ const AddMovComponent = () => {
                                             }><VisibilityIcon></VisibilityIcon></IconButton>,
                                         }}
                                         error={error.acta.error}
-                                        label="Acta ID" />}
+                                        label="Acta ID" /> }
 
                                     clearIcon={<VisibilityIcon />}
                                 />
