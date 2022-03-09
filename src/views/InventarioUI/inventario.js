@@ -103,7 +103,9 @@ const customStyles = {
 
 }
 
-
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
 
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -234,13 +236,25 @@ const InventarioComponent = () => {
                 return row.altura != null ? row.altura.toLocaleString('de-DE') + " mm" : ""
               }
             },
-            { title: 'Mastil', field: 'mastil' },
-            { title: 'Año', field: 'ano' },
+            { title: 'Mastil', field: 'mastil',hidden:true, },
+            { title: 'Año', field: 'ano',hidden:true,  },
             {
-              title: 'Horometro', field: 'horometro', searchable: false, render: (row) => {
+              title: 'Horometro', field: 'horometro',  searchable: false, render: (row) => {
                 return row.horometro != null ? row.horometro.toLocaleString('de-DE') : ""
               }
             },
+
+            {
+              title: 'Estado', field: 'estado', render: (row) => {
+                return capitalizeFirstLetter(row.estado.toLowerCase());
+              }
+            },
+            {
+              title: 'Ubicacion', field: 'ubicacion',  render: (row) => {
+                return capitalizeFirstLetter(row.ubicacion.toLowerCase());
+              }
+            },
+            
             {
               title: 'Precio neto', field: 'precio_neto', hidden:true,searchable: false, render: (row) => {
 

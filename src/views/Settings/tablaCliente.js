@@ -71,7 +71,7 @@ const TablaCliente = () => {
 
         columns={[
           {
-            title: 'RUT Empresa', field: 'rut', editable: "onAdd",
+            title: 'RUT Empresa', field: 'rut',
             editComponent: ({ value, onChange }) => (
               <TextField key="random1" value={value} autoFocus="autoFocus" fullWidth id="standard-basic" placeholder="Rut" variant="standard"
                 onChange={(x) => {
@@ -123,6 +123,7 @@ const TablaCliente = () => {
           onRowUpdate: (newData, oldData) => {
             return new Promise((resolve, reject) => {
               axios.patch(API.baseURL + "/api/cliente/id/" + oldData.rut, {
+                rut:newData.rut,
                 nombre: newData.nombre,
                 telefono: newData.telefono
               }).then((response) => {

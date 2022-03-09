@@ -125,7 +125,7 @@ display: flex;
 flex-direction: row;
 gap: 1.5rem;
 justify-content: space-between;
-flex-wrap: wrap;
+
 `;
 const TextWarning = styled.div`
     font-size: 1.4rem;
@@ -858,7 +858,7 @@ const AddMovComponent = () => {
                                         } else {
                                             setError({ ...error, acta: { error: false, message: '' } });
                                         }
-                                         
+                                         /*
                                         for(const x of movList){
                                             console.log(newValue.label);
                                             if(x.idInspeccion == newValue.label  && x.tipo == 'ENVIO' && tipo == 20 ){
@@ -871,7 +871,7 @@ const AddMovComponent = () => {
                                                dispatch(setGuiaDespacho(x.idGuiaDespacho));
                                             }
                                             
-                                        }
+                                        }*/
                                         dispatch(setActa(newValue));
                                     }}
                                     value={acta}
@@ -880,12 +880,9 @@ const AddMovComponent = () => {
                                         let contador = 0;
                                         for (const x of movList) {
                                             if (x.idInspeccion.toString() == option.label) {
-                                                contador +=1;
+                                                return true;
                                                 
                                             }
-                                        }
-                                        if(contador  >1){
-                                            return true;
                                         }
                                         return false;
                                     }

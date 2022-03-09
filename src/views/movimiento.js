@@ -160,7 +160,7 @@ const MovimientoComponent = () => {
                     }
                 },
                 {
-                    title: 'Fecha de retiro', field: 'fechaRetiro', render: x => {
+                    title: 'Fecha de retiro', searchable: false,field: 'fechaRetiro', render: x => {
                         return x.fechaRetiro != null ? x.fechaRetiro.split("T")[0] : "    ";
                     }
                 },
@@ -197,7 +197,7 @@ const MovimientoComponent = () => {
                 },
                 columnsButton: true,
                 actionsColumnIndex: -1,
-
+                filtering: true
 
 
 

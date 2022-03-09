@@ -22,9 +22,10 @@ import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import CircularProgress from '@mui/material/CircularProgress';
 import CheckIcon from '@mui/icons-material/Check';
 import DangerousIcon from '@mui/icons-material/Dangerous';
-
-
-
+import Select from '@mui/material/Select';
+import FormControl from '@mui/material/FormControl';
+import MenuItem from '@mui/material/MenuItem';
+import InputLabel from '@mui/material/InputLabel';
 const ButtonSend = styled(Button)`
     && {
         
@@ -85,7 +86,8 @@ display: flex;
 flex-direction: row;
 gap: 1.5rem;
 justify-content: space-between;
-flex-wrap: wrap;
+
+
 `;
 
 
@@ -133,7 +135,7 @@ const BackButton = styled(Button)`
     }
 }   
 `;
-function formatNumber(number){
+function formatNumber(number) {
     return new Intl.NumberFormat("de-DE").format(number);
 }
 
@@ -158,9 +160,9 @@ const NumberFormatCustom = forwardRef(function NumberFormatCustom(props, ref) {
             thousandSeparator={'.'} decimalSeparator={false}
             allowNegative={false}
             allowLeadingZeros={false}
-            isAllowed={(value)=>{
+            isAllowed={(value) => {
                 console.log(value);
-                if(value.value>2147483646){
+                if (value.value > 2147483646) {
                     return false;
                 }
                 return true;
@@ -188,9 +190,9 @@ const NumberFormatCustomWithoutPrefix = forwardRef(function NumberFormatCustom(p
             thousandSeparator={'.'} decimalSeparator={false}
             allowNegative={false}
             allowLeadingZeros={false}
-            isAllowed={(value)=>{
+            isAllowed={(value) => {
                 console.log(value);
-                if(value.value>2147483646){
+                if (value.value > 2147483646) {
                     return false;
                 }
                 return true;
@@ -207,7 +209,7 @@ const NumberFormatCustomDecimal = forwardRef(function NumberFormatCustom(props, 
             {...other}
             getInputRef={ref}
             onValueChange={(values) => {
-                
+
 
                 onChange({
                     target: {
@@ -222,10 +224,10 @@ const NumberFormatCustomDecimal = forwardRef(function NumberFormatCustom(props, 
             thousandSeparator={'.'} decimalSeparator={','}
             allowNegative={false}
             allowLeadingZeros={false}
-            decimalScale={2} 
-            isAllowed={(value)=>{
+            decimalScale={2}
+            isAllowed={(value) => {
                 console.log(value);
-                if(value.value>99999999999){
+                if (value.value > 99999999999) {
                     return false;
                 }
                 return true;
@@ -267,7 +269,7 @@ export default function Registro() {
 
     const enviar = async () => {
         //Activar Errores
-        
+
 
         if (codigo == null || codigo == '') {
             error.id = { error: true, message: 'Este campo no puede ser vacio' }
@@ -281,9 +283,12 @@ export default function Registro() {
             error.modelo = { error: true, message: 'Este campo no puede ser vacio' }
         } if (serie == null || serie == '') {
             error.serie = { error: true, message: 'Este campo no puede ser vacio' }
-        }if(ano < 999){
+        } if (ano < 999) {
             error.ano = { error: true, message: 'Año invalido' }
+        }if(ubicacion == ''|| ubicacion == null){
+            error.ubicacion = { error: true, message: 'Este campo no puede ser vacio' }
         }
+
         setError({ ...error })
 
 
@@ -292,11 +297,11 @@ export default function Registro() {
                 return;
             }
         }
-        setButtonState({state:"loading"});
+        setButtonState({ state: "loading" });
         await delay(400);
-       
-       
-       
+
+
+
 
         const postData = {
             tipo: tipo.id != null ? tipo.id : tipo,
@@ -308,6 +313,8 @@ export default function Registro() {
             mastil: mastil.id != null ? mastil.id : mastil != null ? mastil : "",
             ano: ano != '' ? parseInt(ano) : 0,
             horometro: horometro != '' ? parseFloat(horometro) : 0,
+            estado:estado == 10 ? 'DISPONIBLE' : estado == 20 ? 'ARRENDADO' : estado == 30 ? 'VENDIDO': estado ==40 ? 'REMATE':'POR LLEGAR',
+            ubicacion:ubicacion,
             precio_neto: precio != '' ? parseInt(precio) : 0,
         };
 
@@ -319,16 +326,16 @@ export default function Registro() {
                 headers: {
                     'Content-Type': 'application/json'
                 }
-            }).then(async(response) => {
+            }).then(async (response) => {
                 if (response.status == 200) {
-                    setButtonState({state:"done"});
+                    setButtonState({ state: "done" });
                     await delay(800);
                     dispatch(addEquipo(postData));
                     console.log(response.data);
                     navigate('/inventario');
                 }
             }).catch((error) => {
-                setButtonState({state:"fail"});
+                setButtonState({ state: "fail" });
                 console.log(error.message);
                 if (error.message == 'Network Error') {
                     seterrorServer({ error: true, message: "Servidor caido" });
@@ -342,16 +349,16 @@ export default function Registro() {
                 headers: {
                     'Content-Type': 'application/json'
                 }
-            }).then(async(response) => {
+            }).then(async (response) => {
                 if (response.status == 200) {
-                    setButtonState({state:"done"});
+                    setButtonState({ state: "done" });
                     await delay(800);
                     postData.idEquipo = parseInt(params.id);
                     dispatch(editEquipo(postData));
                     navigate('/inventario');
                 }
             }).catch((error) => {
-                setButtonState({state:"fail"});
+                setButtonState({ state: "fail" });
                 console.log(error.message);
                 if (error.message == 'Network Error') {
                     seterrorServer({ error: true, message: "Servidor caido" });
@@ -427,8 +434,9 @@ export default function Registro() {
 
     const [errorServer, seterrorServer] = useState({ error: false, message: '' });
 
-    const [error, setError] = useState({ id: { error: false, message: '' }, tipo: { error: false, message: '' }, marca: { error: false, message: '' }, modelo: { error: false, message: '' }, serie: { error: false, message: '' }
-     ,ano: { error: false, message: '' }
+    const [error, setError] = useState({
+        id: { error: false, message: '' }, tipo: { error: false, message: '' }, marca: { error: false, message: '' }, modelo: { error: false, message: '' }, serie: { error: false, message: '' }
+        , ano: { error: false, message: '' },ubicacion:{error:false,message:''}
     });
 
     const [tipo, setTipo] = useState(equipo != null ? equipo.tipo : '');
@@ -444,8 +452,31 @@ export default function Registro() {
     const [horometro, setHorometro] = useState(equipo != null ? equipo.horometro : '');
     const [precio, setPrecio] = useState(equipo != null ? equipo.precio_neto : '');
 
-    const [buttonState,setButtonState] = useState({state:"init"});
+    const [estado, setEstado] = useState(equipo != null ? 
+        equipo.estado == 'DISPONIBLE' ? 10 :  equipo.estado == 'ARRENDADO' ? 20:  equipo.estado == 'VENDIDO' ? 30:
+                            equipo.estado == 'REMATE' ? 40:50  :10) ;
+        
+        
+      
+    const [ubicacion, setUbicacion] =useState(equipo != null ? equipo.ubicacion : 'Bodega central');
 
+
+    const [buttonState, setButtonState] = useState({ state: "init" });
+
+
+    const handleChangeEstado = (event) => {
+        setEstado(event.target.value)
+
+    }
+    const handleChangeubicacion = (event) => {
+        
+        if (event.target.value === null || event.target.value === '') {
+            setError({ ...error, ubicacion: { error: true, message: 'Este campo no puede ser vacio' } })
+        }else{
+            setError({ ...error, ubicacion: { error: false, message: '' } })
+        }
+        setUbicacion(event.target.value);
+      };
 
 
     return (
@@ -455,7 +486,7 @@ export default function Registro() {
                 y: 0,
                 transition: { duration: 0.5, type: "spring" },
             }}
-            exit    ={{
+            exit={{
                 y: -500,
                 transition: { duration: 0.5, type: "spring", ease: "easeInOut" },
             }}
@@ -472,8 +503,8 @@ export default function Registro() {
                         <Text> Registro de equipo</Text>
                         {errorServer.error ? <Card sx={{ backgroundColor: "red", marginBottom: 1 }}
                         >
-                            
-                        <div style={{display:"flex",alignItems:"center",paddingLeft:5}}> <ReportProblemIcon sx={{color:"white"}}></ReportProblemIcon>   <TextWarning>{errorServer.message}</TextWarning> </div></Card >: <></>}
+
+                            <div style={{ display: "flex", alignItems: "center", paddingLeft: 5 }}> <ReportProblemIcon sx={{ color: "white" }}></ReportProblemIcon>   <TextWarning>{errorServer.message}</TextWarning> </div></Card > : <></>}
                         <ColumnSpace>
                             <RowTextField>
                                 <ColumnElement>
@@ -855,8 +886,8 @@ export default function Registro() {
                             <RowTextField>
                                 <ColumnElement>
                                     <TextField fullWidth id="outlined-basic"
-                                        onChange={(event) => { 
-                                          
+                                        onChange={(event) => {
+
                                             setAltura(event.target.value)
                                         }}
                                         value={altura}
@@ -864,9 +895,9 @@ export default function Registro() {
                                         InputProps={{
                                             endAdornment: <InputAdornment position="start">mm</InputAdornment>,
                                             inputComponent: NumberFormatCustomDecimal,
-                                            
+
                                         }}
-                                        
+
                                         label="Altura" variant="outlined" />
 
                                 </ColumnElement>
@@ -902,27 +933,62 @@ export default function Registro() {
                                 </ColumnElement>
                                 <ColumnElement>
                                     <TextField value={ano}
-                                    error={error.ano.error}
-                                    onChange={(event) => {
-                                        const newValue=event.target.value;
-                                         if (newValue<999) {
-                                            setError({ ...error, ano: { error: true, message: 'Año invalido' } })
-                                        } else {
-                                            setError({ ...error, ano: { error: false, message: '' } });
-                                        }
+                                        error={error.ano.error}
+                                        onChange={(event) => {
+                                            const newValue = event.target.value;
+                                            if (newValue < 999) {
+                                                setError({ ...error, ano: { error: true, message: 'Año invalido' } })
+                                            } else {
+                                                setError({ ...error, ano: { error: false, message: '' } });
+                                            }
 
-                                        
-                                        if(event.target.value.length < 5){
-                                            setAno(event.target.value);
-                                        }
-                                       
-                                    }} fullWidth id="outlined-basic"
+
+                                            if (event.target.value.length < 5) {
+                                                setAno(event.target.value);
+                                            }
+
+                                        }} fullWidth id="outlined-basic"
                                         label="Año" variant="outlined" />
-                                   {error.ano.error && <ErrorDisplay> <span>{error.ano.message}</span></ErrorDisplay>}      
+                                    {error.ano.error && <ErrorDisplay> <span>{error.ano.message}</span></ErrorDisplay>}
                                 </ColumnElement>
 
                             </RowTextField>
 
+                            <RowTextField>
+                                <ColumnElement>
+                                    <FormControl fullWidth  >
+                                        <InputLabel >Estado</InputLabel>
+                                        <Select
+                                            labelId="estado-id"
+                                            id="estado"
+                                            value={estado}
+                                            label="Estado"
+                                            onChange={handleChangeEstado}
+                                      
+
+                                        >
+                                            <MenuItem value={10}>DISPONIBLE</MenuItem>
+                                            <MenuItem value={20}>ARRENDADO</MenuItem>
+                                            <MenuItem value={30}>VENDIDO</MenuItem>
+                                            <MenuItem value={40}>REMATE</MenuItem>
+                                            <MenuItem value={50}>POR LLEGAR</MenuItem>
+
+                                        </Select>
+                                    </FormControl>
+                                </ColumnElement>
+                                <ColumnElement>
+                                
+                                       <TextField  error={error.ubicacion.error} id="id-ubicacion" label="Ubicacion" variant="outlined" 
+                                        value={ubicacion}
+                                        onChange={handleChangeubicacion}
+                                       />
+                                 {error.ubicacion.error && <ErrorDisplay> <span>{error.ubicacion.message}</span></ErrorDisplay>}
+                                
+                                </ColumnElement>
+
+
+
+                            </RowTextField>
                             <TextField
                                 value={precio}
                                 onChange={(event) => {
@@ -939,17 +1005,17 @@ export default function Registro() {
 
                             />
                         </ColumnSpace>
-                       
-                      { buttonState.state=='init'?  <ButtonSend size='large' 
-                      onClick={enviar} variant="contained" endIcon={<SendIcon></SendIcon>} >Enviar</ButtonSend>:
-                            buttonState.state == 'loading'?
-                            <ButtonLoading variant ="contained"
-                            startIcon={<CircularProgress sx={{color:"var(--black)"}}
-                           size={20  } />}    >Cargando...</ButtonLoading>
-                            :  buttonState.state =='done' ?
-                             <ButtonSuccess size='large'  variant="contained" startIcon ={<CheckIcon></CheckIcon>}> Enviado </ButtonSuccess>:
-                             <ButtonError size='large' onClick={enviar}   variant="contained" startIcon ={<DangerousIcon></DangerousIcon>}> Error</ButtonError>
-                      }
+
+                        {buttonState.state == 'init' ? <ButtonSend size='large'
+                            onClick={enviar} variant="contained" endIcon={<SendIcon></SendIcon>} >Enviar</ButtonSend> :
+                            buttonState.state == 'loading' ?
+                                <ButtonLoading variant="contained"
+                                    startIcon={<CircularProgress sx={{ color: "var(--black)" }}
+                                        size={20} />}    >Cargando...</ButtonLoading>
+                                : buttonState.state == 'done' ?
+                                    <ButtonSuccess size='large' variant="contained" startIcon={<CheckIcon></CheckIcon>}> Enviado </ButtonSuccess> :
+                                    <ButtonError size='large' onClick={enviar} variant="contained" startIcon={<DangerousIcon></DangerousIcon>}> Error</ButtonError>
+                        }
                     </ContainerRegistro>
 
                 </Paper>
