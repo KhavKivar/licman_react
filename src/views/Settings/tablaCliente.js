@@ -20,6 +20,7 @@ import Assignment from '@mui/icons-material/Assignment';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import PersonIcon from '@mui/icons-material/Person';
 import ImageIcon from '@mui/icons-material/Image';
+import { updateClientRut } from '../../features/movimientoSlice';
 
 const options = [
   { value: 'Clientes', label: 'Clientes' },
@@ -123,13 +124,14 @@ const TablaCliente = () => {
           onRowUpdate: (newData, oldData) => {
             return new Promise((resolve, reject) => {
               axios.patch(API.baseURL + "/api/cliente/id/" + oldData.rut, {
-                rut:newData.rut,
+                rut:newData.rut.replaceAll(".", ""),
                 nombre: newData.nombre,
                 telefono: newData.telefono
               }).then((response) => {
-                console.log(response.data);
+                console.log(response);
                 if (response.status == 200) {
-                  dispatch(editCliente(newData));
+                  dispatch(editCliente({data:newData,oldRut:oldData.rut}));
+                  dispatch(updateClientRut({oldRut:oldData.rut,newRut:newData.rut}));
                   resolve();
                 }
               }).catch((error)=>{

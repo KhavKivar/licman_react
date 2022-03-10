@@ -293,6 +293,7 @@ const InventarioComponent = () => {
 
         }}
           options={{
+            filtering: true, 
 
             rowStyle: (data, index) => index % 2 == 0 ? { background: "#f5f5f5" } : null,
             searchFieldStyle: { color: "white", },

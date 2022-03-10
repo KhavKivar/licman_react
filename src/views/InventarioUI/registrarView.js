@@ -313,10 +313,13 @@ export default function Registro() {
             mastil: mastil.id != null ? mastil.id : mastil != null ? mastil : "",
             ano: ano != '' ? parseInt(ano) : 0,
             horometro: horometro != '' ? parseFloat(horometro) : 0,
-            estado:estado == 10 ? 'DISPONIBLE' : estado == 20 ? 'ARRENDADO' : estado == 30 ? 'VENDIDO': estado ==40 ? 'REMATE':'POR LLEGAR',
+            estado:estado == 10 ? 'DISPONIBLE' : estado == 20 ? 'LISTO PARA ENVIAR' : estado == 30 ? 'ARRENDADO': estado == 40 ?
+             'VENDIDO': estado == 50 ? 'REMATE': estado == 60 ? 'POR LLEGAR' : estado==70 ?'STAND BY' : 'SIN INFORMACION',
             ubicacion:ubicacion,
             precio_neto: precio != '' ? parseInt(precio) : 0,
         };
+
+
 
 
 
@@ -453,12 +456,20 @@ export default function Registro() {
     const [precio, setPrecio] = useState(equipo != null ? equipo.precio_neto : '');
 
     const [estado, setEstado] = useState(equipo != null ? 
-        equipo.estado == 'DISPONIBLE' ? 10 :  equipo.estado == 'ARRENDADO' ? 20:  equipo.estado == 'VENDIDO' ? 30:
-                            equipo.estado == 'REMATE' ? 40:50  :10) ;
+        equipo.estado == 'DISPONIBLE' ? 10 :  equipo.estado == 'LISTO PARA ENVIAR' ? 20:  equipo.estado == 'ARRENDADO' ? 30:
+                            equipo.estado == 'VENDIDO' ? 40 : equipo.estado == 'REMATE'? 50 : equipo.estado =='POR LLEGAR'?
+                            60 :equipo.estado == 'STAND BY'?70 :80
+                           :
+                            
+                            
+                            10) ;
         
-        
+
+                              
+                          
+
       
-    const [ubicacion, setUbicacion] =useState(equipo != null ? equipo.ubicacion : 'Bodega central');
+    const [ubicacion, setUbicacion] =useState(equipo != null ? equipo.ubicacion : 'Taller');
 
 
     const [buttonState, setButtonState] = useState({ state: "init" });
@@ -966,12 +977,16 @@ export default function Registro() {
                                             onChange={handleChangeEstado}
                                       
 
-                                        >
+                                        >   
+                                            
                                             <MenuItem value={10}>DISPONIBLE</MenuItem>
-                                            <MenuItem value={20}>ARRENDADO</MenuItem>
-                                            <MenuItem value={30}>VENDIDO</MenuItem>
-                                            <MenuItem value={40}>REMATE</MenuItem>
-                                            <MenuItem value={50}>POR LLEGAR</MenuItem>
+                                            <MenuItem value={20}>LISTO PARA ENVIAR</MenuItem>
+                                            <MenuItem value={30}>ARRENDADO</MenuItem>
+                                            <MenuItem value={40}>VENDIDO</MenuItem>
+                                            <MenuItem value={50}>REMATE</MenuItem>
+                                            <MenuItem value={60}>POR LLEGAR</MenuItem>
+                                            <MenuItem value={70}>STAND BY</MenuItem>
+                                            <MenuItem value={80}>SIN INFORMACION</MenuItem>
 
                                         </Select>
                                     </FormControl>

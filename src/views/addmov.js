@@ -44,6 +44,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import CheckIcon from '@mui/icons-material/Check';
 import DangerousIcon from '@mui/icons-material/Dangerous';
 import Card from '@mui/material/Card';
+import { updateEstado } from '../features/inventarioSlice';
 
 
 
@@ -510,6 +511,14 @@ const AddMovComponent = () => {
                 console.log(response.data);
                 dispatch(addMovimiento(response.data));
                 dispatch(cleanInput());
+                if(obj.tipo == 'ENVIO' &&  obj.observaciones == 'Venta'){
+                    const equipo = actaList.find(element=>element.idInspeccion == obj.idInspeccion);
+                    if(equipo >=0){
+                        dispatch(updateEstado({idEquipo:equipo.idEquipo,estado:'VENDIDO'}))
+                    }
+                   
+                }
+               
                 navigate("/movimientos");
                 console.log(response.data);
             }
@@ -534,9 +543,9 @@ const AddMovComponent = () => {
             idInspeccion: acta.label,
             rut: rut.id != null ? rut.id : rut,
             idGuiaDespacho: guiaDespacho,
-            cambio: cambio != "" ? cambio : null,
+            cambio: cambio.id != null ? cambio.id :  cambio != "" ? cambio : null,
             tipo: tipo == 10 ? "ENVIO" : "RETIRO",
-            observaciones: obv,
+            observaciones: obv.id != null ? obv.id : obv,
             fechaRetiro: fechaTermino != "" && fechaTermino != 'Invalid date' && fechaTermino != null ? moment(fechaTermino).format('YYYY-MM-DD') : null
         }
 
@@ -832,18 +841,18 @@ const AddMovComponent = () => {
                         </RowTextField>
                         <RowTextField>
                             <ColumnElement>
-                                <TextField
+                            
+                            <Autocomplete
+                                    disablePortal
+                                    onChange={(event, newValue) => {
+                                         dispatch(setCambio(newValue));
+                                    }   
+                                    }
                                     value={cambio}
-                                    onChange={(e) => {
-
-                                        dispatch(setCambio(e.target.value));
-                                    }}
-                                    InputProps={{
-
-                                        inputComponent: NumberFormatCustomWithoutPrefix,
-                                    }}
-
-                                    id="outlined-basic" label="Cambio" variant="outlined" />
+                                    options={idListEquipo}
+                                    renderInput={(params) => <TextField {...params} label="Cambio" />}
+                                />
+                               
                             </ColumnElement>
                             <ColumnElement>
                                 <Autocomplete
@@ -932,10 +941,74 @@ const AddMovComponent = () => {
                             </ColumnElement>
 
                             <ColumnElement>
-                                <TextField
+
+                            <Autocomplete
                                     value={obv}
-                                    onChange={(e) => dispatch(setObv(e.target.value))}
-                                    id="outlined-basic" label="Observaciones" variant="outlined" />
+                                  
+                                    onChange={(event, newValue) => {
+                                        if (typeof newValue === 'string') {
+                                            dispatch(setObv({
+                                                id: newValue,
+                                            }));
+
+                                        } else if (newValue && newValue.inputValue) {
+                                            dispatch(setObv({
+                                                id: newValue.inputValue,
+                                            }));
+                                        } else {
+                                          
+                                            dispatch(setObv(newValue));
+
+                                        }
+                                    }}
+                                    filterOptions={(options, params) => {
+                                        const filtered = filter(options, params);
+                                        const { inputValue } = params;
+                                        const isExisting = options.some((option) => inputValue === option.id);
+                                        if (inputValue !== '' && !isExisting) {
+                                            filtered.push({
+                                                inputValue,
+                                                id: `Añadir ${inputValue}`,
+                                            });
+                                        }
+
+                                        return filtered;
+                                    }}
+                                    selectOnFocus
+                                    clearOnBlur
+                                    handleHomeEndKeys
+                                    id="Observaciones"
+                                    options={[{id:'Venta'},{id:'Termino Arriendo'},
+                                    {id:'Nuevo Arriendo'},{id:'Despacho Por Cambio'},{id:'Retiro Por Cambio'},
+                                    {id:'Retiro Por Reparacion'},
+                                
+                                    {id:'Despacho Por Reparacion'},
+                                ]}
+                                    getOptionLabel={(option) => {
+
+                                        // Value selected with enter, right from the input
+                                        if (typeof option === 'string') {
+                                            return option;
+                                        }
+                                        // Add "xxx" option created dynamically
+                                        if (option.inputValue) {
+                                            return option.inputValue;
+                                        }
+                                        // Regular option
+                                        return option.id;
+                                    }}
+                                    renderOption={(props, option) => <li {...props}>{option.id}</li>}
+
+                                    freeSolo
+                                    renderInput={(params) => (
+
+                                        <TextField {...params}  label="Observaciones"
+
+
+                                        />
+                                    )}
+                                />
+                             
                             </ColumnElement>
 
                         </RowTextField>

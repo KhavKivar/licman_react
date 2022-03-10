@@ -18,6 +18,13 @@ export const movimientoSlice = createSlice({
       state.data[indexMov] = action.payload;
     }
    },
+   updateClientRut:(state,action)=>{
+    for (let i = 0; i < state.data.length; i++) {
+      if(state.data[i].rut ==action.payload.oldRut ){
+          state.data[i].rut = action.payload.newRut;
+      }
+    } 
+   },
    deleteMov:(state,action)=>{
     const indexMov = state.data.findIndex(x=>x.idMovimiento == parseInt(action.payload.idMovimiento));
     if(indexMov >= 0){        
@@ -30,6 +37,6 @@ export const movimientoSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { initStateMovimiento,addMovimiento,editMovimiento,deleteMov} = movimientoSlice.actions
+export const { initStateMovimiento,addMovimiento,editMovimiento,deleteMov,updateClientRut} = movimientoSlice.actions
 
 export default movimientoSlice.reducer
