@@ -532,7 +532,7 @@ const AddMovComponent = () => {
             }
         }).catch((error) => {
                 setButtonState({state:"fail"});
-                console.log(error.message);
+                console.log(error);
                 if (error.message == 'Network Error') {
                     seterrorServer({ error: true, message: "Servidor caido" });
                 }
