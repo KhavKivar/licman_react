@@ -99,10 +99,10 @@ export default function ActaGeneral() {
 
           }
         }}
-        title="Acta General"
+        title="Actas"
         icons={{
 
-          ViewColumn: forwardRef((props, ref) => <ViewColumnIcon sx={{ marginTop: 0.6 }}   {...props} ref={ref} />),
+          ViewColumn: forwardRef((props, ref) => <ViewColumnIcon sx={{ marginTop: 0 }}   {...props} ref={ref} />),
 
         }}
         columns={[
@@ -170,24 +170,8 @@ export default function ActaGeneral() {
 
             }
           },
-          {
-            icon: () => <div style={{ width: 250, height: 45, margin: "auto" }} > <Select
-
-              getOptionLabel={e => (
-
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  {e.label == "Inventario" ? <Assignment
-                    sx={{ color: "var(--black) !important", opacity: tabSelect.label == e.label ? 1 : 0.5 }}></Assignment> : <ContentPasteIcon sx={{ color: "var(--black) !important", opacity: tabSelect.label == e.label ? 1 : 0.5 }} ></ContentPasteIcon>}
-                  <span style={{ marginLeft: 5, color: "var(--black)", opacity: tabSelect.label == e.label ? 1 : 0.5 }}>{e.label}</span>
-                </div>
-              )}
-              value={tabSelect} onChange={handleChange} options={options} /></div>,
-            tooltip: '',
-            isFreeAction: true,
-            onClick: (event, rowData) => {
-
-            }
-          },
+     
+          
 
           {
             icon: () => <ManageSearchIcon sx={{ color: "black !important" }}></ManageSearchIcon>,

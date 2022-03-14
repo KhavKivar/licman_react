@@ -215,13 +215,13 @@ const InventarioComponent = () => {
 
           icons={{
             ...tableIcons,
-            ViewColumn: forwardRef((props, ref) => <ViewColumnIcon sx={{ marginTop: 0.6 }}   {...props} ref={ref} />),
-            Export: forwardRef((props, ref) => <SaveAltIcon sx={{ marginTop: 0.6 }} {...props} ref={ref} />),
+            ViewColumn: forwardRef((props, ref) => <ViewColumnIcon sx={{ marginTop: 0 }}   {...props} ref={ref} />),
+            Export: forwardRef((props, ref) => <SaveAltIcon sx={{ marginTop: 0 }} {...props} ref={ref} />),
           }}
           title={params.value != null ? TitleElement : "Inventario"}
 
           columns={[
-            { title: 'Numero interno', field: 'idEquipo' },
+            { title: 'Codigo interno', field: 'idEquipo' },
             { title: 'Tipo', field: 'tipo' },
             { title: 'Marca', field: 'marca' },
             { title: 'Modelo', field: 'modelo' },
@@ -319,7 +319,7 @@ const InventarioComponent = () => {
           actions={[
 
             {
-              icon: () => <div style={{ paddingBottom: 5, width: 32 }}><AddBox sx={{ color: "white" }}></AddBox></div>,
+              icon: () => <div style={{ paddingBottom: 0, width: 32 }}><AddBox sx={{ color: "white" }}></AddBox></div>,
               tooltip: 'Añadir equipo',
               isFreeAction: true,
               onClick: (event, rowData) => {
@@ -328,7 +328,7 @@ const InventarioComponent = () => {
             },
 
             {
-              icon: () => <div style={{ paddingBottom: 5, width: 32 }}><ReplayIcon sx={{ color: "white" }}></ReplayIcon></div>,
+              icon: () => <div style={{ paddingBottom: 0, width: 32 }}><ReplayIcon sx={{ color: "white" }}></ReplayIcon></div>,
               tooltip: 'Actualizar',
               isFreeAction: true,
               onClick: (event, rowData) => {
@@ -337,24 +337,7 @@ const InventarioComponent = () => {
 
               }
             },
-            {
-              icon: () => <div style={{ width: 250, height: 45, margin: "auto" }} > <Select
-                getOptionLabel={e => (
-
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    {e.label == "Inventario" ? <Assignment
-                      sx={{ color: "var(--black) !important", opacity: tabSelect.value == e.label ? 1 : 0.5 }}></Assignment> : <ContentPasteIcon sx={{ color: "var(--black) !important", opacity: tabSelect.value == e.label ? 1 : 0.5 }} ></ContentPasteIcon>}
-                    <span style={{ marginLeft: 5, color: "var(--black)", opacity: tabSelect.value == e.label ? 1 : 0.5 }}>{e.label}</span>
-                  </div>
-                )}
-
-                value={tabSelect} onChange={handleChange} options={options} /></div>,
-              tooltip: '',
-              isFreeAction: true,
-              onClick: (event, rowData) => {
-
-              }
-            },
+          
             {
               icon: () => <VisibilityIcon sx={{ color: "black !important" }} />,
               tooltip: 'Inspecionar',

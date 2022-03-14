@@ -8,6 +8,8 @@ export const movRegisterSlice = createSlice({
   reducers: {
     editValue:(state,action)=>{
       const listOfActa= action.payload.listOfActa;
+      const clientes = action.payload.listCliente;
+
       const idEquipo = listOfActa.find(x =>x.idInspeccion==action.payload.idInspeccion).idEquipo;
       const actaList =[];
       for(const x of listOfActa){
@@ -15,7 +17,10 @@ export const movRegisterSlice = createSlice({
           actaList.push({label:x.idInspeccion.toString()});
         }
       }
-      state.rut= action.payload.rut;
+
+      const indexCliente = clientes.findIndex(x=>x.rut == action.payload.rut);
+      
+      state.rut= indexCliente == -1 ? "":  clientes[indexCliente].nombre;
       state.codigo=action.payload.idEquipo.toString();
       state.acta = {label:action.payload.idInspeccion.toString()};
       state.actaList =actaList;

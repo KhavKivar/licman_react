@@ -11,6 +11,7 @@ import Acta from '../views/acta';
 import AddMov from '../views/addmov';
 import Homef from '../views/home';
 import Inventario from '../views/InventarioUI/inventario';
+import ActaGeneral from '../views/InventarioUI/acta_general';
 import Registro from '../views/InventarioUI/registrarView';
 import TablaActa from '../views/InventarioUI/table_actas';
 import Movimiento from '../views/movimiento';
@@ -19,9 +20,10 @@ import ShowPdf from '../views/showpdf';
 import "./content.css";
 import SideBarTop from './sidebartop';
 
+import PersonIcon from '@mui/icons-material/Person';
+import { BarChart,Inventory } from '@mui/icons-material';
 
-
-
+import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 
 
 
@@ -131,8 +133,8 @@ export default function SideBar() {
                 exact="true"
                 activeclassname="active"
                 to="/">
-                <Home>  </Home>
-                <Text clicked={click} >Home</Text>
+                <BarChart>  </BarChart>
+                <Text clicked={click} >Estadisticas</Text>
 
 
 
@@ -144,14 +146,21 @@ export default function SideBar() {
                 <Assignment />
                 <Text clicked={click} >Inventario</Text>
               </Item>
+              <Item onClick={() => setClick(false)}
+                exact="true"
+                activeclassname="active"
+                to="/actas">
+                <ContentPasteIcon />
+                <Text clicked={click} >Actas</Text>
+              </Item>
               <Item onClick={() => setClick(false)} exact="true" activeclassname="active" to="/movimientos">
                 <SwapVertIcon />
                 <Text clicked={click} >Movimientos</Text>
               </Item >
 
               <Item onClick={() => setClick(false)} exact="true" activeclassname="active" to="/config">
-                <SettingsIcon />
-                <Text clicked={click} >Configuraciones</Text>
+                <PersonIcon />
+                <Text clicked={click} >Clientes</Text>
               </Item>
             </SlickBar>
           </SideBarContainer>
@@ -159,6 +168,9 @@ export default function SideBar() {
             <Routes>
               <Route exact path="/" element={<Homef></Homef>} />
               <Route path="/home" element={<Homef></Homef>} />
+              <Route path="/actas" element={<ActaGeneral />}> </Route>
+
+
               <Route path="/inventario" element={<Inventario />}> </Route>
 
               <Route path="/inventario/search/:value" element={<Inventario />}> </Route>

@@ -98,7 +98,51 @@ export default function ShowPdf() {
     const downloadDocument = () =>{
         window.location.href =url;
     };
+    var esImagen = false;
+    if(url != null){
+        console.log(url);
+        esImagen = ['jpg','png','jpeg'].includes( url.toString().split('.').pop())
+        console.log(esImagen);
+    }
+ 
+    const componentShowPdfs = url != null  ? 
 
+    <div>
+        <div>
+        <div  style={{ display: "flex",justifyContent:"space-between" }} > 
+            <div  style={{ display: "flex",gap:"0.5rem"}}>
+                <Button
+                startIcon={<ArrowBackIcon></ArrowBackIcon>}
+                sx={{background:"var(--black)"}}
+                variant="contained" disabled={pageNumber <= 1} onClick={previousPage}>  Anterior</Button>
+
+                <Button  sx={{background:"var(--black)"}} 
+                endIcon={<ArrowForwardIcon></ArrowForwardIcon>}
+                variant="contained" disabled={pageNumber >= numPages} onClick={nextPage}>  Siguiente</Button>
+            </div>
+            <Button 
+             sx={{background:"var(--black)"}}   
+             onClick={downloadDocument}
+            startIcon={<DownloadIcon></DownloadIcon>} variant="contained">Descargar</Button>
+        </div>
+            <p>
+                Pagina {pageNumber || (numPages ? 1 : '--')} de {numPages || '--'}
+            </p>
+
+        </div>
+
+        <Document
+            file={{
+                url:
+                    url,
+            }}
+            onLoadSuccess={onDocumentLoadSuccess}
+            onLoadError={(error) => console.log("Inside Error", error)}
+        >
+            <Page pageNumber={pageNumber} />
+
+        </Document>
+    </div> :<></>;
 
     return (
         <>
@@ -177,46 +221,13 @@ export default function ShowPdf() {
                 </Box>
 
                 </div>
-
-                {url != null &&
-
-                    <div>
-                        <div>
-                        <div  style={{ display: "flex",justifyContent:"space-between" }} > 
-                            <div  style={{ display: "flex",gap:"0.5rem"}}>
-                                <Button
-                                startIcon={<ArrowBackIcon></ArrowBackIcon>}
-                                sx={{background:"var(--black)"}}
-                                variant="contained" disabled={pageNumber <= 1} onClick={previousPage}>  Anterior</Button>
-
-                                <Button  sx={{background:"var(--black)"}} 
-                                endIcon={<ArrowForwardIcon></ArrowForwardIcon>}
-                                variant="contained" disabled={pageNumber >= numPages} onClick={nextPage}>  Siguiente</Button>
-                            </div>
-                            <Button 
-                             sx={{background:"var(--black)"}}   
-                             onClick={downloadDocument}
-                            startIcon={<DownloadIcon></DownloadIcon>} variant="contained">Descargar</Button>
-                        </div>
-                            <p>
-                                Pagina {pageNumber || (numPages ? 1 : '--')} de {numPages || '--'}
-                            </p>
-
-                        </div>
-
-                        <Document
-                            file={{
-                                url:
-                                    url,
-                            }}
-                            onLoadSuccess={onDocumentLoadSuccess}
-                            onLoadError={(error) => console.log("Inside Error", error)}
-                        >
-                            <Page pageNumber={pageNumber} />
-
-                        </Document>
-                    </div>
-                }
+                {esImagen == true && url != null ?  <div style={{width:"50%",paddingTop:"43px"}}>
+                    <a href={url}><img alt="stack overflow" src={url} width="100%"></img></a>
+                </div> 
+            
+                
+                :componentShowPdfs}
+              
             </div>
 
         </>

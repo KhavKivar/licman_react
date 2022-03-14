@@ -285,6 +285,8 @@ const AddMovComponent = () => {
     const equipoList = useSelector((state) => state.inventario.data);
     const movList = useSelector((state) => state.movimiento.data);
     const actaList = useSelector((state) => state.acta.data);
+
+
     const delay = ms => new Promise(res => setTimeout(res, ms));
     const [openInput, setopenInput] = useState(false);
     const [buttonState,setButtonState] = useState({state:"init"});
@@ -301,13 +303,18 @@ const AddMovComponent = () => {
 
     }
 
-    const OpcionesRut = [];
+    
     const idListEquipo = [];
     const idListActa = [];
+    const OpcionesEmpresas = [];
+
 
     for (const cliente in clienteList) {
-        OpcionesRut.push({ id: format(clienteList[cliente].rut, { dots: false }) })
+        OpcionesEmpresas.push(clienteList[cliente].nombre );
     }
+
+
+
     for (const id in equipoList) {
         idListEquipo.push(equipoList[id].idEquipo.toString())
     }
@@ -460,6 +467,7 @@ const AddMovComponent = () => {
             nombre:newName,
             telefono:telefono
         }
+        
         axios.post(API.baseURL + "/api/cliente/",objCliente ).then((response) => {
             if(response.status==200){
                 console.log(response.data);
@@ -537,11 +545,19 @@ const AddMovComponent = () => {
     const sendLogic = () => {
         var re = /(?:\.([^.]+))?$/;
 
+        //Get rut;
+        const index_cliente = clienteList.findIndex(x=>x.nombre == rut);
+        let realRut = "1111111-1";
 
+        if(index_cliente != -1){
+            realRut = clienteList[index_cliente].rut;
+        }
+        console.log(realRut);
+        
         const movimientoObject = {
             transporte: transporte == 10 ? "Marco" : "Externo",
             idInspeccion: acta.label,
-            rut: rut.id != null ? rut.id : rut,
+            rut: realRut,
             idGuiaDespacho: guiaDespacho,
             cambio: cambio.id != null ? cambio.id :  cambio != "" ? cambio : null,
             tipo: tipo == 10 ? "ENVIO" : "RETIRO",
@@ -549,11 +565,27 @@ const AddMovComponent = () => {
             fechaRetiro: fechaTermino != "" && fechaTermino != 'Invalid date' && fechaTermino != null ? moment(fechaTermino).format('YYYY-MM-DD') : null
         }
 
-        if (selectedFile != null) {
+        if (selectedFile != null) {       
             const key = uuidv4() + "." + re.exec(selectedFile.name)[1];
             const url = "https://licman.s3.amazonaws.com/" + key.toString();
-            uploadFile(selectedFile, key);
             movimientoObject.urlGuiaDespacho = url;
+            const params = {
+                ACL: 'public-read',
+                Body: selectedFile,
+                Bucket: S3_BUCKET,
+                Key: key
+            };
+
+            myBucket.putObject(params)
+                .on('httpUploadProgress', (evt) => {
+
+                })
+                .send((err,data) => {
+                    
+                    if(err){
+                        console.log(err);
+                    }
+                });
         }
         if (edit) {
             sendObjEdit(movimientoObject);
@@ -561,6 +593,7 @@ const AddMovComponent = () => {
             sendObj(movimientoObject);
 
         }
+      
     }
     const Enviar = async () => {
         handleErrors();
@@ -570,18 +603,10 @@ const AddMovComponent = () => {
                 return;
             }
         }
-
-        //check if rut exist
-        const rutCh = rut.id != null ? rut.id : rut;
         setButtonState({state:"loading"});
         await delay(400);
-
-        if (OpcionesRut.find(x => x.id == rutCh) == undefined) {
-            handleClickOpen();
-        } else {
-
-            sendLogic();
-        }
+        sendLogic();
+        
 
     };
 
@@ -695,108 +720,20 @@ const AddMovComponent = () => {
                         </RowTextField>
                         <RowTextField>
                             <ColumnElement>
-                                <Autocomplete
-                                    value={rut}
-                                    inputValue={inputRut}
-                                    onInputChange={(event, value) => {
-
-
-                                        if (value.length < 11) {
-                                            if (value.length > 7) {
-                                                dispatch(setRutInputValue(
-                                                    format(value, { dots: false }),
-                                                ));
-                                            } else {
-                                                dispatch(setRutInputValue(
-                                                    clean(value)
-                                                ));
-                                            }
-                                        }
-
-
-                                    }}
+                            <Autocomplete
+                                    disablePortal
                                     onChange={(event, newValue) => {
-
-                                        //InputValue
-                                        //id
-                                        //newValue
                                         if (newValue == null || newValue == '') {
                                             setError({ ...error, rut: { error: true, message: 'Este campo no puede ser vacio' } })
                                         } else {
                                             setError({ ...error, rut: { error: false, message: '' } });
                                         }
-
-
-                                        if (typeof newValue === 'string') {
-                                            console.log("1");
-                                            if (!validate(newValue)) {
-                                                setError({ ...error, rut: { error: true, message: 'rut invalido' } })
-                                            }
-                                            dispatch(setRut({
-                                                id: newValue,
-                                            }));
-
-                                        } else if (newValue && newValue.inputValue) {
-                                            console.log("2");
-                                            if (!validate(newValue.inputValue)) {
-                                                setError({ ...error, rut: { error: true, message: 'rut invalido' } })
-                                            }
-                                            dispatch(setRut({
-                                                id: newValue.inputValue,
-                                            }));
-
-
-                                        } else {
-                                            console.log("3");
-                                            if (!validate(newValue.id)) {
-                                                setError({ ...error, rut: { error: true, message: 'Rut invalido' } })
-                                            }
-                                            dispatch(setRut(newValue));
-
-                                        }
-                                    }}
-                                    filterOptions={(options, params) => {
-                                        const filtered = filter(options, params);
-                                        const { inputValue } = params;
-                                        const isExisting = options.some((option) => inputValue === option.id);
-                                        if (inputValue !== '' && !isExisting) {
-                                            filtered.push({
-                                                inputValue,
-                                                id: `Añadir ${inputValue}`,
-                                            });
-                                        }
-
-                                        return filtered;
-                                    }}
-                                    selectOnFocus
-                                    clearOnBlur
-                                    handleHomeEndKeys
-                                    id="rut"
-                                    options={OpcionesRut}
-                                    getOptionLabel={(option) => {
-
-
-                                        // Value selected with enter, right from the input
-                                        if (typeof option === 'string') {
-                                            return option;
-                                        }
-                                        // Add "xxx" option created dynamically
-                                        if (option.inputValue) {
-                                            return option.inputValue;
-                                        }
-                                        // Regular option
-                                        return option.id;
-                                    }}
-                                    renderOption={(props, option) => <li {...props}>{option.id}</li>}
-
-                                    freeSolo
-                                    renderInput={(params) => (
-
-                                        <TextField {...params} error={error.rut.error} label="Rut Empresa"
-
-
-                                        />
-                                    )}
+                                        dispatch(setRut(newValue));
+                                    }
+                                    }
+                                    value={rut}
+                                    options={OpcionesEmpresas}
+                                    renderInput={(params) => <TextField {...params} error={error.rut.error} label="Nombre empresa" />}
                                 />
 
                                 {error.rut.error && <ErrorDisplay> <span>{error.rut.message}</span></ErrorDisplay>}

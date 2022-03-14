@@ -37,19 +37,25 @@ const MovimientoComponent = () => {
 
     const rowsWithPower = [];
 
+    
 
 
     for (var i in editable) {
-        if (actas.length >0 && cliente.length > 0) {
-            console.log(actas);
-            console.log(cliente)
-            editable[i].idEquipo = actas.find(x => x.idInspeccion == editable[i].idInspeccion).idEquipo;
-            editable[i].empresa = cliente.find(x => x.rut == editable[i].rut).nombre;
+        if (actas.length > 0 && cliente.length > 0) {
+            const acta = actas.find(x => x.idInspeccion == editable[i].idInspeccion);
+            const client = cliente.find(x => x.rut == editable[i].rut);
+            if (acta != undefined) {
+                editable[i].idEquipo = acta.idEquipo;
+            } else {
+                editable[i].idEquipo = "";
+            }
+            if (client != undefined) {
+                editable[i].empresa = client.nombre;
+            } else {
+                editable[i].empresa = "";
+            }
             rowsWithPower.push(editable[i]);
-        }else{
-            editable[i].idEquipo = "";
-            editable[i].empresa ="";
-            rowsWithPower.push(editable[i]);
+
         }
     }
 
@@ -70,7 +76,7 @@ const MovimientoComponent = () => {
 
     return (<>
 
-      
+
 
 
         <MaterialTable
@@ -107,7 +113,7 @@ const MovimientoComponent = () => {
                 { title: 'Movimiento ID', field: 'idMovimiento', hidden: true },
                 { title: 'Transporte', field: 'transporte', render: x => x.transporte == "externo" ? "Externo" : "Marco" },
                 {
-                    title: 'Rut Empresa', field: 'rut', render: x => {
+                    title: 'Rut Empresa', field: 'rut',  hidden: true,render: x => {
                         return <><p data-tip={cliente.find(y => y.rut == x.rut).nombre}>{format(x.rut)}
                         </p>
                             <ReactTooltip /></>
@@ -115,7 +121,7 @@ const MovimientoComponent = () => {
                 },
                 { title: 'Empresa', field: 'empresa' },
                 { title: 'Tipo', field: 'tipo', render: x => x.tipo == "ENVIO" ? "Envio" : "Retiro" },
-                { title: 'Cambio', field: 'cambio', hidden: true },
+                { title: 'Cambio', field: 'cambio' },
                 {
                     title: 'Codigo equipo', field: 'idEquipo', render: x => {
                         return <> <a data-tip="Ver equipo"
@@ -160,11 +166,11 @@ const MovimientoComponent = () => {
                     }
                 },
                 {
-                    title: 'Fecha de retiro', searchable: false,field: 'fechaRetiro', render: x => {
+                    title: 'Fecha de retiro', searchable: false,  hidden: true, field: 'fechaRetiro', render: x => {
                         return x.fechaRetiro != null ? x.fechaRetiro.split("T")[0] : "    ";
                     }
                 },
-                { title: 'Observaciones', field: 'observaciones', hidden: true, searchable: false },
+                { title: 'Observaciones', field: 'observaciones',  searchable: false },
 
             ]}
             data={rowsWithPower}
@@ -225,7 +231,7 @@ const MovimientoComponent = () => {
                     icon: () => <CreateIcon sx={{ color: "black !important" }}></CreateIcon>,
                     tooltip: 'Editar Movimiento',
                     onClick: (event, rowData) => {
-                        dispatch(editValue({ ...rowData, listOfActa: actas }));
+                        dispatch(editValue({ ...rowData, listOfActa: actas ,listCliente:cliente}));
                         navigate('/movimientos/registro/' + rowData.idMovimiento);
 
 
@@ -254,7 +260,7 @@ const MovimientoComponent = () => {
         </div>}
 
     </>
-    
+
     );
 }
 

@@ -288,6 +288,9 @@ export default function Registro() {
         }if(ubicacion == ''|| ubicacion == null){
             error.ubicacion = { error: true, message: 'Este campo no puede ser vacio' }
         }
+        if(mastil == ''|| mastil == null){
+            error.mastil = { error: true, message: 'Este campo no puede ser vacio' }
+        }
 
         setError({ ...error })
 
@@ -310,7 +313,7 @@ export default function Registro() {
             serie: serie,
             capacidad: capacidad != '' ? capacidad : '0',
             altura: altura != '' ? altura : '0',
-            mastil: mastil.id != null ? mastil.id : mastil != null ? mastil : "",
+            mastil: mastil == 10 ? 'SIMPLE' :mastil == 20?'DOBLE':'TRIPLE',
             ano: ano != '' ? parseInt(ano) : 0,
             horometro: horometro != '' ? parseFloat(horometro) : 0,
             estado:estado == 10 ? 'DISPONIBLE' : estado == 20 ? 'LISTO PARA ENVIAR' : estado == 30 ? 'ARRENDADO': estado == 40 ?
@@ -412,7 +415,7 @@ export default function Registro() {
     const serieArray = [...new Set(inventarioList.map(x => x.serie))]
     const serieOpciones = []
 
-    const mastilOpciones = [{ id: "Triple" }, { id: "Doble" }]
+    const mastilOpciones = [{ id: "Triple" }, { id: "Doble" },{id:'Simple'}]
 
     for (const element of codigoArray) {
         codigoOpciones.push({ id: element });
@@ -439,7 +442,7 @@ export default function Registro() {
 
     const [error, setError] = useState({
         id: { error: false, message: '' }, tipo: { error: false, message: '' }, marca: { error: false, message: '' }, modelo: { error: false, message: '' }, serie: { error: false, message: '' }
-        , ano: { error: false, message: '' },ubicacion:{error:false,message:''}
+        , ano: { error: false, message: '' },ubicacion:{error:false,message:''},mastil:{error:false,message:''}
     });
 
     const [tipo, setTipo] = useState(equipo != null ? equipo.tipo : '');
@@ -450,7 +453,7 @@ export default function Registro() {
 
     const [capacidad, setCapacidad] = useState(equipo != null ? equipo.capacidad : '');
     const [altura, setAltura] = useState(equipo != null ? equipo.altura : '');
-    const [mastil, setMastil] = useState(equipo != null ? equipo.mastil : '');
+    const [mastil, setMastil] = useState(equipo != null ? equipo.mastil == 'SIMPLE' ? 10:equipo.mastil == 'DOBLE'? 20:30 : null);
     const [ano, setAno] = useState(equipo != null ? equipo.ano : '');
     const [horometro, setHorometro] = useState(equipo != null ? equipo.horometro : '');
     const [precio, setPrecio] = useState(equipo != null ? equipo.precio_neto : '');
@@ -837,60 +840,38 @@ export default function Registro() {
 
                                 </ColumnElement>
                                 <ColumnElement>
-                                    <Autocomplete
-                                        value={mastil}
-                                        onChange={(event, newValue) => {
 
-                                            if (typeof newValue === 'string') {
-                                                setMastil({
-                                                    id: newValue,
-                                                });
-                                            } else if (newValue && newValue.inputValue) {
-                                                setMastil({
-                                                    id: newValue.inputValue,
-                                                });
-                                            } else {
-                                                setMastil(newValue);
-                                            }
-                                        }}
-                                        filterOptions={(options, params) => {
-                                            const filtered = filter(options, params);
-                                            const { inputValue } = params;
-                                            const isExisting = options.some((option) => inputValue === option.id);
-                                            if (inputValue !== '' && !isExisting) {
-                                                filtered.push({
-                                                    inputValue,
-                                                    id: `Añadir ${inputValue}`,
-                                                });
-                                            }
-
-                                            return filtered;
-                                        }}
-                                        selectOnFocus
-                                        clearOnBlur
-                                        handleHomeEndKeys
+                                <FormControl fullWidth   error ={error.mastil.error} >
+                                    <InputLabel >Mastil</InputLabel>
+                                    <Select
+                                        labelId="mastil-id"
                                         id="mastil"
-                                        options={mastilOpciones}
-
-                                        getOptionLabel={(option) => {
-                                            // Value selected with enter, right from the input
-                                            if (typeof option === 'string') {
-                                                return option;
+                                        value={mastil}
+                                        label="Transporte"
+                                        error ={error.mastil.error}
+                                        onChange={(event,newValue) =>{
+                                            if (event.target.value == null || event.target.value == '') {
+                                                setError({ ...error, mastil: { error: true, message: 'Este campo no puede ser vacio' } })
+                                            } else {
+                                                setError({ ...error, mastil: { error: false, message: '' } });
                                             }
-                                            // Add "xxx" option created dynamically
-                                            if (option.inputValue) {
-                                                return option.inputValue;
-                                            }
-                                            // Regular option
-                                            return option.id;
+                                    
+                                            setMastil(
+                                                event.target.value,
+                                            );
                                         }}
-                                        renderOption={(props, option) => <li {...props}>{option.id}</li>}
+                                        
+                                    >
+                                        <MenuItem value={10}>Simple</MenuItem>
+                                        <MenuItem value={20}>Doble</MenuItem>
+                                        <MenuItem value={30}>Triple</MenuItem>
 
-                                        freeSolo
-                                        renderInput={(params) => (
-                                            <TextField {...params} label="Mastil" />
-                                        )}
-                                    />
+                                    </Select>
+                                </FormControl>
+
+                                {error.mastil.error && <ErrorDisplay> <span>{error.mastil.message}</span></ErrorDisplay>}
+
+                                   
 
                                 </ColumnElement>
                             </RowTextField>
