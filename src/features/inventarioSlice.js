@@ -23,14 +23,14 @@ export const inventarioSlice = createSlice({
       if(indexEquipo >= 0){        
         state.data.splice(indexEquipo,1);
       }
+    },
+    updateEstado:(state,action)=>{
+      const indexEquipo = state.data.findIndex(x=>x.idEquipo == parseInt(action.payload.idEquipo));
+      if(indexEquipo >= 0){        
+        state.data[indexEquipo].estado = action.payload.estado;
+      }
     }
   },
-  updateEstado:(state,action)=>{
-    const indexEquipo = state.data.findIndex(x=>x.idEquipo == parseInt(action.payload.idEquipo));
-    if(indexEquipo >= 0){        
-      state.data[indexEquipo].estado = action.payload.estado;
-    }
-  }
 })
 
 // Action creators are generated for each case reducer function

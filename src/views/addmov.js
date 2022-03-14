@@ -257,7 +257,36 @@ const NumberFormatCustomWithoutPrefix = forwardRef(function NumberFormatCustom(p
     );
 });
 
-
+function obvToEstado(x) {
+    let estado = 'DISPONIBLE';
+    switch (x) {
+        case 'Venta':
+            estado = 'VENDIDO';
+            break;
+        case 'Nuevo Arriendo':
+            estado = 'ARRENDADO';
+            break;
+        case 'Termino Arriendo':
+            estado = 'DISPONIBLE';
+            break;
+        case 'Despacho Por Cambio':
+            estado = 'ARRENDADO';
+            break;
+        case 'Despacho Por Reparacion':
+            estado = 'ARRENDADO';
+            break;
+        case 'Retiro Por Cambio':
+            estado = 'DISPONIBLE';
+            break;
+        case 'Retiro Por Reparacion':
+            estado = 'DISPONIBLE';
+            break;
+        default:
+            estado = 'NO UPDATE';
+            break;
+    }
+    return estado;
+}
 
 
 const AddMovComponent = () => {
@@ -481,43 +510,45 @@ const AddMovComponent = () => {
 
     };
 
-    function sendObjEdit(obj) {
+    const sendObjEdit = (obj) => {
         axios.patch(API.baseURL + '/api/movimiento/id/' + params.id, JSON.stringify(obj), {
             headers: {
                 'Content-Type': 'application/json'
             }
         }).then(async (response) => {
+
             if (response.status == 200) {
                 setButtonState({ state: "done" });
                 await delay(800);
                 dispatch(editMovimiento(response.data));
+                const newEstado = obvToEstado(obj.observaciones);
+                if (newEstado != "NO UPDATE") {
+                    const acta = actaList.find(element => element.idInspeccion == obj.idInspeccion);
+                    if (acta != undefined) {
+                        dispatch(updateEstado({ idEquipo: acta.idEquipo, estado: newEstado }));
+                    }
+                }
                 dispatch(cleanInput());
                 navigate("/movimientos");
-                console.log(response.data);
             }
 
         }).catch(async (error) => {
             setButtonState({ state: "edicion" });
-            try {
-                if (error.message == 'Network Error') {
-                    seterrorServer({ error: true, message: "Servidor caido" });
-                } else if (error.request) {
-                    if (error.request.response != undefined && error.request.response != null ) {
-                        const x = JSON.parse(error.request.response);
-                        if (x.error == true) {
-                            seterrorServer({ error: true, message: x.message.sqlMessage });
-                        }
+            console.log(error)
+
+            if (error.message == 'Network Error') {
+                seterrorServer({ error: true, message: "Servidor caido" });
+            } else if (error.request) {
+                if (error.request.response != undefined && error.request.response != null) {
+                    const x = JSON.parse(error.request.response);
+                    if (x.error == true) {
+                        seterrorServer({ error: true, message: x.message.sqlMessage });
                     }
                 }
-            } catch (e) {
-                console.log(e);
-                seterrorServer({ error: true, message: "Error 505" });
             }
-
-
-
         });
     }
+
     function sendObj(obj) {
         axios.post(API.baseURL + '/api/movimiento/', JSON.stringify(obj), {
             headers: {
@@ -527,28 +558,27 @@ const AddMovComponent = () => {
             if (response.status == 200) {
                 setButtonState({ state: "done" });
                 await delay(800);
-                console.log(response.data);
+
                 dispatch(addMovimiento(response.data));
-                dispatch(cleanInput());
-                if (obj.tipo == 'ENVIO' && obj.observaciones == 'Venta') {
-                    const equipo = actaList.find(element => element.idInspeccion == obj.idInspeccion);
-                    if (equipo >= 0) {
-                        dispatch(updateEstado({ idEquipo: equipo.idEquipo, estado: 'VENDIDO' }))
+                const newEstado = obvToEstado(obj.observaciones);
+                if (newEstado != "NO UPDATE") {
+                    const acta = actaList.find(element => element.idInspeccion == obj.idInspeccion);
+                    if (acta != undefined) {
+                        dispatch(updateEstado({ idEquipo: acta.idEquipo, estado: newEstado }));
                     }
-
                 }
-
+                dispatch(cleanInput());
                 navigate("/movimientos");
-                console.log(response.data);
+
             }
         }).catch((error) => {
             setButtonState({ state: "fail" });
-         
+
             try {
                 if (error.message == 'Network Error') {
                     seterrorServer({ error: true, message: "Servidor caido" });
                 } else if (error.request) {
-                    if (error.request.response != undefined && error.request.response != null ) {
+                    if (error.request.response != undefined && error.request.response != null) {
                         const x = JSON.parse(error.request.response);
                         if (x.error == true) {
                             seterrorServer({ error: true, message: x.message.sqlMessage });

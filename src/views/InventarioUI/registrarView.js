@@ -342,13 +342,23 @@ export default function Registro() {
                 }
             }).catch((error) => {
                 setButtonState({ state: "fail" });
-                console.log(error.message);
-                if (error.message == 'Network Error') {
-                    seterrorServer({ error: true, message: "Servidor caido" });
+               
+                try {
+                    if (error.message == 'Network Error') {
+                        seterrorServer({ error: true, message: "Servidor caido" });
+                    } else if (error.request) {
+                        if (error.request.response != undefined && error.request.response != null ) {
+                            const x = JSON.parse(error.request.response);
+                            if (x.error == true) {
+                                seterrorServer({ error: true, message: x.message.sqlMessage });
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.log(e);
+                    seterrorServer({ error: true, message: "Error 505" });
                 }
-                if (error.response.data != null) {
-                    seterrorServer({ error: true, message: error.response.data.message.sqlMessage });
-                }
+                
             });
         } else {
             axios.patch(API.baseURL + '/api/equipo/id/' + codigo, JSON.stringify(postData), {
@@ -365,14 +375,24 @@ export default function Registro() {
                 }
             }).catch((error) => {
                 setButtonState({ state: "fail" });
-                console.log(error.message);
-                if (error.message == 'Network Error') {
-                    seterrorServer({ error: true, message: "Servidor caido" });
+               
+                try {
+                    if (error.message == 'Network Error') {
+                        seterrorServer({ error: true, message: "Servidor caido" });
+                    } else if (error.request) {
+                        if (error.request.response != undefined && error.request.response != null ) {
+                            const x = JSON.parse(error.request.response);
+                            if (x.error == true) {
+                                seterrorServer({ error: true, message: x.message.sqlMessage });
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.log(e);
+                    seterrorServer({ error: true, message: "Error 505" });
                 }
-                if (error.response.data != null) {
-                    console.log("Entro");
-                    seterrorServer({ error: true, message: error.response.data.message.sqlMessage });
-                }
+                
+             
             });
 
 
