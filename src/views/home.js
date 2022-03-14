@@ -143,7 +143,7 @@ function getModelos(data, data_equipo, data_acta) {
                 const index_equipo = data_equipo.findIndex(x => x.idEquipo == data_acta[index_acta].idEquipo);
                 const equipo = data_equipo[index_equipo];
                 if (equipo != -1) {
-                    console.log(equipo.modelo);
+                   
                     if (!(equipo.modelo in dic)) {
                         dic[equipo.modelo] = 1;
                     } else {

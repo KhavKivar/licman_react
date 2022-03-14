@@ -289,7 +289,7 @@ const AddMovComponent = () => {
 
     const delay = ms => new Promise(res => setTimeout(res, ms));
     const [openInput, setopenInput] = useState(false);
-    const [buttonState,setButtonState] = useState({state:"init"});
+    const [buttonState, setButtonState] = useState({ state: "init" });
     const [errorServer, seterrorServer] = useState({ error: false, message: '' });
 
     const handleFileInput = (e) => {
@@ -303,14 +303,14 @@ const AddMovComponent = () => {
 
     }
 
-    
+
     const idListEquipo = [];
     const idListActa = [];
     const OpcionesEmpresas = [];
 
 
     for (const cliente in clienteList) {
-        OpcionesEmpresas.push(clienteList[cliente].nombre );
+        OpcionesEmpresas.push(clienteList[cliente].nombre);
     }
 
 
@@ -459,26 +459,26 @@ const AddMovComponent = () => {
     };
 
     const handleClose = () => {
-        console.log(newName); 
+        console.log(newName);
         //Create
-        const rut_input =  rut.id != null ? rut.id : rut;
+        const rut_input = rut.id != null ? rut.id : rut;
         const objCliente = {
-            rut:rut_input,
-            nombre:newName,
-            telefono:telefono
+            rut: rut_input,
+            nombre: newName,
+            telefono: telefono
         }
-        
-        axios.post(API.baseURL + "/api/cliente/",objCliente ).then((response) => {
-            if(response.status==200){
+
+        axios.post(API.baseURL + "/api/cliente/", objCliente).then((response) => {
+            if (response.status == 200) {
                 console.log(response.data);
                 sendLogic();
                 dispatch(addCliente(objCliente));
             }
-           
+
         });
 
-       
-     
+
+
     };
 
     function sendObjEdit(obj) {
@@ -486,86 +486,107 @@ const AddMovComponent = () => {
             headers: {
                 'Content-Type': 'application/json'
             }
-        }).then(async (response)  => {
-            if(response.status == 200){
-                setButtonState({state:"done"});
+        }).then(async (response) => {
+            if (response.status == 200) {
+                setButtonState({ state: "done" });
                 await delay(800);
                 dispatch(editMovimiento(response.data));
                 dispatch(cleanInput());
                 navigate("/movimientos");
                 console.log(response.data);
             }
-           
-        }).catch(async(error) => {
-            setButtonState({state:"fail"});
-            console.log(error.message);
-            if (error.message == 'Network Error') {
-                seterrorServer({ error: true, message: "Servidor caido" });
+
+        }).catch(async (error) => {
+            setButtonState({ state: "edicion" });
+            try {
+                if (error.message == 'Network Error') {
+                    seterrorServer({ error: true, message: "Servidor caido" });
+                } else if (error.request) {
+                    if (error.request.response != undefined && error.request.response != null ) {
+                        const x = JSON.parse(error.request.response);
+                        if (x.error == true) {
+                            seterrorServer({ error: true, message: x.message.sqlMessage });
+                        }
+                    }
+                }
+            } catch (e) {
+                console.log(e);
+                seterrorServer({ error: true, message: "Error 505" });
             }
-            if (error.response.data != null) {
-                seterrorServer({ error: true, message: error.response.data.message.sqlMessage });
-            }
+
+
+
         });
     }
-     function sendObj(obj) {
+    function sendObj(obj) {
         axios.post(API.baseURL + '/api/movimiento/', JSON.stringify(obj), {
             headers: {
                 'Content-Type': 'application/json'
             }
-        }).then(async(response) => {
-            if(response.status ==200){
-                setButtonState({state:"done"});
+        }).then(async (response) => {
+            if (response.status == 200) {
+                setButtonState({ state: "done" });
                 await delay(800);
                 console.log(response.data);
                 dispatch(addMovimiento(response.data));
                 dispatch(cleanInput());
-                if(obj.tipo == 'ENVIO' &&  obj.observaciones == 'Venta'){
-                    const equipo = actaList.find(element=>element.idInspeccion == obj.idInspeccion);
-                    if(equipo >=0){
-                        dispatch(updateEstado({idEquipo:equipo.idEquipo,estado:'VENDIDO'}))
+                if (obj.tipo == 'ENVIO' && obj.observaciones == 'Venta') {
+                    const equipo = actaList.find(element => element.idInspeccion == obj.idInspeccion);
+                    if (equipo >= 0) {
+                        dispatch(updateEstado({ idEquipo: equipo.idEquipo, estado: 'VENDIDO' }))
                     }
-                   
+
                 }
-               
+
                 navigate("/movimientos");
                 console.log(response.data);
             }
         }).catch((error) => {
-                setButtonState({state:"fail"});
-                console.log(error);
+            setButtonState({ state: "fail" });
+         
+            try {
                 if (error.message == 'Network Error') {
                     seterrorServer({ error: true, message: "Servidor caido" });
+                } else if (error.request) {
+                    if (error.request.response != undefined && error.request.response != null ) {
+                        const x = JSON.parse(error.request.response);
+                        if (x.error == true) {
+                            seterrorServer({ error: true, message: x.message.sqlMessage });
+                        }
+                    }
                 }
-                if (error.response.data != null) {
-                    seterrorServer({ error: true, message: error.response.data.message.sqlMessage });
-                }
-            });
+            } catch (e) {
+                console.log(e);
+                seterrorServer({ error: true, message: "Error 505" });
+            }
+
+        });
 
     }
     const sendLogic = () => {
         var re = /(?:\.([^.]+))?$/;
 
         //Get rut;
-        const index_cliente = clienteList.findIndex(x=>x.nombre == rut);
+        const index_cliente = clienteList.findIndex(x => x.nombre == rut);
         let realRut = "1111111-1";
 
-        if(index_cliente != -1){
+        if (index_cliente != -1) {
             realRut = clienteList[index_cliente].rut;
         }
         console.log(realRut);
-        
+
         const movimientoObject = {
             transporte: transporte == 10 ? "Marco" : "Externo",
             idInspeccion: acta.label,
             rut: realRut,
             idGuiaDespacho: guiaDespacho,
-            cambio: cambio.id != null ? cambio.id :  cambio != "" ? cambio : null,
+            cambio: cambio.id != null ? cambio.id : cambio != "" ? cambio : null,
             tipo: tipo == 10 ? "ENVIO" : "RETIRO",
             observaciones: obv.id != null ? obv.id : obv,
             fechaRetiro: fechaTermino != "" && fechaTermino != 'Invalid date' && fechaTermino != null ? moment(fechaTermino).format('YYYY-MM-DD') : null
         }
 
-        if (selectedFile != null) {       
+        if (selectedFile != null) {
             const key = uuidv4() + "." + re.exec(selectedFile.name)[1];
             const url = "https://licman.s3.amazonaws.com/" + key.toString();
             movimientoObject.urlGuiaDespacho = url;
@@ -580,9 +601,9 @@ const AddMovComponent = () => {
                 .on('httpUploadProgress', (evt) => {
 
                 })
-                .send((err,data) => {
-                    
-                    if(err){
+                .send((err, data) => {
+
+                    if (err) {
                         console.log(err);
                     }
                 });
@@ -593,7 +614,7 @@ const AddMovComponent = () => {
             sendObj(movimientoObject);
 
         }
-      
+
     }
     const Enviar = async () => {
         handleErrors();
@@ -603,10 +624,10 @@ const AddMovComponent = () => {
                 return;
             }
         }
-        setButtonState({state:"loading"});
+        setButtonState({ state: "loading" });
         await delay(400);
         sendLogic();
-        
+
 
     };
 
@@ -630,10 +651,10 @@ const AddMovComponent = () => {
                 <ContainerRegistro>
                     <Text> {edit ? "Edicion de movimiento" : "Registro de movimiento"}</Text>
                     {errorServer.error ? <Card sx={{ backgroundColor: "red", marginBottom: 1 }}
-                        >
-                            
-                        <div style={{display:"flex",alignItems:"center",paddingLeft:5}}> <ReportProblemIcon sx={{color:"white"}}></ReportProblemIcon> 
-                          <TextWarning>{errorServer.message}</TextWarning> </div></Card >: <></>}
+                    >
+
+                        <div style={{ display: "flex", alignItems: "center", paddingLeft: 5 }}> <ReportProblemIcon sx={{ color: "white" }}></ReportProblemIcon>
+                            <TextWarning>{errorServer.message}</TextWarning> </div></Card > : <></>}
                     <Dialog
                         open={open}
                         onClose={handleClose}
@@ -659,7 +680,7 @@ const AddMovComponent = () => {
                                 fullWidth
                                 variant="standard"
                             />
-                                 <TextField
+                            <TextField
                                 autoFocus
                                 margin="dense"
                                 id="name"
@@ -720,7 +741,7 @@ const AddMovComponent = () => {
                         </RowTextField>
                         <RowTextField>
                             <ColumnElement>
-                            <Autocomplete
+                                <Autocomplete
                                     disablePortal
                                     onChange={(event, newValue) => {
                                         if (newValue == null || newValue == '') {
@@ -778,18 +799,18 @@ const AddMovComponent = () => {
                         </RowTextField>
                         <RowTextField>
                             <ColumnElement>
-                            
-                            <Autocomplete
+
+                                <Autocomplete
                                     disablePortal
                                     onChange={(event, newValue) => {
-                                         dispatch(setCambio(newValue));
-                                    }   
+                                        dispatch(setCambio(newValue));
+                                    }
                                     }
                                     value={cambio}
                                     options={idListEquipo}
                                     renderInput={(params) => <TextField {...params} label="Cambio" />}
                                 />
-                               
+
                             </ColumnElement>
                             <ColumnElement>
                                 <Autocomplete
@@ -798,26 +819,26 @@ const AddMovComponent = () => {
                                     disableClearable
                                     forcePopupIcon={false}
                                     onChange={(event, newValue, reason) => {
-                                       
+
                                         if (newValue == null || newValue == '') {
                                             setError({ ...error, acta: { error: true, message: 'Este campo no puede ser vacio' } })
                                         } else {
                                             setError({ ...error, acta: { error: false, message: '' } });
                                         }
-                                         /*
-                                        for(const x of movList){
-                                            console.log(newValue.label);
-                                            if(x.idInspeccion == newValue.label  && x.tipo == 'ENVIO' && tipo == 20 ){
-                                                dispatch(setRut(x.rut));
-                                                dispatch(setTransporte( x.transporte == "marco" ? 10:20));
-                                               
-                                                dispatch(setCambio(x.cambio));
-                                               dispatch(setFechaTermino(x.fechaTermino));
-                                               dispatch(setObv(x.observaciones));
-                                               dispatch(setGuiaDespacho(x.idGuiaDespacho));
-                                            }
-                                            
-                                        }*/
+                                        /*
+                                       for(const x of movList){
+                                           console.log(newValue.label);
+                                           if(x.idInspeccion == newValue.label  && x.tipo == 'ENVIO' && tipo == 20 ){
+                                               dispatch(setRut(x.rut));
+                                               dispatch(setTransporte( x.transporte == "marco" ? 10:20));
+                                              
+                                               dispatch(setCambio(x.cambio));
+                                              dispatch(setFechaTermino(x.fechaTermino));
+                                              dispatch(setObv(x.observaciones));
+                                              dispatch(setGuiaDespacho(x.idGuiaDespacho));
+                                           }
+                                           
+                                       }*/
                                         dispatch(setActa(newValue));
                                     }}
                                     value={acta}
@@ -827,14 +848,14 @@ const AddMovComponent = () => {
                                         for (const x of movList) {
                                             if (x.idInspeccion.toString() == option.label) {
                                                 return true;
-                                                
+
                                             }
                                         }
                                         return false;
                                     }
                                     }
 
-                                    renderInput={(params) => <TextField  {...params} 
+                                    renderInput={(params) => <TextField  {...params}
                                         InputProps={{
 
 
@@ -851,7 +872,7 @@ const AddMovComponent = () => {
                                             }><VisibilityIcon></VisibilityIcon></IconButton>,
                                         }}
                                         error={error.acta.error}
-                                        label="Acta ID" /> }
+                                        label="Acta ID" />}
 
                                     clearIcon={<VisibilityIcon />}
                                 />
@@ -879,9 +900,9 @@ const AddMovComponent = () => {
 
                             <ColumnElement>
 
-                            <Autocomplete
+                                <Autocomplete
                                     value={obv}
-                                  
+
                                     onChange={(event, newValue) => {
                                         if (typeof newValue === 'string') {
                                             dispatch(setObv({
@@ -893,7 +914,7 @@ const AddMovComponent = () => {
                                                 id: newValue.inputValue,
                                             }));
                                         } else {
-                                          
+
                                             dispatch(setObv(newValue));
 
                                         }
@@ -915,12 +936,12 @@ const AddMovComponent = () => {
                                     clearOnBlur
                                     handleHomeEndKeys
                                     id="Observaciones"
-                                    options={[{id:'Venta'},{id:'Termino Arriendo'},
-                                    {id:'Nuevo Arriendo'},{id:'Despacho Por Cambio'},{id:'Retiro Por Cambio'},
-                                    {id:'Retiro Por Reparacion'},
-                                
-                                    {id:'Despacho Por Reparacion'},
-                                ]}
+                                    options={[{ id: 'Venta' }, { id: 'Termino Arriendo' },
+                                    { id: 'Nuevo Arriendo' }, { id: 'Despacho Por Cambio' }, { id: 'Retiro Por Cambio' },
+                                    { id: 'Retiro Por Reparacion' },
+
+                                    { id: 'Despacho Por Reparacion' },
+                                    ]}
                                     getOptionLabel={(option) => {
 
                                         // Value selected with enter, right from the input
@@ -939,13 +960,13 @@ const AddMovComponent = () => {
                                     freeSolo
                                     renderInput={(params) => (
 
-                                        <TextField {...params}  label="Observaciones"
+                                        <TextField {...params} label="Observaciones"
 
 
                                         />
                                     )}
                                 />
-                             
+
                             </ColumnElement>
 
                         </RowTextField>
@@ -1028,18 +1049,18 @@ const AddMovComponent = () => {
 
 
                     </ColumnSpace>
-                            
-                    { buttonState.state=='init'?  <ButtonSend size='large' 
-                      onClick={Enviar} variant="contained" endIcon={<SendIcon></SendIcon>} >Enviar</ButtonSend>:
-                            buttonState.state == 'loading'?
-                            <ButtonLoading variant ="contained"
-                            startIcon={<CircularProgress sx={{color:"var(--black)"}}
-                           size={20  } />}    >Cargando...</ButtonLoading>
-                            :  buttonState.state =='done' ?
-                             <ButtonSuccess size='large'  variant="contained" startIcon ={<CheckIcon></CheckIcon>}> Enviado </ButtonSuccess>:
-                             <ButtonError size='large' onClick={Enviar}   variant="contained" startIcon ={<DangerousIcon></DangerousIcon>}> Error</ButtonError>
-                      }
-                   
+
+                    {buttonState.state == 'init' ? <ButtonSend size='large'
+                        onClick={Enviar} variant="contained" endIcon={<SendIcon></SendIcon>} >Enviar</ButtonSend> :
+                        buttonState.state == 'loading' ?
+                            <ButtonLoading variant="contained"
+                                startIcon={<CircularProgress sx={{ color: "var(--black)" }}
+                                    size={20} />}    >Cargando...</ButtonLoading>
+                            : buttonState.state == 'done' ?
+                                <ButtonSuccess size='large' variant="contained" startIcon={<CheckIcon></CheckIcon>}> Enviado </ButtonSuccess> :
+                                <ButtonError size='large' onClick={Enviar} variant="contained" startIcon={<DangerousIcon></DangerousIcon>}> Error</ButtonError>
+                    }
+
                 </ContainerRegistro>
             </Paper>
         </Grid>
