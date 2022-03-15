@@ -106,12 +106,22 @@ const TablaImg = () => {
                                 }
                             }).catch((error) => {
                                 setTimeout(() => { setOpenMessage({ show: false, error: false, message: '' }) }, 3000);
-                                if (error.message == 'Network Error') {
-                                    setOpenMessage({ show: true, error: true, message: "Servidor caido" });
-                                }
-                                if (error.response.data != null) {
-                                    setOpenMessage({ show: true, error: true, message: error.response.data.message.sqlMessage });
-                                }
+                                try {
+                                    if (error.message == 'Network Error') {
+                                      setOpenMessage({ error: true, message: "Servidor caido" });
+                                    } else if (error.request) {
+                                      if (error.request.response != undefined && error.request.response != null) {
+                                        const x = JSON.parse(error.request.response);
+                                        console.log(x.message);
+                                        if (x.error == true) {
+                                          setOpenMessage({ show:true,error: true, message: x.message.sqlMessage });
+                                        }
+                                      }
+                                    }
+                                  } catch (e) {
+                                    console.log(e);
+                                    setOpenMessage({ show:true, error: true, message: "Error 505" });
+                                  }
                                 resolve();
                             });;
                         })
@@ -128,12 +138,24 @@ const TablaImg = () => {
                                 }
                             }).catch((error) => {
                                 setTimeout(() => { setOpenMessage({ show: false, error: false, message: '' }) }, 3000);
-                                if (error.message == 'Network Error') {
-                                    setOpenMessage({ show: true, error: true, message: "Servidor caido" });
-                                }
-                                if (error.response.data != null) {
-                                    setOpenMessage({ show: true, error: true, message: error.response.data.message.sqlMessage });
-                                }
+                                try {
+                                    if (error.message == 'Network Error') {
+                                      setOpenMessage({ error: true, message: "Servidor caido" });
+                                    } else if (error.request) {
+                                      if (error.request.response != undefined && error.request.response != null) {
+                                        const x = JSON.parse(error.request.response);
+                                        console.log(x.message);
+                                        if (x.error == true) {
+                                          setOpenMessage({ show:true,error: true, message: x.message.sqlMessage });
+                                        }
+                                      }
+                                    }
+                                  } catch (e) {
+                                    console.log(e);
+                                    setOpenMessage({ show:true, error: true, message: "Error 505" });
+                                  }
+
+                             
                                 resolve();
                             });
 

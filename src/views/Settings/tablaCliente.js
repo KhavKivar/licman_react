@@ -44,7 +44,7 @@ const TablaCliente = () => {
   const [openMessage, setOpenMessage] = React.useState({ show: false, error: false, message: '' });
 
   const updateState = () => {
-    setOpenMessage({show:true,error:false,message:''});
+    setOpenMessage({ show: true, error: false, message: '' });
     ApiObjectCall(dispatch);
     setTimeout(() => { setOpenMessage({ show: false, error: false, message: '' }) }, 3000);
   }
@@ -108,15 +108,28 @@ const TablaCliente = () => {
                   dispatch(addCliente(newData));
                   resolve();
                 }
-              }).catch((error)=>{
+              }).catch((error) => {
                 setTimeout(() => { setOpenMessage({ show: false, error: false, message: '' }) }, 3000);
-                if (error.message == 'Network Error') {
-                  setOpenMessage({  show: true, error: true, message: "Servidor caido" });
+                try {
+                  if (error.message == 'Network Error') {
+                    setOpenMessage({ error: true, message: "Servidor caido" });
+                  } else if (error.request) {
+                    if (error.request.response != undefined && error.request.response != null) {
+                      const x = JSON.parse(error.request.response);
+                      console.log(x.message);
+                      if (x.error == true) {
+                        setOpenMessage({ show:true,error: true, message: x.message.sqlMessage });
+                      }
+                    }
+                  }
+                } catch (e) {
+                  console.log(e);
+                  setOpenMessage({ show:true, error: true, message: "Error 505" });
                 }
-                if (error.response.data != null) {
-                  setOpenMessage({  show: true,error: true, message: error.response.data.message.sqlMessage });
-                }
+
                 resolve();
+
+
               });
 
             });
@@ -124,24 +137,34 @@ const TablaCliente = () => {
           onRowUpdate: (newData, oldData) => {
             return new Promise((resolve, reject) => {
               axios.patch(API.baseURL + "/api/cliente/id/" + oldData.rut, {
-                rut:newData.rut.replaceAll(".", ""),
+                rut: newData.rut.replaceAll(".", ""),
                 nombre: newData.nombre,
                 telefono: newData.telefono
               }).then((response) => {
                 console.log(response);
                 if (response.status == 200) {
-                  dispatch(editCliente({data:newData,oldRut:oldData.rut}));
-                  dispatch(updateClientRut({oldRut:oldData.rut,newRut:newData.rut}));
+                  dispatch(editCliente({ data: newData, oldRut: oldData.rut }));
+                  dispatch(updateClientRut({ oldRut: oldData.rut, newRut: newData.rut }));
                   resolve();
                 }
-              }).catch((error)=>{
+              }).catch((error) => {
                 setTimeout(() => { setOpenMessage({ show: false, error: false, message: '' }) }, 3000);
-                if (error.message == 'Network Error') {
-                  setOpenMessage({  show: true, error: true, message: "Servidor caido" });
+                try {
+                  if (error.message == 'Network Error') {
+                    setOpenMessage({ error: true, message: "Servidor caido" });
+                  } else if (error.request) {
+                    if (error.request.response != undefined && error.request.response != null) {
+                      const x = JSON.parse(error.request.response);
+                      if (x.error == true) {
+                        setOpenMessage({ show:true,error: true, message: x.message.sqlMessage });
+                      }
+                    }
+                  }
+                } catch (e) {
+                  console.log(e);
+                  setOpenMessage({show:true, error: true, message: "Error 505" });
                 }
-                if (error.response.data != null) {
-                  setOpenMessage({  show: true,error: true, message: error.response.data.message.sqlMessage });
-                }
+
                 resolve();
               });
 
@@ -149,7 +172,7 @@ const TablaCliente = () => {
           },
           onRowDelete: (oldData) => {
             return new Promise((resolve, reject) => {
-               
+
               axios.delete(API.baseURL + "/api/cliente/id/" + oldData.rut).then((response) => {
                 console.log(response.data);
                 if (response.status == 200) {
@@ -159,10 +182,10 @@ const TablaCliente = () => {
               }).catch((error) => {
                 setTimeout(() => { setOpenMessage({ show: false, error: false, message: '' }) }, 3000);
                 if (error.message == 'Network Error') {
-                  setOpenMessage({  show: true, error: true, message: "Servidor caido" });
+                  setOpenMessage({ show: true, error: true, message: "Servidor caido" });
                 }
                 if (error.response.data != null) {
-                  setOpenMessage({  show: true,error: true, message: error.response.data.message.sqlMessage });
+                  setOpenMessage({ show: true, error: true, message: error.response.data.message.sqlMessage });
                 }
                 resolve();
               });
