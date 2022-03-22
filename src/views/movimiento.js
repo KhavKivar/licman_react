@@ -43,7 +43,7 @@ const MovimientoComponent = () => {
     for (var i in editable) {
         if (actas.length > 0 && cliente.length > 0) {
             const acta = actas.find(x => x.idInspeccion == editable[i].idInspeccion);
-            const client = cliente.find(x => x.rut == editable[i].rut);
+            const client = cliente.find(x =>  x.rut.replaceAll(".", "") == editable[i].rut.replaceAll(".", ""));
             if (acta != undefined) {
                 editable[i].idEquipo = acta.idEquipo;
             } else {

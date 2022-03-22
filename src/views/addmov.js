@@ -608,7 +608,7 @@ const AddMovComponent = () => {
         const movimientoObject = {
             transporte: transporte == 10 ? "Marco" : "Externo",
             idInspeccion: acta.label,
-            rut: realRut,
+            rut: realRut.replaceAll(".", ""),
             idGuiaDespacho: guiaDespacho,
             cambio: cambio.id != null ? cambio.id : cambio != "" ? cambio : null,
             tipo: tipo == 10 ? "ENVIO" : "RETIRO",
