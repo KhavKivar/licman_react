@@ -15,7 +15,7 @@ import { cleanInput, editValue } from '../features/movRegisterSlice';
 import API from '../services/api';
 import ApiObjectCall from '../services/callServices';
 import MotionHoc from "../services/motionhoc";
-
+import { ExportCsv, ExportPdf } from '@material-table/exporters';
 import CircularProgress from '@mui/material/CircularProgress';
 
 const rows = [{
@@ -192,6 +192,19 @@ const MovimientoComponent = () => {
 
             }}
             options={{
+                pageSize: 5,
+                pageSizeOptions: [5, 10, 20, { value: 70, label: '70' }],
+                exportMenu: [{
+                    label: 'Exportar a PDF',
+                    style: {
+                    
+                    },
+                    exportFunc: (cols, datas) => ExportPdf(cols, datas, 'Movimientos')
+                  }, {
+                    label: 'Exportar a CSV',
+                    exportFunc: (cols, datas) => ExportCsv(cols, datas, 'Movimientos')
+                  }],
+
                 rowStyle: (data, index) => index % 2 == 0 ? { background: "#f5f5f5" } : null,
                 searchFieldStyle: {
                     color: "white",

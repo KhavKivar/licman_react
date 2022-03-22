@@ -17,8 +17,8 @@ import { format } from 'rut.js';
 import { setDetalleValue } from '../../features/generalStateSlice';
 import ApiObjectCall from '../../services/callServices';
 import MotionHoc from "../../services/motionhoc";
-
-
+import SaveAltIcon from '@mui/icons-material/SaveAlt';
+import { ExportCsv, ExportPdf } from '@material-table/exporters';
 
 const options = [
   { value: 'Actas', label: 'Actas' },
@@ -143,6 +143,7 @@ const MovimientoDetalleComponent = () => {
       icons={{
 
         ViewColumn: forwardRef((props, ref) => <ViewColumnIcon sx={{ marginTop: 0.6 }}   {...props} ref={ref} />),
+        Export: forwardRef((props, ref) => <SaveAltIcon sx={{ marginTop: 0.6 }} {...props} ref={ref} />),
 
       }}
       columns={[
@@ -196,6 +197,19 @@ const MovimientoDetalleComponent = () => {
       data={editable}
       onChangeColumnHidden={(column, hidden) => { console.log(column); }}
       options={{
+        exportMenu: [{
+          label: 'Exportar a PDF',
+          style: {
+          
+          },
+          exportFunc: (cols, datas) => ExportPdf(cols, datas, 'Actas')
+        }, {
+          label: 'Exportar a CSV',
+          exportFunc: (cols, datas) => ExportCsv(cols, datas, 'Actas')
+        }],
+
+        pageSize: 5,
+        pageSizeOptions: [5, 10, 20, { value:70, label: '70' }],
         rowStyle: (data, index) => index % 2 == 0 ? { background: "#f5f5f5" } : null,
         searchFieldStyle: {
           color: "white",

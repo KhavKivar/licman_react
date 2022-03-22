@@ -225,7 +225,7 @@ const InventarioComponent = () => {
             { title: 'Tipo', field: 'tipo' },
             { title: 'Marca', field: 'marca' },
             { title: 'Modelo', field: 'modelo' },
-            { title: 'Serie', field: 'serie' },
+            { title: 'Serie', field: 'serie',hidden:true },
             {
               title: 'Capacidad', field: 'capacidad', searchable: false, render: (row) => {
                 return row.capacidad + " Kg";
@@ -294,6 +294,8 @@ const InventarioComponent = () => {
         }}
           options={{
             filtering: true, 
+            pageSize: 5,
+            pageSizeOptions: [5, 10, 20, { value: data.length, label: 'All' }],
 
             rowStyle: (data, index) => index % 2 == 0 ? { background: "#f5f5f5" } : null,
             searchFieldStyle: { color: "white", },
@@ -307,13 +309,14 @@ const InventarioComponent = () => {
               style: {
               
               },
-              exportFunc: (cols, datas) => ExportPdf(cols, datas, 'myPdfFileName')
+              exportFunc: (cols, datas) => ExportPdf(cols, datas, 'Inventario')
             }, {
               label: 'Exportar a CSV',
-              exportFunc: (cols, datas) => ExportCsv(cols, datas, 'myCsvFileName')
+              exportFunc: (cols, datas) => ExportCsv(cols, datas, 'Inventario')
             }],
             actionsColumnIndex: -1,
             searchText: params.value != undefined ? params.value : ""
+            
           }}
 
           actions={[

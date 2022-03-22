@@ -17,7 +17,7 @@ import { format } from 'rut.js';
 import { setInventarioValue } from '../../features/generalStateSlice';
 import ApiObjectCall from '../../services/callServices';
 import "./invstyle.css";
-
+import { ExportCsv, ExportPdf } from '@material-table/exporters';
 
 
 
@@ -139,6 +139,8 @@ export default function ActaGeneral() {
         data={listOfInspecciones}
         onChangeColumnHidden={(column, hidden) => { console.log(column); }}
         options={{
+          pageSize: 5,
+          pageSizeOptions: [5, 10, 20, { value:70, label: '70' }],
           rowStyle: (data, index) => index % 2 == 0 ? { background: "#f5f5f5" } : null,
           searchFieldStyle: {
             color: "white",
@@ -150,6 +152,16 @@ export default function ActaGeneral() {
           },
           columnsButton: true,
           actionsColumnIndex: -1,
+          exportMenu: [{
+            label: 'Exportar a PDF',
+            style: {
+            
+            },
+            exportFunc: (cols, datas) => ExportPdf(cols, datas, 'Actas')
+          }, {
+            label: 'Exportar a CSV',
+            exportFunc: (cols, datas) => ExportCsv(cols, datas, 'Actas')
+          }],
 
 
 
