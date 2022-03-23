@@ -197,7 +197,15 @@ const TablaActaComponent = () => {
                               }, {
                                 label: 'Exportar a CSV',
                                 exportFunc: (cols, datas) => ExportCsv(cols, datas, 'Actas')
-                              }],
+                              },
+                              {
+                                label: 'Exportar todo a CSV',
+                                exportFunc: (cols, datas) => {
+                               
+                                    ExportCsv(cols, listOfInspecciones, 'actas_id_'+params.id.toString())
+                              
+                              }},
+                            ],
 
                               pageSize: 5,
                               pageSizeOptions: [5, 10, 20, { value:70, label: '70' }],

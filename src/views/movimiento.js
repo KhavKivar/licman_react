@@ -203,7 +203,15 @@ const MovimientoComponent = () => {
                   }, {
                     label: 'Exportar a CSV',
                     exportFunc: (cols, datas) => ExportCsv(cols, datas, 'Movimientos')
-                  }],
+                  },
+                  {
+                    label: 'Exportar todo a CSV',
+                    exportFunc: (cols, datas) => {
+                   
+                    ExportCsv(cols, rowsWithPower, 'Inventario')
+                  
+                  }},
+                ],
 
                 rowStyle: (data, index) => index % 2 == 0 ? { background: "#f5f5f5" } : null,
                 searchFieldStyle: {

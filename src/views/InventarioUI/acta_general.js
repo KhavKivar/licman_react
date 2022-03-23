@@ -161,7 +161,17 @@ export default function ActaGeneral() {
           }, {
             label: 'Exportar a CSV',
             exportFunc: (cols, datas) => ExportCsv(cols, datas, 'Actas')
-          }],
+          },
+          {
+            label: 'Exportar todo a CSV',
+            exportFunc: (cols, datas) => {
+           
+            ExportCsv(cols, listOfInspecciones, 'Inventario')
+          
+          }},
+        
+        
+        ],
 
 
 

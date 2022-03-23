@@ -313,7 +313,18 @@ const InventarioComponent = () => {
             }, {
               label: 'Exportar a CSV',
               exportFunc: (cols, datas) => ExportCsv(cols, datas, 'Inventario')
-            }],
+            },
+            {
+              label: 'Exportar todo a CSV',
+              exportFunc: (cols, datas) => {
+             
+              ExportCsv(cols, editable, 'Inventario')
+            
+            }
+            }
+          
+            
+          ],
             actionsColumnIndex: -1,
             searchText: params.value != undefined ? params.value : ""
             
