@@ -31,6 +31,7 @@ import "./invstyle.css";
 import axios from "axios";
 import API from '../../services/api';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import { changeSearch,changeFiltro,changePage } from '../../features/tableSlice';
 
 
 
@@ -136,12 +137,15 @@ const InventarioComponent = () => {
 
   const rows = useSelector((state) => state.inventario.data);
 
+  const tableState = useSelector((state) => state.tableState);
 
+
+  const searchState = tableState.search;
+  const filtroState = tableState.filtroOn;
+  const pageState = tableState.page;
 
 
   const editable = rows.map(o => ({ ...o }));
-
-
 
   const data = useSelector((state) => state.acta.data);
   const listOfInspecciones = data;
@@ -191,6 +195,15 @@ const InventarioComponent = () => {
 
 
         <MaterialTable
+          onSearchChange = {x=> {dispatch(changeSearch(x))}}
+
+          onPageChange = {x=>{
+            
+            dispatch(changePage(x))}}
+          onRowsPerPageChange = {x=>{dispatch(changeFiltro(x))}}
+
+
+
           localization={{
             pagination: {
               labelDisplayedRows: '{from}-{to} de {count}',
@@ -294,8 +307,9 @@ const InventarioComponent = () => {
           }}
           options={{
             filtering: true,
-            pageSize: 5,
+            pageSize: filtroState,
             pageSizeOptions: [5, 10, 20, 50,100],
+            initialPage:pageState,
 
             rowStyle: (data, index) =>    data.ubicacion == 'Actualizar' ? {background: "#ffff00"} :
             data.estado == 'POR LLEGAR' ? {background: "#00b0f0"}:
@@ -400,7 +414,9 @@ const InventarioComponent = () => {
 
             ],
             actionsColumnIndex: -1,
-            searchText: params.value != undefined ? params.value : ""
+            searchText: params.value != undefined ? params.value :
+            
+            searchState
 
           }}
 
