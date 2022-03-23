@@ -28,6 +28,7 @@ export const inventarioSlice = createSlice({
       const indexEquipo = state.data.findIndex(x=>x.idEquipo == parseInt(action.payload.idEquipo));
       if(indexEquipo >= 0){        
         state.data[indexEquipo].estado = action.payload.estado;
+        state.data[indexEquipo].ubicacion = action.payload.ubicacion;
       }
     }
   },

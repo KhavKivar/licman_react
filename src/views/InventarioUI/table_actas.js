@@ -82,11 +82,11 @@ const TablaActaComponent = () => {
     }
 
     const params = useParams();
-    console.log(params.id);
+  
 
     const data = useSelector((state) => state.acta.data);
     const listOfInspecciones = data.filter(x => x.idEquipo == params.id);
-    console.log(listOfInspecciones);
+   
 
     const tabSelect = useSelector((state) => state.generalState.detalleEquipoValue);
 

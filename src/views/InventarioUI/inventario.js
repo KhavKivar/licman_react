@@ -24,7 +24,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Select from 'react-select';
 import { setInventarioValue } from '../../features/generalStateSlice';
 
-import {deleteEquipo} from '../../features/inventarioSlice';
+import { deleteEquipo } from '../../features/inventarioSlice';
 import ApiObjectCall from '../../services/callServices';
 import ActaGeneral from './acta_general';
 import "./invstyle.css";
@@ -148,8 +148,8 @@ const InventarioComponent = () => {
 
 
   const [openMessage, setOpenMessage] = React.useState(false);
-  const [openMessageFail,setOpenMessageFail] = React.useState(false);
-  const [openMessageOkdelete,setOpenMessageOkdelete] = React.useState(false);
+  const [openMessageFail, setOpenMessageFail] = React.useState(false);
+  const [openMessageOkdelete, setOpenMessageOkdelete] = React.useState(false);
 
   const updateState = () => {
     setOpenMessage(true);
@@ -225,21 +225,21 @@ const InventarioComponent = () => {
             { title: 'Tipo', field: 'tipo' },
             { title: 'Marca', field: 'marca' },
             { title: 'Modelo', field: 'modelo' },
-            { title: 'Serie', field: 'serie',hidden:true },
+            { title: 'Serie', field: 'serie', hidden: true },
             {
               title: 'Capacidad', field: 'capacidad', searchable: false, render: (row) => {
                 return row.capacidad + " Kg";
               }
             },
             {
-              title: 'Altura', field: 'altura',hidden:true, searchable: false, render: (row) => {
+              title: 'Altura', field: 'altura', hidden: true, searchable: false, render: (row) => {
                 return row.altura != null ? row.altura.toLocaleString('de-DE') + " mm" : ""
               }
             },
-            { title: 'Mastil', field: 'mastil',hidden:true, },
-            { title: 'Año', field: 'ano',hidden:true,  },
+            { title: 'Mastil', field: 'mastil', hidden: true, },
+            { title: 'Año', field: 'ano', hidden: true, },
             {
-              title: 'Horometro', field: 'horometro',  searchable: false, render: (row) => {
+              title: 'Horometro', field: 'horometro', searchable: false, render: (row) => {
                 return row.horometro != null ? row.horometro.toLocaleString('de-DE') : ""
               }
             },
@@ -250,13 +250,13 @@ const InventarioComponent = () => {
               }
             },
             {
-              title: 'Ubicacion', field: 'ubicacion',  render: (row) => {
+              title: 'Ubicacion', field: 'ubicacion', render: (row) => {
                 return capitalizeFirstLetter(row.ubicacion.toLowerCase());
               }
             },
-            
+
             {
-              title: 'Precio neto', field: 'precio_neto', hidden:true,searchable: false, render: (row) => {
+              title: 'Precio neto', field: 'precio_neto', hidden: true, searchable: false, render: (row) => {
 
                 return row.precio_neto != null ? "$" + row.precio_neto.toLocaleString('de-DE') : ""
               }
@@ -267,39 +267,44 @@ const InventarioComponent = () => {
           data={editable}
           onChangeColumnHidden={(column, hidden) => { console.log(column); }}
           editable={{
-           
-        
+
+
             onRowDelete: (oldData) => {
-                return new Promise((resolve, reject) => {
+              return new Promise((resolve, reject) => {
 
-                    axios.delete(API.baseURL + "/api/equipo/id/"+oldData.idEquipo).then((response) => {
-                        if(response.status == 200){
-                          setOpenMessageOkdelete(true);
-                          dispatch(deleteEquipo(oldData.idEquipo));
-                        
-                          setTimeout(() => { setOpenMessageOkdelete(false) }, 3000);
-                          resolve();
-                        }
-                    }).catch((e)=>{ 
-                      setOpenMessageFail(true);
-                      setTimeout(() => { setOpenMessageFail(false) }, 3000);
-                      resolve();
-                    });
+                axios.delete(API.baseURL + "/api/equipo/id/" + oldData.idEquipo).then((response) => {
+                  if (response.status == 200) {
+                    setOpenMessageOkdelete(true);
+                    dispatch(deleteEquipo(oldData.idEquipo));
 
-                })
+                    setTimeout(() => { setOpenMessageOkdelete(false) }, 3000);
+                    resolve();
+                  }
+                }).catch((e) => {
+                  setOpenMessageFail(true);
+                  setTimeout(() => { setOpenMessageFail(false) }, 3000);
+                  resolve();
+                });
+
+              })
 
             }
 
 
-        }}
+          }}
           options={{
-            filtering: true, 
+            filtering: true,
             pageSize: 5,
-            pageSizeOptions: [5, 10, 20, { value: data.length, label: 'All' }],
+            pageSizeOptions: [5, 10, 20, 50,100],
 
-            rowStyle: (data, index) => index % 2 == 0 ? { background: "#f5f5f5" } : null,
+            rowStyle: (data, index) =>    data.ubicacion == 'Actualizar' ? {background: "#ffff00"} :
+            data.estado == 'POR LLEGAR' ? {background: "#00b0f0"}:
+            data.estado == 'LISTO PARA ENVIAR' ? {background: "#76ff03"}:
+            data.estado == 'VENDIDO' ? {background: "#ff5252"}:
+            index % 2 == 0 ? { background: "#f5f5f5" } :
+         
+            null,
             searchFieldStyle: { color: "white", },
-
             headerStyle: {
               background: "var(--black)", color: "white", fontFamily: '"Poppins", sans-serif', fontSize: "1rem"
             },
@@ -307,7 +312,7 @@ const InventarioComponent = () => {
             exportMenu: [{
               label: 'Exportar a PDF',
               style: {
-              
+
               },
               exportFunc: (cols, datas) => ExportPdf(cols, datas, 'Inventario')
             }, {
@@ -317,17 +322,86 @@ const InventarioComponent = () => {
             {
               label: 'Exportar todo a CSV',
               exportFunc: (cols, datas) => {
-             
-              ExportCsv(cols, editable, 'Inventario')
-            
+                console.log(cols);
+
+                const columnas = [
+                  {
+                    "title": "Codigo interno",
+                    "field": "idEquipo",
+                 
+                  },
+                  {
+                    "title": "Tipo",
+                    "field": "tipo",
+                   
+                  },
+                  {
+                    "title": "Marca",
+                    "field": "marca",
+                   
+                  },
+                  {
+                    "title": "Modelo",
+                    "field": "modelo",
+                   
+                  },
+                  {
+                    "title": "Serie",
+                    "field": "serie",
+                  
+                  },
+                  {
+                    "title": "Capacidad",
+                    "field": "capacidad",
+                    
+                  },
+                  {
+                    "title": "Altura",
+                    "field": "altura",
+                   
+                  },
+                  {
+                    "title": "Mastil",
+                    "field": "mastil",
+                  
+                  },
+                  {
+                    "title": "Año",
+                    "field": "ano",
+                   
+                  },
+                  {
+                    "title": "Horometro",
+                    "field": "horometro",
+                   
+                  
+                  },
+                  {
+                    "title": "Estado",
+                    "field": "estado",
+                   
+                  },
+                  {
+                    "title": "Ubicacion",
+                    "field": "ubicacion",
+                  
+                  },
+                  {
+                    "title": "Precio neto",
+                    "field": "precio_neto",
+                 
+                  }
+                ];
+               ExportCsv(columnas, editable, 'Inventario');
+
+              }
             }
-            }
-          
-            
-          ],
+
+
+            ],
             actionsColumnIndex: -1,
             searchText: params.value != undefined ? params.value : ""
-            
+
           }}
 
           actions={[
@@ -351,7 +425,7 @@ const InventarioComponent = () => {
 
               }
             },
-          
+
             {
               icon: () => <VisibilityIcon sx={{ color: "black !important" }} />,
               tooltip: 'Inspecionar',
@@ -360,10 +434,10 @@ const InventarioComponent = () => {
 
               }
             },
-           
-            
 
-            rowData => ( {
+
+
+            rowData => ({
               icon: () => <CreateIcon sx={{ color: "black !important" }}></CreateIcon>,
               tooltip: 'Editar Equipo',
               onClick: (event, rowData) => {

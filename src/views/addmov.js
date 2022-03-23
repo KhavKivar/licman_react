@@ -259,33 +259,41 @@ const NumberFormatCustomWithoutPrefix = forwardRef(function NumberFormatCustom(p
 
 function obvToEstado(x) {
     let estado = 'DISPONIBLE';
+    let ubicacion = 'Taller';
     switch (x) {
         case 'Venta':
             estado = 'VENDIDO';
+            ubicacion = '-';
             break;
         case 'Nuevo Arriendo':
             estado = 'ARRENDADO';
+            ubicacion = 'Actualizar';
             break;
         case 'Termino Arriendo':
             estado = 'DISPONIBLE';
+            ubicacion = 'Taller';
             break;
         case 'Despacho Por Cambio':
             estado = 'ARRENDADO';
+            ubicacion = 'Actualizar';
             break;
         case 'Despacho Por Reparacion':
             estado = 'ARRENDADO';
+            ubicacion = 'Actualizar';
             break;
         case 'Retiro Por Cambio':
             estado = 'DISPONIBLE';
+            ubicacion = 'Taller';
             break;
         case 'Retiro Por Reparacion':
             estado = 'DISPONIBLE';
+            ubicacion = 'Taller';
             break;
         default:
             estado = 'NO UPDATE';
             break;
     }
-    return estado;
+    return [estado,ubicacion];
 }
 
 
@@ -475,6 +483,11 @@ const AddMovComponent = () => {
             error.fechaTermino = { error: true, message: 'Fecha invalida' };
         }
 
+        if (obv == null || obv == '') {
+            error.observaciones = { error: true, message: 'Este campo no puede ser vacio' };
+        }
+
+
 
 
 
@@ -521,11 +534,11 @@ const AddMovComponent = () => {
                 setButtonState({ state: "done" });
                 await delay(800);
                 dispatch(editMovimiento(response.data));
-                const newEstado = obvToEstado(obj.observaciones);
+                const [newEstado,newUbicacion] = obvToEstado(obj.observaciones);
                 if (newEstado != "NO UPDATE") {
                     const acta = actaList.find(element => element.idInspeccion == obj.idInspeccion);
                     if (acta != undefined) {
-                        dispatch(updateEstado({ idEquipo: acta.idEquipo, estado: newEstado }));
+                        dispatch(updateEstado({ idEquipo: acta.idEquipo, estado: newEstado,ubicacion:newUbicacion }));
                     }
                 }
                 dispatch(cleanInput());
@@ -560,11 +573,11 @@ const AddMovComponent = () => {
                 await delay(800);
 
                 dispatch(addMovimiento(response.data));
-                const newEstado = obvToEstado(obj.observaciones);
+                const [newEstado,newUbicacion]  = obvToEstado(obj.observaciones);
                 if (newEstado != "NO UPDATE") {
                     const acta = actaList.find(element => element.idInspeccion == obj.idInspeccion);
                     if (acta != undefined) {
-                        dispatch(updateEstado({ idEquipo: acta.idEquipo, estado: newEstado }));
+                        dispatch(updateEstado({ idEquipo: acta.idEquipo, estado: newEstado,ubicacion:newUbicacion }));
                     }
                 }
                 dispatch(cleanInput());
@@ -934,6 +947,13 @@ const AddMovComponent = () => {
                                     value={obv}
 
                                     onChange={(event, newValue) => {
+                                        if (newValue == null || newValue == '') {
+                                            setError({ ...error, observaciones: { error: true, message: 'Este campo no puede ser vacio' } })
+                                        } else {
+                                            setError({ ...error, observaciones: { error: false, message: '' } });
+                                        }
+
+
                                         if (typeof newValue === 'string') {
                                             dispatch(setObv({
                                                 id: newValue,
@@ -990,13 +1010,13 @@ const AddMovComponent = () => {
                                     freeSolo
                                     renderInput={(params) => (
 
-                                        <TextField {...params} label="Observaciones"
+                                        <TextField {...params}  error={error.observaciones.error} label="Observaciones"
 
 
                                         />
                                     )}
                                 />
-
+                     {error.observaciones.error && <ErrorDisplay> <span>{error.observaciones.message}</span></ErrorDisplay>}
                             </ColumnElement>
 
                         </RowTextField>

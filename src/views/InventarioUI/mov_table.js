@@ -52,6 +52,8 @@ const MovimientoDetalleComponent = () => {
   const { Option } = components;
   const rows = useSelector((state) => state.movimiento.data);
   const actas = useSelector((state) => state.acta.data);
+  
+  const rows_editable = rows.map(o => ({ ...o }));
 
   const CustomOption = props => (
     <Option {...props}>
@@ -70,12 +72,32 @@ const MovimientoDetalleComponent = () => {
     navigate('/inventario');
   }
   const params = useParams();
+  const cliente = useSelector((state) => state.cliente.data);
+
   const editable = [];
-  for (var i in rows) {
-    if (actas.find(x => x.idInspeccion == rows[i].idInspeccion).idEquipo == params.id) {
-      editable.push(rows[i]);
+  const rowsWithPower = [];
+
+  for (var i in rows_editable) {
+    if (actas.find(x => x.idInspeccion == rows_editable[i].idInspeccion).idEquipo == params.id) {
+      editable.push(rows_editable[i]);
     }
   }
+  
+  for (var i in editable) {
+    if (cliente.length > 0) {
+      
+        const client = cliente.find(x =>  x.rut.replaceAll(".", "") == editable[i].rut.replaceAll(".", ""));
+        if (client != undefined) {
+            editable[i].empresa = client.nombre;
+        } else {
+            editable[i].empresa = "";
+        }
+        rowsWithPower.push(editable[i]);
+    }
+}
+console.log(rowsWithPower);
+
+
   const IconOption = props => (
     <Option {...props}>
       <img
@@ -89,7 +111,7 @@ const MovimientoDetalleComponent = () => {
 
 
 
-  const cliente = useSelector((state) => state.cliente.data);
+  
 
   const handeClick = (e) => {
     navigate('/acta/' + e);
@@ -156,8 +178,9 @@ const MovimientoDetalleComponent = () => {
         },
         { title: 'Movimiento ID', field: 'idMovimiento' },
         { title: 'Transporte', field: 'transporte', render: x => x.transporte == "externo" ? "Externo" : "Marco" },
+        { title: 'Empresa', field: 'empresa' },
         {
-          title: 'Rut Empresa', field: 'rut', render: x => {
+          title: 'Rut Empresa', hidden:true,field: 'rut', render: x => {
             return <><p data-tip={cliente.find(y => y.rut == x.rut).nombre}>{format(x.rut)}
             </p>
               <ReactTooltip /></>
@@ -194,7 +217,7 @@ const MovimientoDetalleComponent = () => {
         { title: 'Observaciones', field: 'observaciones' },
 
       ]}
-      data={editable}
+      data={rowsWithPower}
       onChangeColumnHidden={(column, hidden) => { console.log(column); }}
       options={{
         exportMenu: [{
@@ -217,7 +240,7 @@ const MovimientoDetalleComponent = () => {
       ],
 
         pageSize: 5,
-        pageSizeOptions: [5, 10, 20, { value:70, label: '70' }],
+        pageSizeOptions: [5, 10, 20, 50],
         rowStyle: (data, index) => index % 2 == 0 ? { background: "#f5f5f5" } : null,
         searchFieldStyle: {
           color: "white",

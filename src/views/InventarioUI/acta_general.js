@@ -140,7 +140,7 @@ export default function ActaGeneral() {
         onChangeColumnHidden={(column, hidden) => { console.log(column); }}
         options={{
           pageSize: 5,
-          pageSizeOptions: [5, 10, 20, { value:70, label: '70' }],
+          pageSizeOptions: [5, 10, 20,50,100],
           rowStyle: (data, index) => index % 2 == 0 ? { background: "#f5f5f5" } : null,
           searchFieldStyle: {
             color: "white",
@@ -166,7 +166,7 @@ export default function ActaGeneral() {
             label: 'Exportar todo a CSV',
             exportFunc: (cols, datas) => {
            
-            ExportCsv(cols, listOfInspecciones, 'Inventario')
+            ExportCsv(cols, listOfInspecciones, 'Actas')
           
           }},
         

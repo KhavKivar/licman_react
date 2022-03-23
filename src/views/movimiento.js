@@ -123,7 +123,7 @@ const MovimientoComponent = () => {
                 { title: 'Tipo', field: 'tipo', render: x => x.tipo == "ENVIO" ? "Envio" : "Retiro" },
                 { title: 'Cambio', field: 'cambio' },
                 {
-                    title: 'Codigo equipo', field: 'idEquipo', render: x => {
+                    title: 'Codigo interno', field: 'idEquipo', render: x => {
                         return <> <a data-tip="Ver equipo"
                             style={{ cursor: 'pointer', width: 30, display: "inline-block" }} onClick={() => handeClickEquipo(x.idEquipo)}>
                             {x.idEquipo} </a>
@@ -193,7 +193,7 @@ const MovimientoComponent = () => {
             }}
             options={{
                 pageSize: 5,
-                pageSizeOptions: [5, 10, 20, { value: 70, label: '70' }],
+                pageSizeOptions: [5, 10, 20,50,70],
                 exportMenu: [{
                     label: 'Exportar a PDF',
                     style: {
@@ -208,7 +208,7 @@ const MovimientoComponent = () => {
                     label: 'Exportar todo a CSV',
                     exportFunc: (cols, datas) => {
                    
-                    ExportCsv(cols, rowsWithPower, 'Inventario')
+                    ExportCsv(cols, rowsWithPower, 'Movimientos')
                   
                   }},
                 ],
