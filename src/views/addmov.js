@@ -293,7 +293,7 @@ function obvToEstado(x) {
             estado = 'NO UPDATE';
             break;
     }
-    return [estado,ubicacion];
+    return [estado, ubicacion];
 }
 
 
@@ -534,11 +534,11 @@ const AddMovComponent = () => {
                 setButtonState({ state: "done" });
                 await delay(800);
                 dispatch(editMovimiento(response.data));
-                const [newEstado,newUbicacion] = obvToEstado(obj.observaciones);
+                const [newEstado, newUbicacion] = obvToEstado(obj.observaciones);
                 if (newEstado != "NO UPDATE") {
                     const acta = actaList.find(element => element.idInspeccion == obj.idInspeccion);
                     if (acta != undefined) {
-                        dispatch(updateEstado({ idEquipo: acta.idEquipo, estado: newEstado,ubicacion:newUbicacion }));
+                        dispatch(updateEstado({ idEquipo: acta.idEquipo, estado: newEstado, ubicacion: newUbicacion }));
                     }
                 }
                 dispatch(cleanInput());
@@ -573,11 +573,11 @@ const AddMovComponent = () => {
                 await delay(800);
 
                 dispatch(addMovimiento(response.data));
-                const [newEstado,newUbicacion]  = obvToEstado(obj.observaciones);
+                const [newEstado, newUbicacion] = obvToEstado(obj.observaciones);
                 if (newEstado != "NO UPDATE") {
                     const acta = actaList.find(element => element.idInspeccion == obj.idInspeccion);
                     if (acta != undefined) {
-                        dispatch(updateEstado({ idEquipo: acta.idEquipo, estado: newEstado,ubicacion:newUbicacion }));
+                        dispatch(updateEstado({ idEquipo: acta.idEquipo, estado: newEstado, ubicacion: newUbicacion }));
                     }
                 }
                 dispatch(cleanInput());
@@ -616,18 +616,20 @@ const AddMovComponent = () => {
         if (index_cliente != -1) {
             realRut = clienteList[index_cliente].rut;
         }
-        console.log(realRut);
 
+     
+         
         const movimientoObject = {
             transporte: transporte == 10 ? "Marco" : "Externo",
             idInspeccion: acta.label,
             rut: realRut.replaceAll(".", ""),
             idGuiaDespacho: guiaDespacho,
-            cambio: cambio.id != null ? cambio.id : cambio != "" ? cambio : null,
+            cambio: cambio == null ? null : !isNaN(parseInt(cambio.id)) ? parseInt(cambio.id) : !isNaN(parseInt(cambio)) ?  parseInt(cambio) : null,
             tipo: tipo == 10 ? "ENVIO" : "RETIRO",
             observaciones: obv.id != null ? obv.id : obv,
             fechaRetiro: fechaTermino != "" && fechaTermino != 'Invalid date' && fechaTermino != null ? moment(fechaTermino).format('YYYY-MM-DD') : null
         }
+       
 
         if (selectedFile != null) {
             const key = uuidv4() + "." + re.exec(selectedFile.name)[1];
@@ -1010,13 +1012,13 @@ const AddMovComponent = () => {
                                     freeSolo
                                     renderInput={(params) => (
 
-                                        <TextField {...params}  error={error.observaciones.error} label="Observaciones"
+                                        <TextField {...params} error={error.observaciones.error} label="Observaciones"
 
 
                                         />
                                     )}
                                 />
-                     {error.observaciones.error && <ErrorDisplay> <span>{error.observaciones.message}</span></ErrorDisplay>}
+                                {error.observaciones.error && <ErrorDisplay> <span>{error.observaciones.message}</span></ErrorDisplay>}
                             </ColumnElement>
 
                         </RowTextField>
