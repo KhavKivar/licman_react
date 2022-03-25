@@ -88,6 +88,7 @@ gap: 1.5rem;
 justify-content: space-between;
 
 
+
 `;
 
 
@@ -201,6 +202,38 @@ const NumberFormatCustomWithoutPrefix = forwardRef(function NumberFormatCustom(p
     );
 });
 
+
+const NumberFormatAno = forwardRef(function NumberFormatCustom(props, ref) {
+    const { onChange, ...other } = props;
+
+    return (
+        <NumberFormat
+            {...other}
+            getInputRef={ref}
+            onValueChange={(values) => {
+                onChange({
+                    target: {
+                        name: props.name,
+                        value: values.value,
+                    },
+                });
+            }}
+            isNumericString
+            thousandSeparator={''} decimalSeparator={false}
+            allowNegative={false}
+            allowLeadingZeros={false}
+            isAllowed={(value) => {
+                console.log(value);
+                if (value.value.toString().length > 4) {
+                    console.log("false");
+                    return false;
+                }
+                return true;
+            }}
+        />
+    );
+});
+
 const NumberFormatCustomDecimal = forwardRef(function NumberFormatCustom(props, ref) {
     const { onChange, ...other } = props;
 
@@ -283,12 +316,13 @@ export default function Registro() {
             error.modelo = { error: true, message: 'Este campo no puede ser vacio' }
         } if (serie == null || serie == '') {
             error.serie = { error: true, message: 'Este campo no puede ser vacio' }
-        } if (ano < 999) {
+        } if (ano.toString().length < 4) {
             error.ano = { error: true, message: 'Año invalido' }
-        }if(ubicacion == ''|| ubicacion == null){
+
+        } if (ubicacion == '' || ubicacion == null) {
             error.ubicacion = { error: true, message: 'Este campo no puede ser vacio' }
         }
-        if(mastil == ''|| mastil == null){
+        if (mastil == '' || mastil == null) {
             error.mastil = { error: true, message: 'Este campo no puede ser vacio' }
         }
 
@@ -313,12 +347,12 @@ export default function Registro() {
             serie: serie,
             capacidad: capacidad != '' ? capacidad : '0',
             altura: altura != '' ? altura : '0',
-            mastil: mastil == 10 ? 'SIMPLE' :mastil == 20?'DOBLE':'TRIPLE',
+            mastil: mastil == 10 ? 'SIMPLE' : mastil == 20 ? 'DOBLE' : 'TRIPLE',
             ano: ano != '' ? parseInt(ano) : 0,
             horometro: horometro != '' ? parseFloat(horometro) : 0,
-            estado:estado == 10 ? 'DISPONIBLE' : estado == 20 ? 'LISTO PARA ENVIAR' : estado == 30 ? 'ARRENDADO': estado == 40 ?
-             'VENDIDO': estado == 50 ? 'REMATE': estado == 60 ? 'POR LLEGAR' : estado==70 ?'STAND BY' : 'SIN INFORMACION',
-            ubicacion:ubicacion,
+            estado: estado == 10 ? 'DISPONIBLE' : estado == 20 ? 'LISTO PARA ENVIAR' : estado == 30 ? 'ARRENDADO' : estado == 40 ?
+                'VENDIDO' : estado == 50 ? 'REMATE' : estado == 60 ? 'POR LLEGAR' : estado == 70 ? 'STAND BY' : 'SIN INFORMACION',
+            ubicacion: ubicacion.id != null ? ubicacion.id :ubicacion,
             precio_neto: precio != '' ? parseInt(precio) : 0,
         };
 
@@ -342,12 +376,12 @@ export default function Registro() {
                 }
             }).catch((error) => {
                 setButtonState({ state: "fail" });
-               
+
                 try {
                     if (error.message == 'Network Error') {
                         seterrorServer({ error: true, message: "Servidor caido" });
                     } else if (error.request) {
-                        if (error.request.response != undefined && error.request.response != null ) {
+                        if (error.request.response != undefined && error.request.response != null) {
                             const x = JSON.parse(error.request.response);
                             if (x.error == true) {
                                 seterrorServer({ error: true, message: x.message.sqlMessage });
@@ -358,7 +392,7 @@ export default function Registro() {
                     console.log(e);
                     seterrorServer({ error: true, message: "Error 505" });
                 }
-                
+
             });
         } else {
             axios.patch(API.baseURL + '/api/equipo/id/' + codigo, JSON.stringify(postData), {
@@ -375,12 +409,12 @@ export default function Registro() {
                 }
             }).catch((error) => {
                 setButtonState({ state: "fail" });
-               
+
                 try {
                     if (error.message == 'Network Error') {
                         seterrorServer({ error: true, message: "Servidor caido" });
                     } else if (error.request) {
-                        if (error.request.response != undefined && error.request.response != null ) {
+                        if (error.request.response != undefined && error.request.response != null) {
                             const x = JSON.parse(error.request.response);
                             if (x.error == true) {
                                 seterrorServer({ error: true, message: x.message.sqlMessage });
@@ -391,8 +425,8 @@ export default function Registro() {
                     console.log(e);
                     seterrorServer({ error: true, message: "Error 505" });
                 }
-                
-             
+
+
             });
 
 
@@ -431,11 +465,16 @@ export default function Registro() {
     const modeloArray = [...new Set(inventarioList.map(x => x.modelo))]
     const modeloOpciones = []
 
-
     const serieArray = [...new Set(inventarioList.map(x => x.serie))]
     const serieOpciones = []
 
-    const mastilOpciones = [{ id: "Triple" }, { id: "Doble" },{id:'Simple'}]
+
+    const ubicacionArray = [...new Set(inventarioList.map(x => x.ubicacion))]
+    const ubicacionOpciones = [];
+
+    for (const element of ubicacionArray) {
+        ubicacionOpciones.push({ id: element });
+    }
 
     for (const element of codigoArray) {
         codigoOpciones.push({ id: element });
@@ -462,7 +501,7 @@ export default function Registro() {
 
     const [error, setError] = useState({
         id: { error: false, message: '' }, tipo: { error: false, message: '' }, marca: { error: false, message: '' }, modelo: { error: false, message: '' }, serie: { error: false, message: '' }
-        , ano: { error: false, message: '' },ubicacion:{error:false,message:''},mastil:{error:false,message:''}
+        , ano: { error: false, message: '' }, ubicacion: { error: false, message: '' }, mastil: { error: false, message: '' }
     });
 
     const [tipo, setTipo] = useState(equipo != null ? equipo.tipo : '');
@@ -473,28 +512,21 @@ export default function Registro() {
 
     const [capacidad, setCapacidad] = useState(equipo != null ? equipo.capacidad : '');
     const [altura, setAltura] = useState(equipo != null ? equipo.altura : '');
-    const [mastil, setMastil] = useState(equipo != null ? equipo.mastil == 'SIMPLE' ? 10:equipo.mastil == 'DOBLE'? 20:30 : null);
+    const [mastil, setMastil] = useState(equipo != null ? equipo.mastil == 'SIMPLE' ? 10 : equipo.mastil == 'DOBLE' ? 20 : 30 : null);
     const [ano, setAno] = useState(equipo != null ? equipo.ano : '');
     const [horometro, setHorometro] = useState(equipo != null ? equipo.horometro : '');
     const [precio, setPrecio] = useState(equipo != null ? equipo.precio_neto : '');
 
-    const [estado, setEstado] = useState(equipo != null ? 
-        equipo.estado == 'DISPONIBLE' ? 10 :  equipo.estado == 'LISTO PARA ENVIAR' ? 20:  equipo.estado == 'ARRENDADO' ? 30:
-                            equipo.estado == 'VENDIDO' ? 40 : equipo.estado == 'REMATE'? 50 : equipo.estado =='POR LLEGAR'?
-                            60 :equipo.estado == 'STAND BY'?70 :80
-                           :
-                            
-                            
-                            10) ;
-        
-
-                              
-                          
-
-      
-    const [ubicacion, setUbicacion] =useState(equipo != null ? equipo.ubicacion : 'Taller');
+    const [estado, setEstado] = useState(equipo != null ?
+        equipo.estado == 'DISPONIBLE' ? 10 : equipo.estado == 'LISTO PARA ENVIAR' ? 20 : equipo.estado == 'ARRENDADO' ? 30 :
+            equipo.estado == 'VENDIDO' ? 40 : equipo.estado == 'REMATE' ? 50 : equipo.estado == 'POR LLEGAR' ?
+                60 : equipo.estado == 'STAND BY' ? 70 : 80
+        :
 
 
+        10);
+
+    const [ubicacion, setUbicacion] = useState(equipo != null ? equipo.ubicacion : 'Taller');
     const [buttonState, setButtonState] = useState({ state: "init" });
 
 
@@ -502,16 +534,7 @@ export default function Registro() {
         setEstado(event.target.value)
 
     }
-    const handleChangeubicacion = (event) => {
-        
-        if (event.target.value === null || event.target.value === '') {
-            setError({ ...error, ubicacion: { error: true, message: 'Este campo no puede ser vacio' } })
-        }else{
-            setError({ ...error, ubicacion: { error: false, message: '' } })
-        }
-        setUbicacion(event.target.value);
-      };
-
+ 
 
     return (
         <motion.div
@@ -861,37 +884,37 @@ export default function Registro() {
                                 </ColumnElement>
                                 <ColumnElement>
 
-                                <FormControl fullWidth   error ={error.mastil.error} >
-                                    <InputLabel >Mastil</InputLabel>
-                                    <Select
-                                        labelId="mastil-id"
-                                        id="mastil"
-                                        value={mastil}
-                                        label="Transporte"
-                                        error ={error.mastil.error}
-                                        onChange={(event,newValue) =>{
-                                            if (event.target.value == null || event.target.value == '') {
-                                                setError({ ...error, mastil: { error: true, message: 'Este campo no puede ser vacio' } })
-                                            } else {
-                                                setError({ ...error, mastil: { error: false, message: '' } });
-                                            }
-                                    
-                                            setMastil(
-                                                event.target.value,
-                                            );
-                                        }}
-                                        
-                                    >
-                                        <MenuItem value={10}>Simple</MenuItem>
-                                        <MenuItem value={20}>Doble</MenuItem>
-                                        <MenuItem value={30}>Triple</MenuItem>
+                                    <FormControl fullWidth error={error.mastil.error} >
+                                        <InputLabel >Mastil</InputLabel>
+                                        <Select
+                                            labelId="mastil-id"
+                                            id="mastil"
+                                            value={mastil}
+                                            label="Transporte"
+                                            error={error.mastil.error}
+                                            onChange={(event, newValue) => {
+                                                if (event.target.value == null || event.target.value == '') {
+                                                    setError({ ...error, mastil: { error: true, message: 'Este campo no puede ser vacio' } })
+                                                } else {
+                                                    setError({ ...error, mastil: { error: false, message: '' } });
+                                                }
 
-                                    </Select>
-                                </FormControl>
+                                                setMastil(
+                                                    event.target.value,
+                                                );
+                                            }}
 
-                                {error.mastil.error && <ErrorDisplay> <span>{error.mastil.message}</span></ErrorDisplay>}
+                                        >
+                                            <MenuItem value={10}>Simple</MenuItem>
+                                            <MenuItem value={20}>Doble</MenuItem>
+                                            <MenuItem value={30}>Triple</MenuItem>
 
-                                   
+                                        </Select>
+                                    </FormControl>
+
+                                    {error.mastil.error && <ErrorDisplay> <span>{error.mastil.message}</span></ErrorDisplay>}
+
+
 
                                 </ColumnElement>
                             </RowTextField>
@@ -946,9 +969,13 @@ export default function Registro() {
                                 <ColumnElement>
                                     <TextField value={ano}
                                         error={error.ano.error}
+                                        InputProps={{
+                                            inputComponent: NumberFormatAno,
+                                        }}
                                         onChange={(event) => {
                                             const newValue = event.target.value;
-                                            if (newValue < 999) {
+                                            console.log(newValue);
+                                            if (newValue.length < 4) {
                                                 setError({ ...error, ano: { error: true, message: 'Año invalido' } })
                                             } else {
                                                 setError({ ...error, ano: { error: false, message: '' } });
@@ -976,10 +1003,10 @@ export default function Registro() {
                                             value={estado}
                                             label="Estado"
                                             onChange={handleChangeEstado}
-                                      
 
-                                        >   
-                                            
+
+                                        >
+
                                             <MenuItem value={10}>DISPONIBLE</MenuItem>
                                             <MenuItem value={20}>LISTO PARA ENVIAR</MenuItem>
                                             <MenuItem value={30}>ARRENDADO</MenuItem>
@@ -993,13 +1020,59 @@ export default function Registro() {
                                     </FormControl>
                                 </ColumnElement>
                                 <ColumnElement>
-                                
-                                       <TextField  error={error.ubicacion.error} id="id-ubicacion" label="Ubicacion" variant="outlined" 
+                                    <Autocomplete
+                                        disablePortal
+                                        id="id-ubicacion"
+                                        options={ubicacionOpciones}
                                         value={ubicacion}
-                                        onChange={handleChangeubicacion}
-                                       />
-                                 {error.ubicacion.error && <ErrorDisplay> <span>{error.ubicacion.message}</span></ErrorDisplay>}
-                                
+                                        selectOnFocus
+                                        clearOnBlur
+                                        handleHomeEndKeys
+                                        onChange={(event, newValue) => {
+                                            if (typeof newValue === 'string') {
+                                                setUbicacion({
+                                                    id: newValue,
+                                                });
+                                            } else if (newValue && newValue.inputValue) {
+                                                setUbicacion({
+                                                    id: newValue.inputValue,
+                                                });
+                                            } else {
+                                                setUbicacion(newValue);
+                                            }
+                                        }}
+                                        filterOptions={(options, params) => {
+                                            const filtered = filter(options, params);
+                                            const { inputValue } = params;
+                                            const isExisting = options.some((option) => inputValue === option.id);
+                                            if (inputValue !== '' && !isExisting) {
+                                                filtered.push({
+                                                    inputValue,
+                                                    id: `Añadir ${inputValue}`,
+                                                });
+                                            }
+
+                                            return filtered;
+                                        }}
+                                        getOptionLabel={(option) => {
+                                            // Value selected with enter, right from the input
+                                            if (typeof option === 'string') {
+                                                return option;
+                                            }
+                                            // Add "xxx" option created dynamically
+                                            if (option.inputValue) {
+                                                return option.inputValue;
+                                            }
+                                            // Regular option
+                                            return option.id;
+                                        }}
+
+                                        renderInput={(params) => <TextField error={error.ubicacion.error} {...params}
+                                         label="Ubicacion" />}
+                                    />
+
+                                    {error.ubicacion.error && <ErrorDisplay> <span>{error.ubicacion.message}</span></ErrorDisplay>}
+
                                 </ColumnElement>
 
 

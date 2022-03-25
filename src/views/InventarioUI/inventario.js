@@ -84,7 +84,7 @@ const RegisterButton = styled(Button)(({ theme }) => ({
 
 const ButtonRegistro = styled(Button)`
     && {
-        
+      
         background-color: var(--black);
         color: white;
         :hover{
@@ -273,7 +273,15 @@ const InventarioComponent = () => {
 
                 return row.precio_neto != null ? "$" + row.precio_neto.toLocaleString('de-DE') : ""
               }
+            },
+
+            {
+              title: 'Ultima actualizacion', field: 'ts', hidden: true, searchable: false, render: (row) => {
+
+                  return row.ts == null ?  "": row.ts.split("T")[0] + " " + row.ts.split("T")[1].substr(0, 5);
+              }
             }
+
 
 
           ]}
