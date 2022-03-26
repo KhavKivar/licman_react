@@ -113,11 +113,7 @@ const MovimientoComponent = () => {
                 { title: 'Movimiento ID', field: 'idMovimiento', hidden: true },
                 { title: 'Transporte', field: 'transporte', render: x => x.transporte == "externo" ? "Externo" : "Marco" },
                 {
-                    title: 'Rut Empresa', field: 'rut',  hidden: true,render: x => {
-                        return <><p data-tip={cliente.find(y => y.rut == x.rut).nombre}>{format(x.rut)}
-                        </p>
-                            <ReactTooltip /></>
-                    }
+                    title: 'Rut Empresa', field: 'rut',hidden:true
                 },
                 { title: 'Empresa', field: 'empresa' },
                 { title: 'Tipo', field: 'tipo', render: x => x.tipo == "ENVIO" ? "Envio" : "Retiro" },

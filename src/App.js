@@ -43,8 +43,8 @@ function App() {
       console.log(response.data);
     });
   }
-  const updateState = async x => {
-    await axios.get(API.baseURL + "/api/equipo/").then((response) => {
+  const updateState =  x => {
+     axios.get(API.baseURL + "/api/equipo/").then((response) => {
       dispatch(updateAllState(response.data));
   
     });
@@ -52,15 +52,15 @@ function App() {
       dispatch(updateModeloState(response.data));
     
     });
-    await axios.get(API.baseURL + "/api/cliente/").then((response) => {
+     axios.get(API.baseURL + "/api/cliente/").then((response) => {
       dispatch(updateClienteState(response.data));
     
     });
-    await axios.get(API.baseURL + "/api/inspeccion/").then((response) => {
+     axios.get(API.baseURL + "/api/inspeccion/").then((response) => {
       dispatch(updateActaState(response.data));
     
     });
-    await axios.get(API.baseURL + "/api/movimiento/").then((response) => {
+     axios.get(API.baseURL + "/api/movimiento/").then((response) => {
       dispatch(updateMovState(response.data));
      
     });
@@ -70,8 +70,8 @@ function App() {
   useEffect(() => {
     getState();
     const intervalCall = setInterval(() => {
-      updateState();
-    }, 5000);
+       updateState();
+    }, 15000);
   }, []);
 
   return (
