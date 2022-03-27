@@ -425,12 +425,18 @@ const AddMovComponent = () => {
 
 
     const handleChangeFecha = (newValue) => {
+      
         if (newValue == "Invalid Date") {
             setError({ ...error, fechaTermino: { error: true, message: 'Fecha invalida' } })
         } else {
             setError({ ...error, fechaTermino: { error: false, message: '' } });
         }
-        dispatch(setFechaTermino(newValue));
+        if(newValue == null){
+            dispatch(setFechaTermino(null));
+        }else{
+            dispatch(setFechaTermino( newValue.toString()));
+        }
+     
     };
 
     const uploadFile = (file, name) => {
@@ -629,7 +635,7 @@ const AddMovComponent = () => {
             observaciones: obv.id != null ? obv.id : obv,
             fechaRetiro: fechaTermino != "" && fechaTermino != 'Invalid date' && fechaTermino != null ? moment(fechaTermino).format('YYYY-MM-DD') : null
         }
-       
+        console.log(movimientoObject);
 
         if (selectedFile != null) {
             const key = uuidv4() + "." + re.exec(selectedFile.name)[1];
@@ -864,7 +870,7 @@ const AddMovComponent = () => {
                                     disableClearable
                                     forcePopupIcon={false}
                                     onChange={(event, newValue, reason) => {
-
+                                     
                                         if (newValue == null || newValue == '') {
                                             setError({ ...error, acta: { error: true, message: 'Este campo no puede ser vacio' } })
                                         } else {
