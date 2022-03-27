@@ -21,14 +21,14 @@ import "./content.css";
 import SideBarTop from './sidebartop';
 
 import PersonIcon from '@mui/icons-material/Person';
-import { BarChart,Inventory } from '@mui/icons-material';
+import { BarChart, Inventory } from '@mui/icons-material';
 
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 
+import Login from '../views/login';
+import PowerOff from './power-off-solid.svg';
 
-
-
-
+import Avatar from './avatar.png';
 const Container = styled.div`
 
   .active {
@@ -37,6 +37,56 @@ const Container = styled.div`
   }
 `;
 
+const Details = styled.div`
+  display: ${(props) => (props.clicked ? "flex" : "none")};
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const Logout = styled.button`
+  border: none;
+  width: 2rem;
+  height: 2rem;
+  background-color: transparent;
+  img {
+    width: 100% !important;
+    height: auto !important;
+    filter: invert(15%) sepia(70%) saturate(6573%) hue-rotate(2deg)
+      brightness(100%) contrast(126%);
+    transition: all 0.3s ease;
+    &:hover {
+      border: none;
+      padding: 0;
+      opacity: 0.5;
+    }
+  }
+`;
+
+const Profile = styled.div`
+  width: ${(props) => (props.clicked ? "14rem" : "3rem")};
+  height: 3rem;
+  padding: 0.5rem 1rem;
+  /* border: 2px solid var(--white); */
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: ${(props) => (props.clicked ? "9rem" : "0")};
+  background-color: var(--black);
+  color: var(--white);
+  transition: all 0.3s ease;
+  z-index: 200;
+  img {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    cursor: pointer;
+    &:hover {
+      border: 2px solid var(--grey);
+      padding: 2px;
+    }
+  }
+`;
 
 
 
@@ -63,13 +113,12 @@ flex-direction: column;
 align-items: center;
 background-color: var(--black);
 padding: 2rem 0;
-
-top:  ${(props => props.clicked ? "6rem" : "5rem")};
+top:  ${(props => props.clicked ? "5rem" : "5rem")};
 left:0;
 width: ${(props => props.clicked ? "17rem" : "3.5rem")};
 transition: all 0.35 ease;
 border-radius: 0 30px 30px 0;
-position:${(props=>props.clicked ?"absolute":"relative")};
+position:${(props => props.clicked ? "absolute" : "absolute")};
 z-index: 10;
 `;
 
@@ -104,10 +153,33 @@ const Logo = styled.div`
 
 `;
 
+const Name = styled.div`
+  padding: 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  h4 {
+    display: inline-block;
+  }
+  a {
+    font-size: 0.8rem;
+    text-decoration: none;
+    color: var(--grey);
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+`;
+
+
 export default function SideBar() {
   const [click, setClick] = useState(false);
-
   const handleClick = () => { setClick(!click) };
+
+  const [profileClick, setprofileClick] = useState(false);
+  const handleProfileClick = () => setprofileClick(!profileClick);
+
   return (
     <>
 
@@ -126,18 +198,12 @@ export default function SideBar() {
           <SideBarContainer>
 
             <SlickBar clicked={click}>
-
-
-
               <Item onClick={() => setClick(false)}
                 exact="true"
                 activeclassname="active"
-                to="/">
+                to="/home">
                 <BarChart>  </BarChart>
                 <Text clicked={click} >Estadisticas</Text>
-
-
-
               </Item>
               <Item onClick={() => setClick(false)}
                 exact="true"
@@ -157,12 +223,29 @@ export default function SideBar() {
                 <SwapVertIcon />
                 <Text clicked={click} >Movimientos</Text>
               </Item >
-
               <Item onClick={() => setClick(false)} exact="true" activeclassname="active" to="/config">
                 <PersonIcon />
                 <Text clicked={click} >Clientes</Text>
               </Item>
             </SlickBar>
+
+            <Profile clicked={profileClick}>
+              <img
+                onClick={() => handleProfileClick()}
+                src={Avatar}
+                alt="Profile"
+              />
+              <Details clicked={profileClick}>
+                <Name>
+                  <h4>Admin</h4>
+
+                </Name>
+
+                <Logout>
+                  <img src={PowerOff} alt="logout" />
+                </Logout>
+              </Details>
+            </Profile>
           </SideBarContainer>
           <div className="content">
             <Routes>
@@ -174,7 +257,7 @@ export default function SideBar() {
               <Route path="/inventario" element={<Inventario />}> </Route>
 
               <Route path="/inventario/search/:value" element={<Inventario />}> </Route>
-             
+
               <Route path="/inventario/detalle/:id" element={<TablaActa />}> </Route>
 
               <Route path="/registro" element={<Registro />}> </Route>

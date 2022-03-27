@@ -13,7 +13,6 @@ import {  	esES } from '@mui/material/locale';
 
 
 
-
 const theme = createTheme({
   palette: {
     primary: {
@@ -35,7 +34,7 @@ ReactDOM.render(
   <ThemeProvider theme={theme}>
     <App />
     </ThemeProvider>
-  </BrowserRouter>,
+  </BrowserRouter>
   </Provider>,
   document.getElementById('root')
 );

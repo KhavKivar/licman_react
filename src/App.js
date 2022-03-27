@@ -16,6 +16,7 @@ import { initStateModelo,updateModeloState } from './features/modeloSlice'
 import { green, orange, blue, yellow, purple } from '@mui/material/colors';
 import { initStateMovimiento, updateMovState } from './features/movimientoSlice';
 
+import Login from './views/login';
 
 function App() {
   const dispatch = useDispatch();
@@ -66,6 +67,7 @@ function App() {
     });
 
   }
+  const login = true;
 
   useEffect(() => {
     getState();
@@ -74,10 +76,11 @@ function App() {
     }, 15000);
   }, []);
 
-  return (
 
+  return (
+ 
     <div className="App">
-      <Sidebar></Sidebar>
+       { login ? <Sidebar></Sidebar> : <Login></Login>}
     </div>
 
   );

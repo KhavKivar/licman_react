@@ -1,7 +1,11 @@
-import React, { PureComponent } from 'react';
-import { useState } from 'react';
-import { PieChart, Pie, Sector } from 'recharts';
-import { Line, LineChart, BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import React, { PureComponent, useState } from 'react';
+
+import {
+    PieChart, Pie, Sector, Line, LineChart, BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend
+    , ResponsiveContainer
+} from 'recharts';
+
+
 import MotionHoc from "../services/motionhoc";
 import Box from '@mui/material/Box';
 import styled from 'styled-components';
@@ -20,8 +24,26 @@ const TextTitle = styled.h2`
 const Row = styled.div`
     display:flex;
     gap:1.5rem;
-    flex-wrap: wrap;
+ 
     
+`;
+
+const Column = styled.div`
+    display:flex;
+    gap:1.5rem;
+    flex-wrap: wrap;
+    flex-direction:column;
+    
+`;
+const ContainerGraph = styled.div`
+    width: 100%;
+    height: 55vh;
+`;
+const ContainerGraphModelo = styled.div`
+    width: 79vw; 
+`;
+const ContainerHeight = styled.div`
+   height: 60vh;
 `;
 
 
@@ -141,7 +163,7 @@ function getModelos(data, data_equipo, data_acta) {
 
             if (index_acta != -1) {
                 const index_equipo = data_equipo.findIndex(x => x.idEquipo == data_acta[index_acta].idEquipo);
-                
+
                 if (index_equipo != -1) {
                     const equipo = data_equipo[index_equipo];
                     if (!(equipo.modelo in dic)) {
@@ -261,122 +283,149 @@ const HomeComponent = () => {
         });
     };
     return (
+
         <Box sx={{ backgroundColor: "#EEEEEE", borderRadius: '1%', padding: "30px" }}>
 
-            <Row>
+            <Column>
 
-                <Box sx={{ backgroundColor: "white", borderRadius: '1%', padding: "10px" }}>
-                    <TextTitle>Estado del inventario</TextTitle>
+                <ContainerGraphModelo>
+                    <Row>
+                        <Box sx={{ backgroundColor: "white", borderRadius: '1%', padding: "10px", width: "49%" }}>
 
-                    <BarChart
-                        width={500}
-                        height={500}
-                        data={tipoData}
-                        margin={{
+                            <TextTitle>Estado del inventario</TextTitle>
+                            <ContainerGraph>
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart
+                                        width={500}
+                                        height={400}
+                                        data={tipoData}
+                                        margin={{
 
-                            right: 30,
-                            left: 20,
-                            bottom: 5,
-                        }}
-                    >
-                        <CartesianGrid strokeDasharray="4 4" />
-                        <XAxis dataKey="name" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend
-                            formatter={(value, entry, index) => <span style={{ color: "var(--black)" }}>{value}</span>}
+                                            right: 30,
+                                            left: 20,
+                                            bottom: 5,
+                                        }}
+                                    >
+                                        <CartesianGrid strokeDasharray="4 4" />
+                                        <XAxis dataKey="name" />
+                                        <YAxis />
+                                        <Tooltip />
+                                        <Legend
+                                            formatter={(value, entry, index) => <span style={{ color: "var(--black)" }}>{value}</span>}
 
 
-                            payload={[{ value: 'Disponibles ' + disponible, type: 'square', id: 'ID01', color: "#448aff" },
-                            { value: 'Listo para enviar ' + listos, type: 'square', id: 'ID01', color: "green" },
-                            { value: 'Arrendados ' + arrendados, type: 'square', id: 'ID01', color: "#ff5252" },
-                            { value: 'Por llegar ' + porLLegar, type: 'square', id: 'ID01', color: "blue" }
-                            ]}
+                                            payload={[{ value: 'Disponibles ' + disponible, type: 'square', id: 'ID01', color: "#448aff" },
+                                            { value: 'Listo para enviar ' + listos, type: 'square', id: 'ID01', color: "green" },
+                                            { value: 'Arrendados ' + arrendados, type: 'square', id: 'ID01', color: "#ff5252" },
+                                            { value: 'Por llegar ' + porLLegar, type: 'square', id: 'ID01', color: "blue" }
+                                            ]}
 
-                            verticalAlign="top" height={60} />
-                        <Bar dataKey="disponible" stackId="a" fill="#448aff" />
-                        <Bar dataKey="arrendados" stackId="a" fill="#ff5252" />
-                    </BarChart>
-                </Box>
-                <Box sx={{ backgroundColor: "white", borderRadius: '1%', padding: "10px" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
-                        <TextTitle>Linea de tiempo</TextTitle>
-                        <LocalizationProvider dateAdapter={AdapterDateFns}>
-                            <DatePicker
-                                views={['year']}
-                                label="Año"
-                                value={value}
-                                onChange={(newValue) => {
-                                    setValue(newValue);
-                                }}
-                                renderInput={(params) => <TextField {...params} helperText={null} />}
-                            />
-                        </LocalizationProvider>
-                    </div>
+                                            verticalAlign="top" height={60} />
+                                        <Bar dataKey="disponible" stackId="a" fill="#448aff" />
+                                        <Bar dataKey="arrendados" stackId="a" fill="#ff5252" />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </ContainerGraph>
 
-                    <LineChart
-                        width={500}
-                        height={500}
-                        data={linea_tiempo}
-                        margin={{
-                            top: 5,
-                            right: 30,
-                            left: 20,
-                            bottom: 5,
-                        }}
-                    >
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Line type="monotone" dataKey="envios" stroke="#8884d8" activeDot={{ r: 8 }} />
-                        <Line type="monotone" dataKey="retiros" stroke="#82ca9d" />
-                    </LineChart>
-                </Box>
-                <Box sx={{ backgroundColor: "white", borderRadius: '1%', padding: "10px" }}>
-                    <TextTitle>Top 10 modelos mas solicitados</TextTitle>
 
-                    <BarChart
-                        width={1042}
-                        height={500}
-                        data={data_modelos}
-                        margin={{
+                        </Box>
+                        <Box sx={{ backgroundColor: "white", borderRadius: '1%', padding: "10px", width: "49%" }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
+                                <TextTitle>Linea de tiempo</TextTitle>
+                                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                    <DatePicker
+                                        views={['year']}
+                                        label="Año"
+                                        value={value}
+                                        onChange={(newValue) => {
+                                            setValue(newValue);
+                                        }}
+                                        renderInput={(params) => <TextField {...params} helperText={null} />}
+                                    />
+                                </LocalizationProvider>
+                            </div>
+                            <ContainerGraph>
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <LineChart
+                                        width={500}
+                                        height={400}
+                                        data={linea_tiempo}
+                                        margin={{
+                                            top: 5,
+                                            right: 30,
+                                            left: 20,
+                                            bottom: 5,
+                                        }}
+                                    >
+                                        <CartesianGrid strokeDasharray="3 3" />
+                                        <XAxis dataKey="name" />
+                                        <YAxis />
+                                        <Tooltip />
+                                        <Legend />
+                                        <Line type="monotone" dataKey="envios" stroke="#8884d8" activeDot={{ r: 8 }} />
+                                        <Line type="monotone" dataKey="retiros" stroke="#82ca9d" />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            </ContainerGraph>
 
-                            right: 30,
-                            left: 20,
-                            bottom: 5,
-                        }}
-                    >
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Bar dataKey="value" fill="#8884d8" />
+                        </Box>
+                    </Row>
+                </ContainerGraphModelo>
 
-                    </BarChart>
-                </Box>
-                <Box sx={{ backgroundColor: "white", borderRadius: '1%', padding: "10px" }}>
-                    <TextTitle>Top 10 clientes</TextTitle>
-                    <PieChart width={630} height={400}>
-                        <Pie
-                            activeIndex={state_pie.activeIndex}
-                            activeShape={renderActiveShape}
-                            data={data_clientes}
-                            cx="50%"
-                            cy="50%"
-                            innerRadius={90}
-                            outerRadius={120}
-                            fill="#8884d8"
-                            dataKey="value"
-                            onMouseEnter={onPieEnter}
-                        />
-                    </PieChart>
-                </Box>
+                <ContainerGraphModelo>
+                    <ContainerHeight>
+                        <Box sx={{ backgroundColor: "white", borderRadius: '1%', padding: "10px", width: "100%", height: "60vh" }}>
+                            <TextTitle>Top 10 modelos mas solicitados</TextTitle>
 
-            </Row>
-        </Box>
+                            <ResponsiveContainer width="100%" height="90%">
+                                <BarChart
+                                    width={600}
+                                    height={500}
+                                    data={data_modelos}
+                                    margin={{
+
+                                        right: 30,
+                                        left: 20,
+                                        bottom: 5,
+                                    }}
+                                >
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="name" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Legend />
+                                    <Bar dataKey="value" fill="#8884d8" />
+
+                                </BarChart>
+                            </ResponsiveContainer>
+
+                        </Box>
+                    </ContainerHeight>
+                </ContainerGraphModelo>
+                <ContainerGraphModelo>
+                    <Box sx={{ backgroundColor: "white", borderRadius: '1%', padding: "10px", width: "100%", height: "60vh" }}>
+                        <TextTitle>Top 10 clientes</TextTitle>
+                        <ResponsiveContainer width="100%" height="90%">
+                            <PieChart width={630} height={400}>
+                                <Pie
+                                    activeIndex={state_pie.activeIndex}
+                                    activeShape={renderActiveShape}
+                                    data={data_clientes}
+                                    cx="50%"
+                                    cy="50%"
+                                    innerRadius={90}
+                                    outerRadius={120}
+                                    fill="#8884d8"
+                                    dataKey="value"
+                                    onMouseEnter={onPieEnter}
+                                />
+                            </PieChart></ResponsiveContainer>
+
+                    </Box>
+                </ContainerGraphModelo>
+
+            </Column >
+        </Box >
     );
 
 
