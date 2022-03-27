@@ -1,6 +1,20 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { useSelector, useDispatch } from 'react-redux';
+import moment from 'moment';
 
+function formatFecha(fechaTs) {
+  try {
+    const fecha = fechaTs.split("T")[0].split("-");
+   
+    const resultado = fecha[1] + "/" + fecha[2] + "/" + fecha[0];
+ 
+    return resultado;
+
+  } catch {
+    return null;
+  }
+
+}
 export const movRegisterSlice = createSlice({
   name: 'movRegister',
   initialState: {
@@ -20,11 +34,11 @@ export const movRegisterSlice = createSlice({
         }
       }
 
-      const fecha_termino =  action.payload.fechaRetiro == null ? null : new Date(action.payload.fechaRetiro).toString();
-      
-      
-      const indexCliente = clientes.findIndex(x => x.rut == action.payload.rut);
+      const fecha_termino = action.payload.fechaRetiro == null ? null :
+        formatFecha(action.payload.fechaRetiro);
 
+
+      const indexCliente = clientes.findIndex(x => x.rut == action.payload.rut);
       state.rut = indexCliente == -1 ? "" : clientes[indexCliente].nombre;
       state.codigo = action.payload.idEquipo.toString();
       state.acta = { label: action.payload.idInspeccion.toString() };
@@ -34,7 +48,7 @@ export const movRegisterSlice = createSlice({
       state.transporte = action.payload.transporte == 'marco' ? '10' : '20';
       state.tipo = action.payload.tipo == 'ENVIO' ? '10' : '20';
       state.cambio = action.payload.cambio == null ? "" : action.payload.cambio.toString();
-      state.fechaTermino =fecha_termino;
+      state.fechaTermino = fecha_termino;
       state.selectedFile = null;
 
     },

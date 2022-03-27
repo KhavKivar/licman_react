@@ -380,7 +380,9 @@ const AddMovComponent = () => {
     const transporte = useSelector((state) => state.movRegister.transporte);
     const tipo = useSelector((state) => state.movRegister.tipo);
     const cambio = useSelector((state) => state.movRegister.cambio);
-    const fechaTermino = useSelector((state) => state.movRegister.fechaTermino);
+    const fechaAux = useSelector((state) => state.movRegister.fechaTermino);
+    const fechaTermino = fechaAux == null ? null : fechaAux;
+    console.log(fechaTermino); 
 
     const guiaDespacho = useSelector((state) => state.movRegister.guiaDespacho);
     const obv = useSelector((state) => state.movRegister.obv);
@@ -933,7 +935,7 @@ const AddMovComponent = () => {
                         <RowTextField>
                             <ColumnElement>
                                 <ThemeProvider theme={themeWithLocale}>
-                                    <LocalizationProvider locale={esLocale} dateAdapter={AdapterDateFns}>
+                                    <LocalizationProvider  dateAdapter={AdapterDateFns}>
                                         <DesktopDatePicker
                                             value={fechaTermino}
 
