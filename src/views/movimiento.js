@@ -162,11 +162,11 @@ const MovimientoComponent = () => {
                     }
                 },
                 {
-                    title: 'Fecha de retiro', searchable: false,  hidden: false, field: 'fechaRetiro', render: x => {
+                    title: 'Fecha de retiro', searchable: false,  hidden: true, field: 'fechaRetiro', render: x => {
                         return x.fechaRetiro != null ? x.fechaRetiro.split("T")[0] : "    ";
                     }
                 },
-                { title: 'Observaciones', field: 'observaciones',  hidden: true,  searchable: false },
+                { title: 'Observaciones', field: 'observaciones',  hidden: false,  searchable: false },
 
             ]}
             data={rowsWithPower}
