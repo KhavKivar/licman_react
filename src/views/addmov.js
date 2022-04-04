@@ -706,7 +706,8 @@ const AddMovComponent = () => {
                     {errorServer.error ? <Card sx={{ backgroundColor: "red", marginBottom: 1 }}
                     >
 
-                        <div style={{ display: "flex", alignItems: "center", paddingLeft: 5 }}> <ReportProblemIcon sx={{ color: "white" }}></ReportProblemIcon>
+                        <div style={{ display: "flex", alignItems: "center", paddingLeft: 5 }}> 
+                        <ReportProblemIcon sx={{ color: "white" }}></ReportProblemIcon>
                             <TextWarning>{errorServer.message}</TextWarning> </div></Card > : <></>}
                     <Dialog
                         open={open}

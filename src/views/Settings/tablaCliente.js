@@ -22,9 +22,20 @@ import PersonIcon from '@mui/icons-material/Person';
 import ImageIcon from '@mui/icons-material/Image';
 import { updateClientRut } from '../../features/movimientoSlice';
 
-const options = [
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import isAdmin, { isAdminOrVendedor } from '../../services/utils_role';
+
+const options_normal = [
   { value: 'Clientes', label: 'Clientes' },
   { value: 'Imagenes', label: 'Imagenes' },
+
+
+]
+
+const options_admin = [
+  { value: 'Clientes', label: 'Clientes' },
+  { value: 'Imagenes', label: 'Imagenes' },
+  { value: 'Usuarios', label: 'Usuarios' },
 
 ]
 
@@ -98,100 +109,123 @@ const TablaCliente = () => {
         editable={{
           onRowAdd: (newData) => {
             return new Promise((resolve, reject) => {
-              axios.post(API.baseURL + "/api/cliente/", {
-                rut: newData.rut.replaceAll(".", ""),
-                nombre: newData.nombre,
-                telefono: newData.telefono
-              }).then((response) => {
-                console.log(response.data);
-                if (response.status == 200) {
-                  dispatch(addCliente(newData));
-                  resolve();
-                }
-              }).catch((error) => {
-                setTimeout(() => { setOpenMessage({ show: false, error: false, message: '' }) }, 3000);
-                try {
-                  if (error.message == 'Network Error') {
-                    setOpenMessage({ error: true, message: "Servidor caido" });
-                  } else if (error.request) {
-                    if (error.request.response != undefined && error.request.response != null) {
-                      const x = JSON.parse(error.request.response);
-                      console.log(x.message);
-                      if (x.error == true) {
-                        setOpenMessage({ show:true,error: true, message: x.message.sqlMessage });
+              if (isAdminOrVendedor()) {
+                axios.post(API.baseURL + "/api/cliente/", {
+                  rut: newData.rut.replaceAll(".", ""),
+                  nombre: newData.nombre,
+                  telefono: newData.telefono
+                }).then((response) => {
+                  console.log(response.data);
+                  if (response.status == 200) {
+                    dispatch(addCliente(newData));
+                    resolve();
+                  }
+                }).catch((error) => {
+                  setTimeout(() => { setOpenMessage({ show: false, error: false, message: '' }) }, 3000);
+                  try {
+                    if (error.message == 'Network Error') {
+                      setOpenMessage({ error: true, message: "Servidor caido" });
+                    } else if (error.request) {
+                      if (error.request.response != undefined && error.request.response != null) {
+                        const x = JSON.parse(error.request.response);
+                        console.log(x.message);
+                        if (x.error == true) {
+                          setOpenMessage({ show: true, error: true, message: x.message.sqlMessage });
+                        }
                       }
                     }
+                  } catch (e) {
+                    console.log(e);
+                    setOpenMessage({ show: true, error: true, message: "Error 505" });
                   }
-                } catch (e) {
-                  console.log(e);
-                  setOpenMessage({ show:true, error: true, message: "Error 505" });
-                }
 
-                resolve();
+                  resolve();
 
+                });
+              } else {
+                setTimeout(() => { setOpenMessage({ show: false, error: false, message: '' }) }, 3000);
+                setOpenMessage({ show: true, error: true, message: "No tienes permiso para realizar esta accion" });
+                reject();
+                //Show mensage
+              }
 
-              });
 
             });
           },
           onRowUpdate: (newData, oldData) => {
             return new Promise((resolve, reject) => {
-              axios.patch(API.baseURL + "/api/cliente/id/" + oldData.rut, {
-                rut: newData.rut.replaceAll(".", ""),
-                nombre: newData.nombre,
-                telefono: newData.telefono
-              }).then((response) => {
-                console.log(response);
-                if (response.status == 200) {
-                  dispatch(editCliente({ data: newData, oldRut: oldData.rut }));
-                  dispatch(updateClientRut({ oldRut: oldData.rut, newRut: newData.rut }));
-                  resolve();
-                }
-              }).catch((error) => {
-                setTimeout(() => { setOpenMessage({ show: false, error: false, message: '' }) }, 3000);
-                try {
-                  if (error.message == 'Network Error') {
-                    setOpenMessage({ error: true, message: "Servidor caido" });
-                  } else if (error.request) {
-                    if (error.request.response != undefined && error.request.response != null) {
-                      const x = JSON.parse(error.request.response);
-                      if (x.error == true) {
-                        setOpenMessage({ show:true,error: true, message: x.message.sqlMessage });
+              if (isAdminOrVendedor()) {
+                axios.patch(API.baseURL + "/api/cliente/id/" + oldData.rut, {
+                  rut: newData.rut.replaceAll(".", ""),
+                  nombre: newData.nombre,
+                  telefono: newData.telefono
+                }).then((response) => {
+                  console.log(response);
+                  if (response.status == 200) {
+                    dispatch(editCliente({ data: newData, oldRut: oldData.rut }));
+                    dispatch(updateClientRut({ oldRut: oldData.rut, newRut: newData.rut }));
+                    resolve();
+                  }
+                }).catch((error) => {
+                  setTimeout(() => { setOpenMessage({ show: false, error: false, message: '' }) }, 3000);
+                  try {
+                    if (error.message == 'Network Error') {
+                      setOpenMessage({ error: true, message: "Servidor caido" });
+                    } else if (error.request) {
+                      if (error.request.response != undefined && error.request.response != null) {
+                        const x = JSON.parse(error.request.response);
+                        if (x.error == true) {
+                          setOpenMessage({ show: true, error: true, message: x.message.sqlMessage });
+                        }
                       }
                     }
+                  } catch (e) {
+                    console.log(e);
+                    setOpenMessage({ show: true, error: true, message: "Error 505" });
                   }
-                } catch (e) {
-                  console.log(e);
-                  setOpenMessage({show:true, error: true, message: "Error 505" });
-                }
 
-                resolve();
-              });
+                  resolve();
+                });
+              } else {
+                setTimeout(() => { setOpenMessage({ show: false, error: false, message: '' }) }, 3000);
+                setOpenMessage({ show: true, error: true, message: "No tienes permiso para realizar esta accion" });
+                reject();
+              }
 
             });
           },
           onRowDelete: (oldData) => {
             return new Promise((resolve, reject) => {
+              if (isAdminOrVendedor()) {
 
-              axios.delete(API.baseURL + "/api/cliente/id/" + oldData.rut).then((response) => {
-                console.log(response.data);
-                if (response.status == 200) {
-                  dispatch(removeCliente(oldData));
+
+
+                axios.delete(API.baseURL + "/api/cliente/id/" + oldData.rut).then((response) => {
+                  console.log(response.data);
+                  if (response.status == 200) {
+                    dispatch(removeCliente(oldData));
+                    resolve();
+                  }
+                }).catch((error) => {
+                  setTimeout(() => { setOpenMessage({ show: false, error: false, message: '' }) }, 3000);
+                  if (error.message == 'Network Error') {
+                    setOpenMessage({ show: true, error: true, message: "Servidor caido" });
+                  }
+                  if (error.response.data != null) {
+                    setOpenMessage({ show: true, error: true, message: error.response.data.message.sqlMessage });
+                  }
                   resolve();
-                }
-              }).catch((error) => {
+                });
+              }
+              else {
                 setTimeout(() => { setOpenMessage({ show: false, error: false, message: '' }) }, 3000);
-                if (error.message == 'Network Error') {
-                  setOpenMessage({ show: true, error: true, message: "Servidor caido" });
-                }
-                if (error.response.data != null) {
-                  setOpenMessage({ show: true, error: true, message: error.response.data.message.sqlMessage });
-                }
-                resolve();
-              });
+                setOpenMessage({ show: true, error: true, message: "No tienes permiso para realizar esta accion" });
+                reject();
+              }
 
 
-            })
+            });
+
 
           }
 
@@ -230,12 +264,28 @@ const TablaCliente = () => {
 
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   {e.label == "Clientes" ? <PersonIcon
-                    sx={{ color: "var(--black) !important", opacity: tabSelect.value == e.label ? 1 : 0.5 }}></PersonIcon> : <ImageIcon sx={{ color: "var(--black) !important", opacity: tabSelect.value == e.label ? 1 : 0.5 }} ></ImageIcon>}
+                    sx={{ color: "var(--black) !important", opacity: tabSelect.value == e.label ? 1 : 0.5 }}>
+
+                    </PersonIcon> : 
+                    
+                    e.label == "Imagenes" ?
+                    <ImageIcon sx={{ color: "var(--black) !important", opacity: tabSelect.value == e.label ? 1 : 0.5 }} ></ImageIcon>
+
+                    :  
+                    <AccountBoxIcon sx={{ color: "var(--black) !important", opacity: tabSelect.value == e.label ? 1 : 0.5 }} ></AccountBoxIcon>
+                    
+                    
+                    }
+
+
                   <span style={{ marginLeft: 5, color: "var(--black)", opacity: tabSelect.value == e.label ? 1 : 0.5 }}>{e.label}</span>
                 </div>
               )}
 
-              value={tabSelect} onChange={handleChange} options={options} /></div>,
+              value={tabSelect} onChange={handleChange} options={
+                
+                isAdmin() ? options_admin : options_normal
+            } /></div>,
             tooltip: '',
             isFreeAction: true,
             onClick: (event, rowData) => {

@@ -3,7 +3,7 @@ import Assignment from '@mui/icons-material/Assignment';
 import Home from '@mui/icons-material/Home';
 import SettingsIcon from '@mui/icons-material/Settings';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavLink, Route, Routes } from 'react-router-dom';
 import styled from 'styled-components';
 import logo from '../logo.svg';
@@ -22,13 +22,14 @@ import SideBarTop from './sidebartop';
 
 import PersonIcon from '@mui/icons-material/Person';
 import { BarChart, Inventory } from '@mui/icons-material';
-
+import { useDispatch, useSelector } from 'react-redux';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 
 import Login from '../views/login';
 import PowerOff from './power-off-solid.svg';
 
 import Avatar from './avatar.png';
+import { setLogin } from '../features/loginSlice';
 const Container = styled.div`
 
   .active {
@@ -161,6 +162,7 @@ const Name = styled.div`
   align-items: center;
   h4 {
     display: inline-block;
+    overflow: hidden;
   }
   a {
     font-size: 0.8rem;
@@ -176,10 +178,28 @@ const Name = styled.div`
 export default function SideBar() {
   const [click, setClick] = useState(false);
   const handleClick = () => { setClick(!click) };
+  const dispatch = useDispatch();
 
   const [profileClick, setprofileClick] = useState(false);
   const handleProfileClick = () => setprofileClick(!profileClick);
+  
 
+  const [userName, setUsername] = useState("");
+  useEffect(() => {
+    setUsername(getUserName());
+  },[]);
+
+  const getUserName = () => {
+    const user = localStorage.getItem('usuario');
+    return user;
+  };
+
+
+  const logoutAction = () =>{
+    localStorage.clear();
+    dispatch(setLogin(false));
+
+  }
   return (
     <>
 
@@ -237,12 +257,12 @@ export default function SideBar() {
               />
               <Details clicked={profileClick}>
                 <Name>
-                  <h4>Admin</h4>
+                  <h4>{userName}</h4>
 
                 </Name>
 
                 <Logout>
-                  <img src={PowerOff} alt="logout" />
+                  <img src={PowerOff} onClick={logoutAction} alt="logout" />
                 </Logout>
               </Details>
             </Profile>

@@ -1,7 +1,6 @@
 import MaterialTable from '@material-table/core';
-import Assignment from '@mui/icons-material/Assignment';
-import ContentPasteIcon from '@mui/icons-material/ContentPaste';
-import ManageSearchIcon from '@mui/icons-material/ManageSearch';
+import { ExportCsv, ExportPdf } from '@material-table/exporters';
+import DeleteIconOutline from '@mui/icons-material/DeleteOutline';
 import ReplayIcon from '@mui/icons-material/Replay';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import Alert from '@mui/material/Alert';
@@ -11,19 +10,22 @@ import * as React from 'react';
 import { forwardRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import Select from 'react-select';
 import ReactTooltip from 'react-tooltip';
 import { format } from 'rut.js';
 import { setInventarioValue } from '../../features/generalStateSlice';
 import ApiObjectCall from '../../services/callServices';
+import isAdmin from '../../services/utils_role';
 import "./invstyle.css";
-import { ExportCsv, ExportPdf } from '@material-table/exporters';
-
-
-
-
-
-
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import API from '../../services/api';
+import { deleteInspeccion } from '../../features/actaSlice';
+import axios from "axios";
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Button from '@mui/material/Button';
 
 const options = [
   { value: 'Inventario', label: 'Inventario' },
@@ -54,6 +56,47 @@ export default function ActaGeneral() {
 
 
   const [openMessage, setOpenMessage] = React.useState(false);
+
+  const [openMessageFail, setOpenMessageFail] = React.useState(false);
+  const [openMessageOkdelete, setOpenMessageOkdelete] = React.useState(false);
+  const [selectData, setselectData] = React.useState('');
+
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleRemove = () => {
+    setOpen(false);
+    const rowData = selectData;
+    console.log(rowData);
+
+    axios.delete(API.baseURL + "/api/inspeccion/id/" + rowData.idInspeccion).then((response) => {
+      console.log(response);
+      if (response.status == 200) {
+       
+        setOpenMessageOkdelete(true);
+        dispatch(deleteInspeccion({ id: rowData.idInspeccion }));
+
+        setTimeout(() => { setOpenMessageOkdelete(false) }, 3000);
+      }
+    }).catch((e) => {
+      console.log(e);
+      setOpenMessageFail(true);
+      setTimeout(() => { setOpenMessageFail(false) }, 3000);
+    });
+
+
+
+
+  };
+
+
   const updateState = () => {
     setOpenMessage(true);
     ApiObjectCall(dispatch);
@@ -76,6 +119,38 @@ export default function ActaGeneral() {
         transition: { duration: 0.5, type: "spring", ease: "easeInOut" },
       }}
     >
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Esta seguro de eliminar la acta?"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Recuerde que para eliminar un acta, antes es necesario eliminar los movimientos asociados
+            a la acta.
+
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+
+          <Button sx={{
+            background: "red", color: "white",
+            ':hover': {
+              bgcolor: 'red',
+              opacity: 0.5, // theme.palette.primary.main
+              color: 'white',
+            },
+          }}
+            onClick={handleRemove} autoFocus>
+            Si
+          </Button>
+          <Button onClick={handleClose}>No</Button>
+        </DialogActions>
+      </Dialog>
 
       <MaterialTable
         localization={{
@@ -139,8 +214,9 @@ export default function ActaGeneral() {
         data={listOfInspecciones}
         onChangeColumnHidden={(column, hidden) => { console.log(column); }}
         options={{
+          filtering: true,
           pageSize: 5,
-          pageSizeOptions: [5, 10, 20,50,100],
+          pageSizeOptions: [5, 10, 20, 50, 100],
           rowStyle: (data, index) => index % 2 == 0 ? { background: "#f5f5f5" } : null,
           searchFieldStyle: {
             color: "white",
@@ -155,7 +231,7 @@ export default function ActaGeneral() {
           exportMenu: [{
             label: 'Exportar a PDF',
             style: {
-            
+
             },
             exportFunc: (cols, datas) => ExportPdf(cols, datas, 'Actas')
           }, {
@@ -165,13 +241,14 @@ export default function ActaGeneral() {
           {
             label: 'Exportar todo a CSV',
             exportFunc: (cols, datas) => {
-           
-            ExportCsv(cols, listOfInspecciones, 'Actas')
-          
-          }},
-        
-        
-        ],
+
+              ExportCsv(cols, listOfInspecciones, 'Actas')
+
+            }
+          },
+
+
+          ],
 
 
 
@@ -192,11 +269,11 @@ export default function ActaGeneral() {
 
             }
           },
-     
-          
+
+
 
           {
-            icon: () => <ManageSearchIcon sx={{ color: "black !important" }}></ManageSearchIcon>,
+            icon: () => <VisibilityIcon sx={{ color: "black !important" }}></VisibilityIcon>,
 
             tooltip: 'Ver acta',
             onClick: (event, rowData) => {
@@ -204,11 +281,15 @@ export default function ActaGeneral() {
 
             }
           },
-          rowData => ({
-            icon: () => <div style={{ paddingLeft: 10 }}></div>,
-            tooltip: '',
-            onClick: (event, rowData) => {
 
+          rowData => ({
+            icon: () => <DeleteIconOutline sx={{ color: "black !important" }}></DeleteIconOutline>,
+            tooltip: 'Eliminar',
+            hidden: !isAdmin(),
+            onClick: (event, rowData) => {
+              setselectData(rowData);
+              setOpen(true);
+              //Call api
 
             }
           }),
@@ -226,6 +307,18 @@ export default function ActaGeneral() {
           <AlertTitle>Exito</AlertTitle>
           Se han actualizado las variables — <strong>con exito!</strong>
 
+        </Alert>
+      </div>}
+      {openMessageFail && <div style={{ position: "absolute", right: "80px", bottom: "0px", paddingBottom: 20 }}>
+        <Alert severity="error">
+          <AlertTitle>Error</AlertTitle>
+          No se pudo eliminar la <strong>acta!</strong>
+        </Alert>
+      </div>}
+      {openMessageOkdelete && <div style={{ position: "absolute", right: "80px", bottom: "0px", paddingBottom: 20 }}>
+        <Alert severity="success">
+          <AlertTitle>Exito</AlertTitle>
+          Se ha  eliminado la acta — <strong> con exito!</strong>
         </Alert>
       </div>}
     </motion.div>)

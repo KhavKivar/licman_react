@@ -13,6 +13,12 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import styled from '@emotion/styled';
 import logo from '../logo.svg';
 import Button from '@mui/material/Button';
+import axios from "axios";
+import ReportProblemIcon from '@mui/icons-material/ReportProblem';
+import API from '../services/api';
+import { useDispatch, useSelector } from 'react-redux';
+import { setLogin } from '../features/loginSlice';
+
 const Column = styled.div`
     display:flex;
     flex-direction: column;
@@ -26,14 +32,18 @@ margin-bottom: 5px;
 
 const DividerTop = styled.div`
 margin-top: 20px;
-margin-bottom: 20px;
+margin-bottom: 10px;
 `;
 
 
 
-const PaddindBottom = styled.div`
 
+const Row = styled.div`
+display:flex;
+align-items:center;
 `;
+
+
 
 
 const CenterHorizontal = styled.div`
@@ -51,15 +61,67 @@ color:var(--black);
 text-align: center;
 
 `;
+const TextWarning = styled.div`
+    font-size: 1.4rem;
+    padding:0.5rem;
+    color:red;
+`;
 
 const LoginComponent = () => {
     const [values, setValues] = React.useState({
-        amount: '',
+        nombre: '',
         password: '',
-        weight: '',
-        weightRange: '',
         showPassword: false,
     });
+    const dispatch = useDispatch();
+    const CallApi = (x) => {
+
+        const postData = {
+            nombre: values.nombre,
+            password: values.password,
+        }
+        axios.post(API.baseURL + '/api/usuario/login/', JSON.stringify(postData), {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(async (response) => {
+            if (response.status == 200) {
+                const response_data = response.data;
+                console.log(response.data);
+                if (response_data.message == 'Login Success') {
+                    localStorage.setItem('token', response.data.token);
+                    localStorage.setItem('usuario', postData.nombre);
+                    document.cookie = "role=" + response_data.role+"; Secure; SameSite=None;";
+                    
+                    dispatch(setLogin(true));
+                } else {
+                    seterrorServer({ error: true, message: "Contraseña invalida" });
+                    setTimeout(function () {
+                        seterrorServer({ error: false, message: "" })
+                    }, 2000);
+                }
+
+            }
+        }).catch((error) => {
+
+            try {
+                if (error.message == 'Network Error') {
+                    seterrorServer({ error: true, message: "Sin conexion" })
+                } else if (error.request) {
+                    seterrorServer({ error: true, message: "Usuario invalido" })
+                }
+            } catch (e) {
+                console.log(e);
+                seterrorServer({ error: true, message: "Error desconocido" })
+
+            }
+            setTimeout(function () {
+                seterrorServer({ error: false, message: "" })
+            }, 2000);
+
+        });
+
+    }
 
     const handleChange = (prop) => (event) => {
         setValues({ ...values, [prop]: event.target.value });
@@ -74,7 +136,10 @@ const LoginComponent = () => {
             showPassword: !values.showPassword,
         });
     };
-    return <Box sx={{ backgroundColor: "#EEEEEE",  height: '100vh' }}>
+
+    const [errorServer, seterrorServer] = React.useState({ error: false, message: '' });
+
+    return <Box sx={{ backgroundColor: "#EEEEEE", height: '100vh' }}>
 
         <CenterHorizontal>
             <Center>
@@ -82,22 +147,28 @@ const LoginComponent = () => {
                     <DividerTop>
                         <img width="100%" height="100%" src={logo}></img>
                     </DividerTop>
+                    <Row>
+                        <TextWarning>{errorServer.message}</TextWarning> </Row>
                     <Divider>
                         <TextField fullWidth
                             id="input-with-icon-textfield"
                             label="Nombre de usuario"
+                            value={values.nombre}
+                            onChange={handleChange('nombre')}
+                            error={errorServer.error}
 
                             variant="outlined"
                         />
                     </Divider>
                     <Divider>
-                        <FormControl fullWidth variant="outlined">
+                        <FormControl fullWidth variant="outlined" error={errorServer.error}>
                             <InputLabel htmlFor="outlined-adornment-password">Contraseña</InputLabel>
                             <OutlinedInput
                                 id="outlined-adornment-password"
                                 type={values.showPassword ? 'text' : 'password'}
                                 value={values.password}
                                 onChange={handleChange('password')}
+                                error={errorServer.error}
                                 endAdornment={
                                     <InputAdornment position="end">
                                         <IconButton
@@ -115,9 +186,9 @@ const LoginComponent = () => {
                         </FormControl>
                     </Divider>
                     <Divider>
-                        <Button fullWidth variant="contained">Iniciar sesion</Button>
+                        <Button onClick={CallApi} fullWidth variant="contained">Iniciar sesion</Button>
                     </Divider>
-                    <PaddindBottom></PaddindBottom>
+
                 </Column>
             </Center>
         </CenterHorizontal>

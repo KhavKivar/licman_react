@@ -11,6 +11,8 @@ import TablaCliente from './tablaCliente';
 import TablaImg from './tablaImg';
 import "./tab.css";
 import { useDispatch, useSelector } from 'react-redux';
+
+import TablaUsuario from './tablaUsuarios';
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -52,7 +54,11 @@ function a11yProps(index) {
   };
   const tabSelect = useSelector((state) => state.generalState.settingValue);
   return (  
-    tabSelect.value == "Clientes" ?    <TablaCliente></TablaCliente> :<TablaImg></TablaImg>
+    tabSelect.value == "Clientes" ?    <TablaCliente></TablaCliente> :
+    tabSelect.value == "Imagenes" ? 
+    <TablaImg></TablaImg> : 
+    
+    <TablaUsuario></TablaUsuario>
 
 
   );

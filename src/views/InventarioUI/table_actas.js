@@ -1,9 +1,10 @@
 
 import MaterialTable from '@material-table/core';
+import { ExportCsv, ExportPdf } from '@material-table/exporters';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
-import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import ReplayIcon from '@mui/icons-material/Replay';
+import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import Alert from '@mui/material/Alert';
@@ -24,9 +25,7 @@ import { setDetalleValue } from '../../features/generalStateSlice';
 import ApiObjectCall from '../../services/callServices';
 import MotionHoc from "../../services/motionhoc";
 import MovimientoDetalle from "./mov_table";
-import { ExportCsv, ExportPdf } from '@material-table/exporters';
-import SaveAltIcon from '@mui/icons-material/SaveAlt';
-
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -188,6 +187,7 @@ const TablaActaComponent = () => {
                         data={listOfInspecciones}
                         onChangeColumnHidden={(column, hidden) => { console.log(column); }}
                         options={{
+                            filtering: true,
                             exportMenu: [{
                                 label: 'Exportar a PDF',
                                 style: {
@@ -261,7 +261,7 @@ const TablaActaComponent = () => {
 
 
                             {
-                                icon: () => <ManageSearchIcon sx={{ color: "black !important" }}></ManageSearchIcon>,
+                                icon: () => <VisibilityIcon sx={{ color: "black !important" }}></VisibilityIcon>,
 
                                 tooltip: 'Ver acta',
                                 onClick: (event, rowData) => {

@@ -4,6 +4,8 @@ import { initStateActa } from '../features/actaSlice'
 import { initStateCliente } from '../features/clienteSlice'
 import { initStateModelo } from '../features/modeloSlice'
 import { initStateMovimiento } from '../features/movimientoSlice';
+
+import { initDataUser } from '../features/usuarioSlice';
 import { useSelector, useDispatch } from 'react-redux'
 import axios from "axios";
 import API from './api';
@@ -30,6 +32,11 @@ const ApiObjectCall = (e) =>{
     });
     axios.get(API.baseURL + "/api/movimiento/").then((response) => {
       dispatch(initStateMovimiento(response.data));
+      console.log(response.data);
+    });
+
+    axios.get(API.baseURL + "/api/usuario/").then((response) => {
+      dispatch(initDataUser(response.data));
       console.log(response.data);
     });
   }

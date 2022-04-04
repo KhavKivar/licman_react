@@ -20,84 +20,78 @@ import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import Assignment from '@mui/icons-material/Assignment';
 import PersonIcon from '@mui/icons-material/Person';
 import ImageIcon from '@mui/icons-material/Image';
+
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
-import isAdmin, { isAdminOrVendedor } from '../../services/utils_role';
 
+import {addUser,editUser,removeUser} from '../../features/usuarioSlice';
 
-const options_normal = [
-    { value: 'Clientes', label: 'Clientes' },
-    { value: 'Imagenes', label: 'Imagenes' },
-  
-  
-  ]
-  
-  const options_admin = [
+const options = [
     { value: 'Clientes', label: 'Clientes' },
     { value: 'Imagenes', label: 'Imagenes' },
     { value: 'Usuarios', label: 'Usuarios' },
-  
-  ]
+
+]
 
 
-const TablaImg = () => {
+
+const TablaUsuario = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const rows = useSelector((state) => state.modelo.data);
-
-    const inventario = useSelector((state) => state.inventario.data);
-    const modelList = []
-    for (var i in inventario) {
-        if (!rows.some(x => x.modelo == inventario[i].modelo) && !modelList.some(x => x.value == inventario[i].modelo)) {
-            modelList.push(
-                { value: inventario[i].modelo, label: inventario[i].modelo }
-            );
-        }
-
-    }
-
-
+    const rows = useSelector((state) => state.usuarios.data);
     const editable = rows.map(o => ({ ...o }));
     const [openMessage, setOpenMessage] = React.useState({ show: false, error: false, message: '' });
+
+
     const updateState = () => {
         setOpenMessage({ show: true, error: false, message: '' });
         ApiObjectCall(dispatch);
         setTimeout(() => { setOpenMessage({ show: false, error: false, message: '' }) }, 3000);
     }
+
     const handleChange = (e) => {
         dispatch(setSettingValue(e));
 
     }
     const tabSelect = useSelector((state) => state.generalState.settingValue);
-
+    const roleList = [{value:'ADMIN',label:'ADMIN'},{value:'USUARIO',label:'USUARIO'},{value:'VENDEDOR',label:'VENDEDOR'}];
 
     return (
         <>
             <MaterialTable
-                title="Lista de imagenes"
+                title="Usuarios"
                 icons={{
                     Add: forwardRef((props, ref) => <AddBox sx={{ marginBottom: 1 }}{...props} ref={ref} />),
                     ViewColumn: forwardRef((props, ref) => <ViewColumnIcon sx={{ marginTop: 0.6 }}   {...props} ref={ref} />),
                 }}
                 columns={[
-                    {
-                        title: 'Modelo', field: 'modelo', editable: "onAdd",
-                        editComponent: ({ value, onChange }) => (
-                            <Select
-                                options={modelList}
-                                name="modelo opciones"
-                                onChange={(selectedOption) => onChange(selectedOption.value)}
-                                value={value ? value.value : value}
-                                placeholder="Seleccione un modelo"
-                            />
-                        )
 
+                    {
+                        title: 'id', field: 'id', hidden: true
                     },
                     {
-                        title: 'URL Imagen', field: 'url', render: (x) => {
-
-                            return <a href={x.url} target="_blank">Link </a>
-                        }
+                        title: 'Nombre Usuario', field: 'nombre'
+                    },
+                    {
+                        title: 'password', field: 'password'
+                    },
+                    {
+                        title: 'role', field: 'role',
+                        editComponent: ({ value, onChange }) => (
+                         
+                            <Select
+                                 defaultValue = {{value:
+                                 value == null ?
+                                 "USUARIO": value,label:
+                                 value == null ?
+                                 "USUARIO": value}}
+                                options={roleList}
+                                name="Roles"
+                                onChange={(selectedOption) => onChange(selectedOption.value)}
+                                value={value ? value.value : value}
+                                placeholder="Rol"
+                            />
+                        )
                     },
 
 
@@ -107,10 +101,10 @@ const TablaImg = () => {
                 editable={{
                     onRowAdd: (newData) => {
                         return new Promise((resolve, reject) => {
-                            axios.post(API.baseURL + "/api/modelo/", newData).then((response) => {
+                            axios.post(API.baseURL + "/api/usuario/", newData).then((response) => {
                                 console.log(response.data);
                                 if (response.status == 200) {
-                                    dispatch(addModelo(newData));
+                                    dispatch(addUser(response.data));
                                     resolve();
                                 }
                             }).catch((error) => {
@@ -137,12 +131,24 @@ const TablaImg = () => {
                     },
                     onRowUpdate: (newData, oldData) => {
                         return new Promise((resolve, reject) => {
-                            axios.patch(API.baseURL + "/api/modelo/id/" + oldData.modelo, {
-                                url: newData.url
-                            }).then((response) => {
+                            console.log(oldData.role);
+                            const object_to_send = {};
+                            if(newData.password == oldData.password){
+                                object_to_send.nombre =  newData.nombre;
+                                object_to_send.role =  newData.role;
+                            
+                            }else{
+                                object_to_send.nombre =  newData.nombre;
+                                object_to_send.role =  newData.role;
+                                object_to_send.password =  newData.password;
+
+                            }
+                          
+
+                            axios.patch(API.baseURL + "/api/usuario/id/" + oldData.id, object_to_send).then((response) => {
                                 console.log(response.data);
                                 if (response.status == 200) {
-                                    dispatch(editModelo(newData));
+                                    dispatch(editUser(response.data));
                                     resolve();
                                 }
                             }).catch((error) => {
@@ -172,10 +178,10 @@ const TablaImg = () => {
                     },
                     onRowDelete: (oldData) => {
                         return new Promise((resolve, reject) => {
-                            axios.delete(API.baseURL + "/api/modelo/id/" + oldData.modelo).then((response) => {
+                            axios.delete(API.baseURL + "/api/usuario/id/" + oldData.id).then((response) => {
                                 console.log(response.data);
                                 if (response.status == 200) {
-                                    dispatch(removeModelo(oldData));
+                                    dispatch(removeUser(oldData));
                                     resolve();
                                 }
                             }).catch((error) => {
@@ -209,42 +215,45 @@ const TablaImg = () => {
                 }}
                 actions={[
 
-
                     {
                         icon: () => <div style={{ width: 250, height: 45, margin: "auto", marginLeft: 10 }} > <Select
                             getOptionLabel={e => (
+
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
                                     {e.label == "Clientes" ? <PersonIcon
                                         sx={{ color: "var(--black) !important", opacity: tabSelect.value == e.label ? 1 : 0.5 }}>
+
                                     </PersonIcon> :
+
                                         e.label == "Imagenes" ?
                                             <ImageIcon sx={{ color: "var(--black) !important", opacity: tabSelect.value == e.label ? 1 : 0.5 }} ></ImageIcon>
+
                                             :
                                             <AccountBoxIcon sx={{ color: "var(--black) !important", opacity: tabSelect.value == e.label ? 1 : 0.5 }} ></AccountBoxIcon>
+
+
                                     }
+
+
                                     <span style={{ marginLeft: 5, color: "var(--black)", opacity: tabSelect.value == e.label ? 1 : 0.5 }}>{e.label}</span>
                                 </div>
                             )}
 
-                            value={tabSelect} onChange={handleChange} options={
-                
-                isAdmin() ? options_admin : options_normal
-            } /></div>,
+                            value={tabSelect} onChange={handleChange} options={options} /></div>,
                         tooltip: '',
                         isFreeAction: true,
                         onClick: (event, rowData) => {
 
                         }
-                    },
-                    {
+                    }, {
                         icon: () => <div style={{ paddingBottom: 5 }}><ReplayIcon sx={{ color: "white" }}></ReplayIcon></div>,
                         tooltip: 'Actualizar',
                         isFreeAction: true,
                         onClick: (event, rowData) => {
                             updateState();
-
                         }
                     }
+
                 ]}
 
             >
@@ -260,19 +269,22 @@ const TablaImg = () => {
                         {openMessage.message}
                     </Alert>
                 </div>
-                : <div style={{ position: "absolute", right: "80px", bottom: "0px", paddingBottom: 20 }}>
+
+                :
+                <div style={{ position: "absolute", right: "80px", bottom: "0px", paddingBottom: 20 }}>
                     <Alert severity="success">
                         <AlertTitle>Exito</AlertTitle>
                         Se han actualizado las variables — <strong>con exito!</strong>
 
                     </Alert>
                 </div>
-                : <></>
-            }</>
+                : <></>}
+
+        </>
     );
 }
 
-export default TablaImg;
+export default TablaUsuario;
 
 
 

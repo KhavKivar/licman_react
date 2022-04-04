@@ -2,36 +2,40 @@ import MaterialTable from '@material-table/core';
 import { ExportCsv, ExportPdf } from '@material-table/exporters';
 import AddBox from '@mui/icons-material/AddBox';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import Assignment from '@mui/icons-material/Assignment';
-import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import CreateIcon from '@mui/icons-material/Create';
-import ManageSearchIcon from '@mui/icons-material/ManageSearch';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import ReplayIcon from '@mui/icons-material/Replay';
 import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
 import { styled } from '@mui/material/styles';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
+import axios from "axios";
 import { motion } from "framer-motion";
 import * as React from 'react';
+
+import  { useEffect } from 'react';
 import { forwardRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-import Select from 'react-select';
 import { setInventarioValue } from '../../features/generalStateSlice';
-
 import { deleteEquipo } from '../../features/inventarioSlice';
+import { changeFiltro, changePage, changeSearch } from '../../features/tableSlice';
+import API from '../../services/api';
 import ApiObjectCall from '../../services/callServices';
+import isAdmin from '../../services/utils_role';
 import ActaGeneral from './acta_general';
 import "./invstyle.css";
-import axios from "axios";
-import API from '../../services/api';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import { changeSearch,changeFiltro,changePage } from '../../features/tableSlice';
 
 
 
@@ -132,6 +136,13 @@ const InventarioComponent = () => {
     dispatch(setInventarioValue(e));
 
   }
+  const [isAdminVariable, setIsAdminVariable] = React.useState(null);
+ 
+  useEffect(() => {
+     setIsAdminVariable(isAdmin());
+
+   },[]);
+
 
 
 
@@ -147,13 +158,49 @@ const InventarioComponent = () => {
 
   const editable = rows.map(o => ({ ...o }));
 
+ 
   const data = useSelector((state) => state.acta.data);
   const listOfInspecciones = data;
 
+  const [selectData, setselectData] = React.useState('');
 
   const [openMessage, setOpenMessage] = React.useState(false);
   const [openMessageFail, setOpenMessageFail] = React.useState(false);
   const [openMessageOkdelete, setOpenMessageOkdelete] = React.useState(false);
+
+  const [open, setOpen] = React.useState(false);
+
+  
+
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+
+  const handleRemove = () => {
+    setOpen(false);
+    const rowData = selectData;
+    axios.delete(API.baseURL + "/api/equipo/id/" + rowData.idEquipo).then((response) => {
+      if (response.status == 200) {
+        setOpenMessageOkdelete(true);
+        dispatch(deleteEquipo(rowData.idEquipo));
+        setTimeout(() => { setOpenMessageOkdelete(false) }, 3000);
+      }
+    }).catch((e) => {
+      setOpenMessageFail(true);
+      setTimeout(() => { setOpenMessageFail(false) }, 3000);
+
+    });
+
+
+
+  };
+
 
   const updateState = () => {
     setOpenMessage(true);
@@ -179,7 +226,11 @@ const InventarioComponent = () => {
 
 
 
-  if (tabSelect.value == 'Inventario') {
+  if (tabSelect.value == 'Inventario' ) {
+
+    if(isAdminVariable ==null){
+      return (<></>);
+    }
     return (
       <motion.div
         initial={{ y: 500 }}
@@ -193,14 +244,47 @@ const InventarioComponent = () => {
         }}
       >
 
+        <Dialog
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">
+            {"Esta seguro de eliminar este equipo del inventario?"}
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              Recuerde eliminar los movimientos y actas asociados al equipo antes de eliminarlo.
+
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+           
+            <Button sx={{
+              background: "red", color: "white",
+              ':hover': {
+                bgcolor: 'red',
+                opacity: 0.5, // theme.palette.primary.main
+                color: 'white',
+              },
+            }}
+              onClick={handleRemove} autoFocus>
+              Si
+            </Button>
+            <Button onClick={handleClose}>No</Button>
+          </DialogActions>
+        </Dialog>
+
 
         <MaterialTable
-          onSearchChange = {x=> {dispatch(changeSearch(x))}}
+          onSearchChange={x => { dispatch(changeSearch(x)) }}
 
-          onPageChange = {x=>{
-            
-            dispatch(changePage(x))}}
-          onRowsPerPageChange = {x=>{dispatch(changeFiltro(x))}}
+          onPageChange={x => {
+
+            dispatch(changePage(x))
+          }}
+          onRowsPerPageChange={x => { dispatch(changeFiltro(x)) }}
 
 
 
@@ -278,7 +362,7 @@ const InventarioComponent = () => {
             {
               title: 'Ultima actualizacion', field: 'ts', hidden: true, searchable: false, render: (row) => {
 
-                  return row.ts == null ?  "": row.ts.split("T")[0] + " " + row.ts.split("T")[1].substr(0, 5);
+                return row.ts == null ? "" : row.ts.split("T")[0] + " " + row.ts.split("T")[1].substr(0, 5);
               }
             }
 
@@ -287,45 +371,20 @@ const InventarioComponent = () => {
           ]}
           data={editable}
           onChangeColumnHidden={(column, hidden) => { console.log(column); }}
-          editable={{
 
-
-            onRowDelete: (oldData) => {
-              return new Promise((resolve, reject) => {
-
-                axios.delete(API.baseURL + "/api/equipo/id/" + oldData.idEquipo).then((response) => {
-                  if (response.status == 200) {
-                    setOpenMessageOkdelete(true);
-                    dispatch(deleteEquipo(oldData.idEquipo));
-
-                    setTimeout(() => { setOpenMessageOkdelete(false) }, 3000);
-                    resolve();
-                  }
-                }).catch((e) => {
-                  setOpenMessageFail(true);
-                  setTimeout(() => { setOpenMessageFail(false) }, 3000);
-                  resolve();
-                });
-
-              })
-
-            }
-
-
-          }}
           options={{
             filtering: true,
             pageSize: filtroState,
-            pageSizeOptions: [5, 10, 20, 50,100],
-            initialPage:pageState,
+            pageSizeOptions: [5, 10, 20, 50, 100],
+            initialPage: pageState,
 
-            rowStyle: (data, index) =>    data.ubicacion == 'Actualizar' ? {background: "#ffff00"} :
-            data.estado == 'POR LLEGAR' ? {background: "#00b0f0"}:
-            data.estado == 'LISTO PARA ENVIAR' ? {background: "#76ff03"}:
-            data.estado == 'VENDIDO' ? {background: "#ff5252"}:
-            index % 2 == 0 ? { background: "#f5f5f5" } :
-         
-            null,
+            rowStyle: (data, index) => data.ubicacion == 'Actualizar' ? { background: "#ffff00" } :
+              data.estado == 'POR LLEGAR' ? { background: "#00b0f0" } :
+                data.estado == 'LISTO PARA ENVIAR' ? { background: "#76ff03" } :
+                  data.estado == 'VENDIDO' ? { background: "#ff5252" } :
+                    index % 2 == 0 ? { background: "#f5f5f5" } :
+
+                      null,
             searchFieldStyle: { color: "white", },
             headerStyle: {
               background: "var(--black)", color: "white", fontFamily: '"Poppins", sans-serif', fontSize: "1rem"
@@ -350,71 +409,71 @@ const InventarioComponent = () => {
                   {
                     "title": "Codigo interno",
                     "field": "idEquipo",
-                 
+
                   },
                   {
                     "title": "Tipo",
                     "field": "tipo",
-                   
+
                   },
                   {
                     "title": "Marca",
                     "field": "marca",
-                   
+
                   },
                   {
                     "title": "Modelo",
                     "field": "modelo",
-                   
+
                   },
                   {
                     "title": "Serie",
                     "field": "serie",
-                  
+
                   },
                   {
                     "title": "Capacidad",
                     "field": "capacidad",
-                    
+
                   },
                   {
                     "title": "Altura",
                     "field": "altura",
-                   
+
                   },
                   {
                     "title": "Mastil",
                     "field": "mastil",
-                  
+
                   },
                   {
                     "title": "Año",
                     "field": "ano",
-                   
+
                   },
                   {
                     "title": "Horometro",
                     "field": "horometro",
-                   
-                  
+
+
                   },
                   {
                     "title": "Estado",
                     "field": "estado",
-                   
+
                   },
                   {
                     "title": "Ubicacion",
                     "field": "ubicacion",
-                  
+
                   },
                   {
                     "title": "Precio neto",
                     "field": "precio_neto",
-                 
+
                   }
                 ];
-               ExportCsv(columnas, editable, 'Inventario');
+                ExportCsv(columnas, editable, 'Inventario');
 
               }
             }
@@ -423,8 +482,8 @@ const InventarioComponent = () => {
             ],
             actionsColumnIndex: -1,
             searchText: params.value != undefined ? params.value :
-            
-            searchState
+
+              searchState
 
           }}
 
@@ -434,6 +493,8 @@ const InventarioComponent = () => {
               icon: () => <div style={{ paddingBottom: 0, width: 32 }}><AddBox sx={{ color: "white" }}></AddBox></div>,
               tooltip: 'Añadir equipo',
               isFreeAction: true,
+              
+              hidden:!isAdminVariable,
               onClick: (event, rowData) => {
                 navigate('/registro');
               }
@@ -458,17 +519,29 @@ const InventarioComponent = () => {
 
               }
             },
-
-
-
-            rowData => ({
+            {
               icon: () => <CreateIcon sx={{ color: "black !important" }}></CreateIcon>,
               tooltip: 'Editar Equipo',
+            
+              hidden:!isAdminVariable,
               onClick: (event, rowData) => {
 
                 navigate('/registro/' + rowData.idEquipo);
               }
-            })
+            },
+
+            rowData => (
+            {
+              icon: () => <DeleteOutlineIcon sx={{ color: "black !important" }}></DeleteOutlineIcon>,
+              tooltip: 'Eliminar equipo',
+              hidden:!isAdminVariable,
+              onClick: (event, rowData) => {
+                setOpen(true);
+                setselectData(rowData);
+              }
+            }
+
+            ),
 
 
 
@@ -487,7 +560,7 @@ const InventarioComponent = () => {
         {openMessageFail && <div style={{ position: "absolute", right: "80px", bottom: "0px", paddingBottom: 20 }}>
           <Alert severity="error">
             <AlertTitle>Error</AlertTitle>
-            Error al eliminar el <strong>equipo!</strong>
+            No se pudo eliminar el <strong>equipo!</strong>
           </Alert>
         </div>}
         {openMessageOkdelete && <div style={{ position: "absolute", right: "80px", bottom: "0px", paddingBottom: 20 }}>

@@ -220,6 +220,7 @@ console.log(rowsWithPower);
       data={rowsWithPower}
       onChangeColumnHidden={(column, hidden) => { console.log(column); }}
       options={{
+        filtering: true,
         exportMenu: [{
           label: 'Exportar a PDF',
           style: {

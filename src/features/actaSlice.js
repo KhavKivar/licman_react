@@ -9,6 +9,14 @@ export const actaSlice = createSlice({
     initStateActa: (state, action) => {
       state.data = action.payload;
     },
+    deleteInspeccion: (state, action) => {
+      const { id } = action.payload;
+      const index = state.data.findIndex((inspeccion) => inspeccion.idInspeccion === id);
+      if(index != -1){
+        state.data.splice(index, 1);
+      }
+     
+    },
     updateActaState: (state, action) => {
       const data = action.payload;
       const data_prev = state.data;
@@ -46,6 +54,6 @@ export const actaSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { initStateActa,updateActaState } = actaSlice.actions
+export const { initStateActa,updateActaState,deleteInspeccion } = actaSlice.actions
 
 export default actaSlice.reducer

@@ -9,6 +9,11 @@ import movRegisterSlice from '../features/movRegisterSlice'
 
 import tableSlice from '../features/tableSlice'
 
+import loginSlice from '../features/loginSlice'
+
+import usuarioSlice from '../features/usuarioSlice'
+
+
 export const store = configureStore({
   reducer: {
     inventario: inventarioSlice,
@@ -18,6 +23,8 @@ export const store = configureStore({
     movimiento:movimientoSlice,
     generalState:generalStateSlice,
     movRegister:movRegisterSlice,
-    tableState:tableSlice
+    tableState:tableSlice,
+    loginState:loginSlice,
+    usuarios:usuarioSlice,
   },
 })

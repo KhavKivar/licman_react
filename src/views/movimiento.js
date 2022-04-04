@@ -17,6 +17,16 @@ import ApiObjectCall from '../services/callServices';
 import MotionHoc from "../services/motionhoc";
 import { ExportCsv, ExportPdf } from '@material-table/exporters';
 import CircularProgress from '@mui/material/CircularProgress';
+import isAdmin from '../services/utils_role';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Button from '@mui/material/Button';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import  { useEffect } from 'react';
+
 
 const rows = [{
     fecha_entrada: "03/01/2021", transporte: "MARCO", empresa_envio: "DVP", retiro: "X", cambio: "O",
@@ -37,13 +47,48 @@ const MovimientoComponent = () => {
 
     const rowsWithPower = [];
 
-    
+    const [selectData, setselectData] = React.useState('');
+    const [open, setOpen] = React.useState(false);
+
+    const [isAdminVariable, setIsAdminVariable] = React.useState(null);
+    useEffect(() => {
+        setIsAdminVariable(isAdmin());
+   
+      },[]);
+
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+    const handleRemove = () => {
+        setOpen(false);
+        const rowData = selectData;
+
+        axios.delete(API.baseURL + "/api/movimiento/id/" + rowData.idMovimiento).
+            then((response) => {
+                if (response.status == 200) {
+                    dispatch(deleteMov({ idMovimiento: rowData.idMovimiento }));
+                }
+            }).catch((e) => {
+
+
+            });
+
+
+
+
+    };
+
+
 
 
     for (var i in editable) {
         if (actas.length > 0 && cliente.length > 0) {
             const acta = actas.find(x => x.idInspeccion == editable[i].idInspeccion);
-            const client = cliente.find(x =>  x.rut.replaceAll(".", "") == editable[i].rut.replaceAll(".", ""));
+            const client = cliente.find(x => x.rut.replaceAll(".", "") == editable[i].rut.replaceAll(".", ""));
             if (acta != undefined) {
                 editable[i].idEquipo = acta.idEquipo;
             } else {
@@ -75,10 +120,41 @@ const MovimientoComponent = () => {
 
 
     return (<>
+        <Dialog
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+        >
+            <DialogTitle id="alert-dialog-title">
+                {"Esta seguro de eliminar este movimiento?"}
+            </DialogTitle>
+            <DialogContent>
+                <DialogContentText id="alert-dialog-description">
+                   
+
+                </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+
+                <Button sx={{
+                    background: "red", color: "white",
+                    ':hover': {
+                        bgcolor: 'red',
+                        opacity: 0.5, // theme.palette.primary.main
+                        color: 'white',
+                    },
+                }}
+                    onClick={handleRemove} autoFocus>
+                    Si
+                </Button>
+                <Button onClick={handleClose}>No</Button>
+            </DialogActions>
+        </Dialog>
 
 
 
-
+{isAdminVariable != null && 
         <MaterialTable
             localization={{
                 pagination: {
@@ -94,7 +170,7 @@ const MovimientoComponent = () => {
                 },
 
                 header: {
-                    actions: 'Acciones'
+                    actions:  isAdmin() ? 'Acciones' : "" 
                 },
                 body: {
                     emptyDataSourceMessage: 'No hay informacion para mostrar',
@@ -113,7 +189,7 @@ const MovimientoComponent = () => {
                 { title: 'Movimiento ID', field: 'idMovimiento', hidden: true },
                 { title: 'Transporte', field: 'transporte', render: x => x.transporte == "externo" ? "Externo" : "Marco" },
                 {
-                    title: 'Rut Empresa', field: 'rut',hidden:true
+                    title: 'Rut Empresa', field: 'rut', hidden: true
                 },
                 { title: 'Empresa', field: 'empresa' },
                 { title: 'Tipo', field: 'tipo', render: x => x.tipo == "ENVIO" ? "Envio" : "Retiro" },
@@ -162,51 +238,37 @@ const MovimientoComponent = () => {
                     }
                 },
                 {
-                    title: 'Fecha de retiro', searchable: false,  hidden: true, field: 'fechaRetiro', render: x => {
+                    title: 'Fecha de retiro', searchable: false, hidden: true, field: 'fechaRetiro', render: x => {
                         return x.fechaRetiro != null ? x.fechaRetiro.split("T")[0] : "    ";
                     }
                 },
-                { title: 'Observaciones', field: 'observaciones',  hidden: false,  searchable: false },
+                { title: 'Observaciones', field: 'observaciones', hidden: false, searchable: false },
 
             ]}
             data={rowsWithPower}
             onChangeColumnHidden={(column, hidden) => { console.log(column); }}
-            editable={{
-                onRowDelete: (oldData) => {
-                    return new Promise((resolve, reject) => {
-                        axios.delete(API.baseURL + "/api/movimiento/id/" + oldData.idMovimiento).then((response) => {
-                            console.log(response.data);
-                        });
-                        dispatch(deleteMov({ idMovimiento: oldData.idMovimiento }));
 
-                        resolve();
-
-                    })
-
-                }
-
-
-            }}
             options={{
                 pageSize: 5,
-                pageSizeOptions: [5, 10, 20,50,70],
+                pageSizeOptions: [5, 10, 20, 50, 70],
                 exportMenu: [{
                     label: 'Exportar a PDF',
                     style: {
-                    
+
                     },
                     exportFunc: (cols, datas) => ExportPdf(cols, datas, 'Movimientos')
-                  }, {
+                }, {
                     label: 'Exportar a CSV',
                     exportFunc: (cols, datas) => ExportCsv(cols, datas, 'Movimientos')
-                  },
-                  {
+                },
+                {
                     label: 'Exportar todo a CSV',
                     exportFunc: (cols, datas) => {
-                   
-                    ExportCsv(cols, rowsWithPower, 'Movimientos')
-                  
-                  }},
+
+                        ExportCsv(cols, rowsWithPower, 'Movimientos')
+
+                    }
+                },
                 ],
 
                 rowStyle: (data, index) => index % 2 == 0 ? { background: "#f5f5f5" } : null,
@@ -231,6 +293,7 @@ const MovimientoComponent = () => {
                     icon: () => <div style={{ paddingBottom: 5, width: 32 }}><AddBox sx={{ color: "white" }}></AddBox></div>,
                     tooltip: 'Añadir Movimiento',
                     isFreeAction: true,
+                    hidden:!isAdminVariable,
                     onClick: (event, rowData) => {
                         dispatch(cleanInput());
                         navigate('/movimientos/registro');
@@ -245,29 +308,33 @@ const MovimientoComponent = () => {
                     }
                 },
                 {
-                    icon: () => <CreateIcon sx={{ color: "black !important" }}></CreateIcon>,
-                    tooltip: 'Editar Movimiento',
-                    onClick: (event, rowData) => {
-                        dispatch(editValue({ ...rowData, listOfActa: actas ,listCliente:cliente}));
-                        navigate('/movimientos/registro/' + rowData.idMovimiento);
+                        icon: () => <CreateIcon sx={{ color: "black !important" }}></CreateIcon>,
+                        tooltip: 'Editar Movimiento',
+                        hidden: !isAdminVariable,
+                        onClick: (event, rowData) => {
+                            dispatch(editValue({ ...rowData, listOfActa: actas, listCliente: cliente }));
+                            navigate('/movimientos/registro/' + rowData.idMovimiento);
+                        }
+                    },
+                rowData => (
+                   
+                    {
+                        icon: () => <DeleteOutlineIcon sx={{ color: "black !important" }}></DeleteOutlineIcon>,
+                        tooltip: 'Borrar movimiento',
+                        hidden: !isAdminVariable,
+                        onClick: (event, rowData) => {
+                            setOpen(true);
+                            setselectData(rowData);
 
-
+                        }
                     }
-                },
-
-
-
-
-
-
-
+                )
             ]}
-
         >
 
 
         </MaterialTable>
-
+    }
         {openMessage && <div style={{ position: "absolute", right: "80px", bottom: "0px", paddingBottom: 20 }}>
             <Alert severity="success">
                 <AlertTitle>Exito</AlertTitle>
@@ -275,6 +342,9 @@ const MovimientoComponent = () => {
 
             </Alert>
         </div>}
+        
+        
+        
 
     </>
 
