@@ -77,6 +77,8 @@ const TablaUsuario = () => {
                     },
                     {
                         title: 'role', field: 'role',
+                        editable:'onUpdate',
+
                         editComponent: ({ value, onChange }) => (
                          
                             <Select
@@ -101,6 +103,7 @@ const TablaUsuario = () => {
                 editable={{
                     onRowAdd: (newData) => {
                         return new Promise((resolve, reject) => {
+                            console.log(newData);
                             axios.post(API.baseURL + "/api/usuario/", newData).then((response) => {
                                 console.log(response.data);
                                 if (response.status == 200) {
