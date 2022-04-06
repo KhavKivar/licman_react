@@ -12,7 +12,7 @@ import { initState, updateAllState } from './features/inventarioSlice'
 import { initStateActa, updateActaState } from './features/actaSlice'
 import { initStateCliente, updateClienteState } from './features/clienteSlice'
 import { initStateModelo, updateModeloState } from './features/modeloSlice'
-import {initDataUser} from './features/usuarioSlice';
+import { initDataUser } from './features/usuarioSlice';
 
 import { green, orange, blue, yellow, purple } from '@mui/material/colors';
 import { initStateMovimiento, updateMovState } from './features/movimientoSlice';
@@ -91,7 +91,7 @@ function App() {
           const response_data = response.data;
           if (response_data.message == 'Login Success') {
             console.log("login");
-            document.cookie = "role=" + response_data.role+"; Secure; SameSite=None;";
+            document.cookie = "role=" + response_data.role + "; Secure; SameSite=None;";
             dispatch(setLogin(true));
             return;
           }
@@ -126,11 +126,19 @@ function App() {
 
     <div className="App">
       {login == null ?
-        <Box sx={{ display: 'flex' }}>
-          <CircularProgress />
-        </Box> :
+        <div style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%'
+          }}>
+            <CircularProgress />
+
+
+          </div> :
         login ?
-          <Sidebar></Sidebar> : <Login></Login>}
+          <Sidebar></Sidebar> :<Login></Login>
+
+       }
     </div>
 
   );
