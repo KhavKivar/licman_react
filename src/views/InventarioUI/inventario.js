@@ -30,7 +30,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { setInventarioValue } from '../../features/generalStateSlice';
 import { deleteEquipo } from '../../features/inventarioSlice';
-import { changeFiltro, changePage, changeSearch } from '../../features/tableSlice';
+import { changeFiltro, changePage, changeSearch, columnsFilterInventario } from '../../features/tableSlice';
 import API from '../../services/api';
 import ApiObjectCall from '../../services/callServices';
 import isAdmin from '../../services/utils_role';
@@ -170,6 +170,8 @@ const InventarioComponent = () => {
 
   const [open, setOpen] = React.useState(false);
 
+
+  const columnsFilter = tableState.columnsFilterInventario;
   
 
 
@@ -223,6 +225,10 @@ const InventarioComponent = () => {
 
   </div>;
 
+function quitarAcentos(cadena){
+	const acentos = {'á':'a','é':'e','í':'i','ó':'o','ú':'u','Á':'A','É':'E','Í':'I','Ó':'O','Ú':'U'};
+	return cadena.split('').map( letra => acentos[letra] || letra).join('').toString();	
+}
 
 
 
@@ -286,6 +292,15 @@ const InventarioComponent = () => {
           }}
           onRowsPerPageChange={x => { dispatch(changeFiltro(x)) }}
 
+          onFilterChange={(filters) => {
+                        console.log(filters);
+                        const filtrosList= [];
+                        for(const i of filters){
+                            filtrosList.push({columns:i.column.field,value:i.value});
+                        }
+                        dispatch(columnsFilterInventario(filtrosList));
+                    }}
+
 
 
           localization={{
@@ -318,52 +333,60 @@ const InventarioComponent = () => {
           title={params.value != null ? TitleElement : "Inventario"}
 
           columns={[
-            { title: 'Codigo interno', field: 'idEquipo' },
-            { title: 'Tipo', field: 'tipo' },
-            { title: 'Marca', field: 'marca' },
-            { title: 'Modelo', field: 'modelo' },
-            { title: 'Serie', field: 'serie', hidden: true },
+            { title: 'Codigo interno', field: 'idEquipo',defaultFilter:columnsFilter.idEquipo },
+            { title: 'Tipo', field: 'tipo', defaultFilter: columnsFilter.tipo,
+            
+            customFilterAndSearch: (value, rowData) => { 
+              console.log(value); 
+                    console.log(rowData);     
+              return quitarAcentos(rowData.tipo.toLowerCase()).startsWith(value.toLowerCase());
+                      
+            }
+             },
+            { title: 'Marca', field: 'marca', defaultFilter: columnsFilter.marca },
+            { title: 'Modelo', field: 'modelo', defaultFilter: columnsFilter.modelo },
+            { title: 'Serie', field: 'serie', hidden: true, defaultFilter: columnsFilter.serie },
             {
               title: 'Capacidad', field: 'capacidad', searchable: false, render: (row) => {
                 return row.capacidad + " Kg";
-              }
+              }, defaultFilter: columnsFilter.capacidad
             },
             {
               title: 'Altura', field: 'altura', hidden: true, searchable: false, render: (row) => {
                 return row.altura != null ? row.altura.toLocaleString('de-DE') + " mm" : ""
-              }
+              }, defaultFilter: columnsFilter.altura
             },
-            { title: 'Mastil', field: 'mastil', hidden: true, },
-            { title: 'Año', field: 'ano', hidden: true, },
+            { title: 'Mastil', field: 'mastil', hidden: true, defaultFilter: columnsFilter.mastil },
+            { title: 'Año', field: 'ano', hidden: true, defaultFilter: columnsFilter.ano },
             {
               title: 'Horometro', field: 'horometro', searchable: false, render: (row) => {
                 return row.horometro != null ? row.horometro.toLocaleString('de-DE') : ""
-              }
+              }, defaultFilter: columnsFilter.horometro
             },
 
             {
               title: 'Estado', field: 'estado', render: (row) => {
                 return capitalizeFirstLetter(row.estado.toLowerCase());
-              }
+              }, defaultFilter: columnsFilter.estado
             },
             {
               title: 'Ubicacion', field: 'ubicacion', render: (row) => {
                 return capitalizeFirstLetter(row.ubicacion.toLowerCase());
-              }
+              }, defaultFilter: columnsFilter.ubicacion
             },
 
             {
               title: 'Precio neto', field: 'precio_neto', hidden: true, searchable: false, render: (row) => {
 
                 return row.precio_neto != null ? "$" + row.precio_neto.toLocaleString('de-DE') : ""
-              }
+              }, defaultFilter: columnsFilter.precio_neto
             },
 
             {
               title: 'Ultima actualizacion', field: 'ts', hidden: true, searchable: false, render: (row) => {
 
                 return row.ts == null ? "" : row.ts.split("T")[0] + " " + row.ts.split("T")[1].substr(0, 5);
-              }
+              }, defaultFilter: columnsFilter.ts
             }
 
 

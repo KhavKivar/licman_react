@@ -28,7 +28,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { useEffect } from 'react';
 
 
-import { changeFiltro_mov, changePage_mov, changeSearch_mov } from '../features/tableSlice';
+import { changeFiltro_mov, changePage_mov, changeSearch_mov,columnsFilterMov } from '../features/tableSlice';
 
 const rows = [{
     fecha_entrada: "03/01/2021", transporte: "MARCO", empresa_envio: "DVP", retiro: "X", cambio: "O",
@@ -63,8 +63,9 @@ const MovimientoComponent = () => {
 
     useEffect(() => {
         setIsAdminVariable(isAdmin());
+        console.log("render");
 
-    }, []);
+    },[]);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -122,6 +123,11 @@ const MovimientoComponent = () => {
     };
 
     const [openMessage, setOpenMessage] = React.useState(false);
+
+
+
+
+
     const updateState = () => {
         setOpenMessage(true);
         ApiObjectCall(dispatch);
@@ -129,252 +135,282 @@ const MovimientoComponent = () => {
     }
 
 
-    return (<>
-        <Dialog
-            open={open}
-            onClose={handleClose}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
-        >
-            <DialogTitle id="alert-dialog-title">
-                {"Esta seguro de eliminar este movimiento?"}
-            </DialogTitle>
-            <DialogContent>
-                <DialogContentText id="alert-dialog-description">
+    const columnsFilter = tableState.columnsFilterMov;
 
-
-                </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-
-                <Button sx={{
-                    background: "red", color: "white",
-                    ':hover': {
-                        bgcolor: 'red',
-                        opacity: 0.5, // theme.palette.primary.main
-                        color: 'white',
-                    },
-                }}
-                    onClick={handleRemove} autoFocus>
-                    Si
-                </Button>
-                <Button onClick={handleClose}>No</Button>
-            </DialogActions>
-        </Dialog>
-
-
-
-        {isAdminVariable != null &&
-            <MaterialTable
-                onSearchChange={x => { dispatch(changeSearch_mov(x)) }}
-
-                onPageChange={x => {
-
-                    dispatch(changePage_mov(x))
-                }}
-                onRowsPerPageChange={x => { dispatch(changeFiltro_mov(x)) }}
-            
-                onColumnDragged={x=>{
-                    console.log(x);
-                }}
-              
-
-                localization={{
-                    pagination: {
-                        labelDisplayedRows: '{from}-{to} de {count}',
-                        labelRowsPerPage: 'Filas por pagina:',
-                        labelRowsSelect: 'filas'
-                    },
-                    toolbar: {
-                        showColumnsTitle: 'Mostrar Columnas',
-                        exportTitle: "Exportar",
-                        searchPlaceholder: "Buscar",
-                        addRemoveColumns: "Añadir o remover Columnas"
-                    },
-
-                    header: {
-                        actions: isAdmin() ? 'Acciones' : ""
-                    },
-                    body: {
-                        emptyDataSourceMessage: 'No hay informacion para mostrar',
-
-                    }
-                }}
-                title="Movimientos"
-                columns={[
-                    {
-                        title: 'Fecha Movimiento', field: 'fechaMov', render: x => {
-
-                            return x.fechaMov.split("T")[0] + " " + x.fechaMov.split("T")[1].substr(0, 5);
-
-                        }
-                    },
-                    { title: 'Movimiento ID', field: 'idMovimiento', hidden: true },
-                    { title: 'Transporte', field: 'transporte', render: x => x.transporte == "externo" ? "Externo" : "Marco" },
-                    {
-                        title: 'Rut Empresa', field: 'rut', hidden: true
-                    },
-                    { title: 'Empresa', field: 'empresa' },
-                    { title: 'Tipo', field: 'tipo', render: x => x.tipo == "ENVIO" ? "Envio" : "Retiro" },
-                    { title: 'Cambio', field: 'cambio' },
-                    {
-                        title: 'Codigo interno', field: 'idEquipo', render: x => {
-                            return <> <a data-tip="Ver equipo"
-                                style={{ cursor: 'pointer', width: 30, display: "inline-block" }} onClick={() => handeClickEquipo(x.idEquipo)}>
-                                {x.idEquipo} </a>
-                                <ReactTooltip />
-                            </>
-                                ;
-
-                        }
-                    },
-                    {
-                        title: 'Acta ID', field: 'idInspeccion', render: x => {
-                            return <> <a data-tip="Ver acta"
-                                style={{ cursor: 'pointer', width: 50, height: 30, display: "inline-block" }} onClick={() => handeClick(x.idInspeccion)}>
-                                {x.idInspeccion} </a>
-                                <ReactTooltip />
-                            </>
-                                ;
-
-                        }
-                    },
-                    {
-                        title: 'N° Guia de despacho', field: 'idGuiaDespacho', render: x => {
-                            return <>
-
-                                <a data-tip="Ver documento"
-                                    style={{ cursor: 'pointer', width: 30, display: "inline-block" }} onClick={() => {
-                                        navigate('/movimientos/showPdf/' + x.idMovimiento);
-                                    }}>
-                                    {x.idGuiaDespacho} </a>
-                                <ReactTooltip />
+  
+    let fechaColumn = {
+        title: 'Fecha Movimiento', field: 'fechaMov', render: x => {
+            return x.fechaMov.split("T")[0] + " " + x.fechaMov.split("T")[1].substr(0, 5);
+        }, defaultFilter: columnsFilter.fechaMov
+    };
 
 
 
 
 
+    return (
 
 
-                            </>
-
-                        }
-                    },
-                    {
-                        title: 'Fecha de retiro', searchable: false, hidden: true, field: 'fechaRetiro', render: x => {
-                            return x.fechaRetiro != null ? x.fechaRetiro.split("T")[0] : "    ";
-                        }
-                    },
-                    { title: 'Observaciones', field: 'observaciones', hidden: false, searchable: false },
-
-                ]}
-                data={rowsWithPower}
-                onChangeColumnHidden={(column, hidden) => { console.log(column); }}
-
-                options={{
-                    searchText:searchState,
-                    pageSize: filtroState,
-                    initialPage: pageState,
+        <>
+            <Dialog
+                open={open}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">
+                    {"Esta seguro de eliminar este movimiento?"}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
 
 
-                   
-                    pageSizeOptions: [5, 10, 20, 50, 70],
-                    exportMenu: [{
-                        label: 'Exportar a PDF',
-                        style: {
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
 
+                    <Button sx={{
+                        background: "red", color: "white",
+                        ':hover': {
+                            bgcolor: 'red',
+                            opacity: 0.5, // theme.palette.primary.main
+                            color: 'white',
                         },
-                        exportFunc: (cols, datas) => ExportPdf(cols, datas, 'Movimientos')
-                    }, {
-                        label: 'Exportar a CSV',
-                        exportFunc: (cols, datas) => ExportCsv(cols, datas, 'Movimientos')
-                    },
-                    {
-                        label: 'Exportar todo a CSV',
-                        exportFunc: (cols, datas) => {
+                    }}
+                        onClick={handleRemove} autoFocus>
+                        Si
+                    </Button>
+                    <Button onClick={handleClose}>No</Button>
+                </DialogActions>
+            </Dialog>
 
-                            ExportCsv(cols, rowsWithPower, 'Movimientos')
+
+
+            {isAdminVariable != null &&
+                <MaterialTable
+
+                    onSearchChange={x => { dispatch(changeSearch_mov(x)) }}
+
+                    onPageChange={x => {
+
+                        dispatch(changePage_mov(x))
+                    }}
+                    onRowsPerPageChange={x => { dispatch(changeFiltro_mov(x)) }}
+
+                    onFilterChange={(filters) => {
+                        console.log(filters);
+                        const filtrosList= [];
+                        for(const i of filters){
+                            filtrosList.push({columns:i.column.field,value:i.value});
+                        }
+                        dispatch(columnsFilterMov(filtrosList));
+                    }}
+
+
+                    onColumnDragged={x => {
+                        console.log(x);
+                    }}
+
+
+                    localization={{
+                        pagination: {
+                            labelDisplayedRows: '{from}-{to} de {count}',
+                            labelRowsPerPage: 'Filas por pagina:',
+                            labelRowsSelect: 'filas'
+                        },
+                        toolbar: {
+                            showColumnsTitle: 'Mostrar Columnas',
+                            exportTitle: "Exportar",
+                            searchPlaceholder: "Buscar",
+                            addRemoveColumns: "Añadir o remover Columnas"
+                        },
+
+                        header: {
+                            actions: isAdmin() ? 'Acciones' : ""
+                        },
+                        body: {
+                            emptyDataSourceMessage: 'No hay informacion para mostrar',
 
                         }
-                    },
-                    ],
+                    }}
+                    title="Movimientos"
+                    columns={[
+                        fechaColumn,
 
-                    rowStyle: (data, index) => index % 2 == 0 ? { background: "#f5f5f5" } : null,
-                    searchFieldStyle: {
-                        color: "white",
-                    },
-
-                    headerStyle: {
-
-                        background: "var(--black)", color: "white", fontFamily: '"Poppins", sans-serif', fontSize: "1rem"
-                    },
-                    columnsButton: true,
-                    actionsColumnIndex: -1,
-                    filtering: true
-
-
-
-                }}
-
-                actions={[
-                    {
-                        icon: () => <div style={{ paddingBottom: 5, width: 32 }}><AddBox sx={{ color: "white" }}></AddBox></div>,
-                        tooltip: 'Añadir Movimiento',
-                        isFreeAction: true,
-                        hidden: !isAdminVariable,
-                        onClick: (event, rowData) => {
-                            dispatch(cleanInput());
-                            navigate('/movimientos/registro');
-                        }
-                    },
-                    {
-                        icon: () => <div style={{ paddingBottom: 5 }}><ReplayIcon sx={{ color: "white" }}></ReplayIcon></div>,
-                        tooltip: 'Actualizar',
-                        isFreeAction: true,
-                        onClick: (event, rowData) => {
-                            updateState();
-                        }
-                    },
-                    {
-                        icon: () => <CreateIcon sx={{ color: "black !important" }}></CreateIcon>,
-                        tooltip: 'Editar Movimiento',
-                        hidden: !isAdminVariable,
-                        onClick: (event, rowData) => {
-                            dispatch(editValue({ ...rowData, listOfActa: actas, listCliente: cliente }));
-                            navigate('/movimientos/registro/' + rowData.idMovimiento);
-                        }
-                    },
-                    rowData => (
-
+                        { title: 'Movimiento ID', field: 'idMovimiento', hidden: true,defaultFilter:columnsFilter.idMovimiento },
+                        { title: 'Transporte', field: 'transporte', defaultFilter: columnsFilter.transporte ,
+                        render: x => x.transporte == "externo" ? "Externo" : "Marco" },
                         {
-                            icon: () => <DeleteOutlineIcon sx={{ color: "black !important" }}></DeleteOutlineIcon>,
-                            tooltip: 'Borrar movimiento',
-                            hidden: !isAdminVariable,
-                            onClick: (event, rowData) => {
-                                setOpen(true);
-                                setselectData(rowData);
+                            title: 'Rut Empresa', field: 'rut', hidden: true,defaultFilter:columnsFilter.rut,
+                        },
+                        { title: 'Empresa', field: 'empresa', defaultFilter: columnsFilter.empresa },
+                        { title: 'Tipo', field: 'tipo', render: x => x.tipo == "ENVIO" ? "Envio" : "Retiro", 
+                        defaultFilter: columnsFilter.tipo },
+                        { title: 'Cambio', field: 'cambio', defaultFilter: columnsFilter.cambio },
+                        {
+                            title: 'Codigo interno', field: 'idEquipo', render: x => {
+                                return <> <a data-tip="Ver equipo"
+                                    style={{ cursor: 'pointer', width: 30, display: "inline-block" }} onClick={() => handeClickEquipo(x.idEquipo)}>
+                                    {x.idEquipo} </a>
+                                    <ReactTooltip />
+                                </>
+                                    ;
+
+                            },defaultFilter:columnsFilter.idEquipo
+                        },
+                        {
+                            title: 'Acta ID', field: 'idInspeccion', render: x => {
+                                return <> <a data-tip="Ver acta"
+                                    style={{ cursor: 'pointer', width: 50, height: 30, display: "inline-block" }} onClick={() => handeClick(x.idInspeccion)}>
+                                    {x.idInspeccion} </a>
+                                    <ReactTooltip />
+                                </>
+                                    ;
+
+                            },defaultFilter:columnsFilter.idInspeccion
+                        },
+                        {
+                            title: 'N° Guia de despacho', field: 'idGuiaDespacho', render: x => {
+                                return <>
+
+                                    <a data-tip="Ver documento"
+                                        style={{ cursor: 'pointer', width: 30, display: "inline-block" }} onClick={() => {
+                                            navigate('/movimientos/showPdf/' + x.idMovimiento);
+                                        }}>
+                                        {x.idGuiaDespacho} </a>
+                                    <ReactTooltip />
+
+
+
+
+
+
+
+                                </>
+
+                            },defaultFilter:columnsFilter.idGuiaDespacho
+                        },
+                        {
+                            title: 'Fecha de retiro', searchable: false, hidden: true, field: 'fechaRetiro', render: x => {
+                                return x.fechaRetiro != null ? x.fechaRetiro.split("T")[0] : "";
+                            },defaultFilter:columnsFilter.fechaRetiro
+                        },
+                        { title: 'Observaciones', field: 'observaciones', hidden: false, searchable: false,
+                         defaultFilter: columnsFilter.observaciones },
+
+                    ]}
+                    data={rowsWithPower}
+                    onChangeColumnHidden={(column, hidden) => { console.log(column); }}
+
+                    options={{
+                        searchText: searchState,
+                        pageSize: filtroState,
+
+                        initialPage: pageState,
+
+
+
+
+
+
+
+                        pageSizeOptions: [5, 10, 20, 50, 70],
+                        exportMenu: [{
+                            label: 'Exportar a PDF',
+                            style: {
+
+                            },
+                            exportFunc: (cols, datas) => ExportPdf(cols, datas, 'Movimientos')
+                        }, {
+                            label: 'Exportar a CSV',
+                            exportFunc: (cols, datas) => ExportCsv(cols, datas, 'Movimientos')
+                        },
+                        {
+                            label: 'Exportar todo a CSV',
+                            exportFunc: (cols, datas) => {
+
+                                ExportCsv(cols, rowsWithPower, 'Movimientos')
 
                             }
-                        }
-                    )
-                ]}
-            >
+                        },
+                        ],
+
+                        rowStyle: (data, index) => index % 2 == 0 ? { background: "#f5f5f5" } : null,
+                        searchFieldStyle: {
+                            color: "white",
+                        },
+
+                        headerStyle: {
+
+                            background: "var(--black)", color: "white", fontFamily: '"Poppins", sans-serif', fontSize: "1rem"
+                        },
+                        columnsButton: true,
+                        actionsColumnIndex: -1,
+                        filtering: true
 
 
-            </MaterialTable>
-        }
-        {openMessage && <div style={{ position: "absolute", right: "80px", bottom: "0px", paddingBottom: 20 }}>
-            <Alert severity="success">
-                <AlertTitle>Exito</AlertTitle>
-                Se han actualizado las variables — <strong>con exito!</strong>
 
-            </Alert>
-        </div>}
+                    }}
+
+                    actions={[
+                        {
+                            icon: () => <div style={{ paddingBottom: 5, width: 32 }}><AddBox sx={{ color: "white" }}></AddBox></div>,
+                            tooltip: 'Añadir Movimiento',
+                            isFreeAction: true,
+                            hidden: !isAdminVariable,
+                            onClick: (event, rowData) => {
+                                dispatch(cleanInput());
+                                navigate('/movimientos/registro');
+                            }
+                        },
+                        {
+                            icon: () => <div style={{ paddingBottom: 5 }}><ReplayIcon sx={{ color: "white" }}></ReplayIcon></div>,
+                            tooltip: 'Actualizar',
+                            isFreeAction: true,
+                            onClick: (event, rowData) => {
+                                updateState();
+                            }
+                        },
+                        {
+                            icon: () => <CreateIcon sx={{ color: "black !important" }}></CreateIcon>,
+                            tooltip: 'Editar Movimiento',
+                            hidden: !isAdminVariable,
+                            onClick: (event, rowData) => {
+                                dispatch(editValue({ ...rowData, listOfActa: actas, listCliente: cliente }));
+                                navigate('/movimientos/registro/' + rowData.idMovimiento);
+                            }
+                        },
+                        rowData => (
+
+                            {
+                                icon: () => <DeleteOutlineIcon sx={{ color: "black !important" }}></DeleteOutlineIcon>,
+                                tooltip: 'Borrar movimiento',
+                                hidden: !isAdminVariable,
+                                onClick: (event, rowData) => {
+                                    setOpen(true);
+                                    setselectData(rowData);
+
+                                }
+                            }
+                        )
+                    ]}
+                >
+
+
+                </MaterialTable>
+            }
+            {openMessage && <div style={{ position: "absolute", right: "80px", bottom: "0px", paddingBottom: 20 }}>
+                <Alert severity="success">
+                    <AlertTitle>Exito</AlertTitle>
+                    Se han actualizado las variables — <strong>con exito!</strong>
+
+                </Alert>
+            </div>}
 
 
 
 
-    </>
+        </>
 
     );
 }
