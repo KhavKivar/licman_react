@@ -377,6 +377,7 @@ const InventarioComponent = () => {
             pageSize: filtroState,
             pageSizeOptions: [5, 10, 20, 50, 100],
             initialPage: pageState,
+            
 
             rowStyle: (data, index) => data.ubicacion == 'Actualizar' ? { background: "#ffff00" } :
               data.estado == 'POR LLEGAR' ? { background: "#00b0f0" } :

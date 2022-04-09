@@ -173,7 +173,11 @@ const MovimientoComponent = () => {
                     dispatch(changePage_mov(x))
                 }}
                 onRowsPerPageChange={x => { dispatch(changeFiltro_mov(x)) }}
-
+            
+                onColumnDragged={x=>{
+                    console.log(x);
+                }}
+              
 
                 localization={{
                     pagination: {

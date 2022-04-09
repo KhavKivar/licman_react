@@ -431,12 +431,12 @@ const ActaComponent = () => {
                     </div>
                     <List>
                         <ListItem disablePadding>
-                            <ListItemText primary={"Rut Cliente"} ></ListItemText>
+                            <ListItemText primary={"Rut recepcionista"} ></ListItemText>
                             { format(acta.rut)}
                         </ListItem>
                         <Divider></Divider>
                         <ListItem disablePadding>
-                            <ListItemText primary={"Nombre Cliente"} ></ListItemText>
+                            <ListItemText primary={"Nombre recepcionista"} ></ListItemText>
                             {acta.nombre}
                         </ListItem>
                         <Divider></Divider>

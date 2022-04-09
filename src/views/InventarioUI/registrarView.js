@@ -320,6 +320,7 @@ export default function Registro() {
             error.ano = { error: true, message: 'Año invalido' }
 
         } if (ubicacion == '' || ubicacion == null) {
+            console.log(ubicacion);
             error.ubicacion = { error: true, message: 'Este campo no puede ser vacio' }
         }
         if (mastil == '' || mastil == null) {
@@ -1029,6 +1030,16 @@ export default function Registro() {
                                         clearOnBlur
                                         handleHomeEndKeys
                                         onChange={(event, newValue) => {
+                                            console.log(newValue);
+
+                                            if (newValue === null || newValue === '') {
+                                                setError({ ...error, ubicacion: { error: true, message: 'Este campo no puede ser vacio' } })
+                                            } else {
+                                                setError({ ...error, ubicacion: { error: false, message: '' } });
+                                            }
+
+
+
                                             if (typeof newValue === 'string') {
                                                 setUbicacion({
                                                     id: newValue,
