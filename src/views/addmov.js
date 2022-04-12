@@ -25,7 +25,7 @@ import { createTheme, ThemeProvider, useTheme } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 import AWS from 'aws-sdk';
 import axios from "axios";
-import esLocale from "date-fns/locale/es";
+
 import moment from 'moment';
 import { forwardRef, useMemo, useState } from 'react';
 import NumberFormat from 'react-number-format';
@@ -45,12 +45,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import DangerousIcon from '@mui/icons-material/Dangerous';
 import Card from '@mui/material/Card';
 import { updateEstado } from '../features/inventarioSlice';
-
-
-
-
-
-
+import esLocale from 'date-fns/locale/es';
 
 
 
@@ -968,9 +963,10 @@ const AddMovComponent = () => {
                         </RowTextField>
                         <RowTextField>
                             <ColumnElement>
-                                <ThemeProvider theme={themeWithLocale}>
-                                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                              
+                                    <LocalizationProvider locale={esLocale} dateAdapter={AdapterDateFns } >
                                         <DesktopDatePicker
+                                       
                                             value={fechaMovimiento}
 
                                             label="Fecha Movimiento"
@@ -982,12 +978,12 @@ const AddMovComponent = () => {
                                         />
 
                                     </LocalizationProvider>
-                                </ThemeProvider>
+                          
                                 {error.fechaMovimiento.error && <ErrorDisplay> <span>{error.fechaMovimiento.message}</span></ErrorDisplay>}
                             </ColumnElement>
                             <ColumnElement>
                                 <ThemeProvider theme={themeWithLocale}>
-                                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                    <LocalizationProvider dateAdapter={AdapterDateFns} locale={esLocale}>
                                         <DesktopDatePicker
                                             value={fechaTermino}
 
