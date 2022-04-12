@@ -24,7 +24,7 @@ import axios from "axios";
 import { motion } from "framer-motion";
 import * as React from 'react';
 
-import  { useEffect } from 'react';
+import { useEffect } from 'react';
 import { forwardRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -137,11 +137,11 @@ const InventarioComponent = () => {
 
   }
   const [isAdminVariable, setIsAdminVariable] = React.useState(null);
- 
-  useEffect(() => {
-     setIsAdminVariable(isAdmin());
 
-   },[]);
+  useEffect(() => {
+    setIsAdminVariable(isAdmin());
+
+  }, []);
 
 
 
@@ -158,7 +158,7 @@ const InventarioComponent = () => {
 
   const editable = rows.map(o => ({ ...o }));
 
- 
+
   const data = useSelector((state) => state.acta.data);
   const listOfInspecciones = data;
 
@@ -172,7 +172,7 @@ const InventarioComponent = () => {
 
 
   const columnsFilter = tableState.columnsFilterInventario;
-  
+
 
 
   const handleClickOpen = () => {
@@ -225,16 +225,16 @@ const InventarioComponent = () => {
 
   </div>;
 
-function quitarAcentos(cadena){
-	const acentos = {'á':'a','é':'e','í':'i','ó':'o','ú':'u','Á':'A','É':'E','Í':'I','Ó':'O','Ú':'U'};
-	return cadena.split('').map( letra => acentos[letra] || letra).join('').toString();	
-}
+  function quitarAcentos(cadena) {
+    const acentos = { 'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u', 'Á': 'A', 'É': 'E', 'Í': 'I', 'Ó': 'O', 'Ú': 'U' };
+    return cadena.split('').map(letra => acentos[letra] || letra).join('').toString();
+  }
 
 
 
-  if (tabSelect.value == 'Inventario' ) {
+  if (tabSelect.value == 'Inventario') {
 
-    if(isAdminVariable ==null){
+    if (isAdminVariable == null) {
       return (<></>);
     }
     return (
@@ -266,7 +266,7 @@ function quitarAcentos(cadena){
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-           
+
             <Button sx={{
               background: "red", color: "white",
               ':hover': {
@@ -293,13 +293,13 @@ function quitarAcentos(cadena){
           onRowsPerPageChange={x => { dispatch(changeFiltro(x)) }}
 
           onFilterChange={(filters) => {
-                        console.log(filters);
-                        const filtrosList= [];
-                        for(const i of filters){
-                            filtrosList.push({columns:i.column.field,value:i.value});
-                        }
-                        dispatch(columnsFilterInventario(filtrosList));
-                    }}
+            console.log(filters);
+            const filtrosList = [];
+            for (const i of filters) {
+              filtrosList.push({ columns: i.column.field, value: i.value });
+            }
+            dispatch(columnsFilterInventario(filtrosList));
+          }}
 
 
 
@@ -333,16 +333,17 @@ function quitarAcentos(cadena){
           title={params.value != null ? TitleElement : "Inventario"}
 
           columns={[
-            { title: 'Codigo interno', field: 'idEquipo',defaultFilter:columnsFilter.idEquipo },
-            { title: 'Tipo', field: 'tipo', defaultFilter: columnsFilter.tipo,
-            
-            customFilterAndSearch: (value, rowData) => { 
-              console.log(value); 
-                    console.log(rowData);     
-              return quitarAcentos(rowData.tipo.toLowerCase()).startsWith(value.toLowerCase());
-                      
-            }
-             },
+            { title: 'Codigo interno', field: 'idEquipo', defaultFilter: columnsFilter.idEquipo },
+            {
+              title: 'Tipo', field: 'tipo', defaultFilter: columnsFilter.tipo,
+
+              customFilterAndSearch: (value, rowData) => {
+                console.log(value);
+                console.log(rowData);
+                return quitarAcentos(rowData.tipo.toLowerCase()).startsWith(value.toLowerCase());
+
+              }
+            },
             { title: 'Marca', field: 'marca', defaultFilter: columnsFilter.marca },
             { title: 'Modelo', field: 'modelo', defaultFilter: columnsFilter.modelo },
             { title: 'Serie', field: 'serie', hidden: true, defaultFilter: columnsFilter.serie },
@@ -400,7 +401,7 @@ function quitarAcentos(cadena){
             pageSize: filtroState,
             pageSizeOptions: [5, 10, 20, 50, 100],
             initialPage: pageState,
-            
+
 
             rowStyle: (data, index) => data.ubicacion == 'Actualizar' ? { background: "#ffff00" } :
               data.estado == 'POR LLEGAR' ? { background: "#00b0f0" } :
@@ -423,6 +424,77 @@ function quitarAcentos(cadena){
             }, {
               label: 'Exportar a CSV',
               exportFunc: (cols, datas) => ExportCsv(cols, datas, 'Inventario')
+            },
+            {
+              label: 'Exportar todo a PDF',
+              exportFunc: (cols, datas) => {
+                console.log(cols);
+
+                const columnas = [
+                  {
+                    "title": "Codigo interno",
+                    "field": "idEquipo",
+
+                  },
+                  {
+                    "title": "Tipo",
+                    "field": "tipo",
+
+                  },
+                  {
+                    "title": "Marca",
+                    "field": "marca",
+
+                  },
+                  {
+                    "title": "Modelo",
+                    "field": "modelo",
+
+                  },
+                  {
+                    "title": "Serie",
+                    "field": "serie",
+
+                  },
+                  {
+                    "title": "Capacidad",
+                    "field": "capacidad",
+
+                  },
+                  {
+                    "title": "Altura",
+                    "field": "altura",
+
+                  },
+                  {
+                    "title": "Mastil",
+                    "field": "mastil",
+
+                  },
+                  {
+                    "title": "Año",
+                    "field": "ano",
+
+                  },
+                  {
+                    "title": "Horometro",
+                    "field": "horometro",
+
+
+                  },
+                  {
+                    "title": "Estado",
+                    "field": "estado",
+
+                  },
+                  {
+                    "title": "Ubicacion",
+                    "field": "ubicacion",
+
+                  }
+                ];
+                ExportPdf(columnas, editable, 'Inventario');
+              }
             },
             {
               label: 'Exportar todo a CSV',
@@ -517,8 +589,8 @@ function quitarAcentos(cadena){
               icon: () => <div style={{ paddingBottom: 0, width: 32 }}><AddBox sx={{ color: "white" }}></AddBox></div>,
               tooltip: 'Añadir equipo',
               isFreeAction: true,
-              
-              hidden:!isAdminVariable,
+
+              hidden: !isAdminVariable,
               onClick: (event, rowData) => {
                 navigate('/registro');
               }
@@ -546,8 +618,8 @@ function quitarAcentos(cadena){
             {
               icon: () => <CreateIcon sx={{ color: "black !important" }}></CreateIcon>,
               tooltip: 'Editar Equipo',
-            
-              hidden:!isAdminVariable,
+
+              hidden: !isAdminVariable,
               onClick: (event, rowData) => {
 
                 navigate('/registro/' + rowData.idEquipo);
@@ -555,15 +627,15 @@ function quitarAcentos(cadena){
             },
 
             rowData => (
-            {
-              icon: () => <DeleteOutlineIcon sx={{ color: "black !important" }}></DeleteOutlineIcon>,
-              tooltip: 'Eliminar equipo',
-              hidden:!isAdminVariable,
-              onClick: (event, rowData) => {
-                setOpen(true);
-                setselectData(rowData);
+              {
+                icon: () => <DeleteOutlineIcon sx={{ color: "black !important" }}></DeleteOutlineIcon>,
+                tooltip: 'Eliminar equipo',
+                hidden: !isAdminVariable,
+                onClick: (event, rowData) => {
+                  setOpen(true);
+                  setselectData(rowData);
+                }
               }
-            }
 
             ),
 

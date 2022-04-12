@@ -210,6 +210,9 @@ const MovimientoComponent = () => {
                     onColumnDragged={x => {
                         console.log(x);
                     }}
+                    onColumnResized={x => {
+                        console.log(x);
+                    }}
 
 
                     localization={{
@@ -324,6 +327,10 @@ const MovimientoComponent = () => {
                         }, {
                             label: 'Exportar a CSV',
                             exportFunc: (cols, datas) => ExportCsv(cols, datas, 'Movimientos')
+                        },
+                        {
+                            label: 'Exportar todo a PDF',
+                            exportFunc: (cols, datas) => ExportPdf(cols, rowsWithPower, 'Movimientos')
                         },
                         {
                             label: 'Exportar todo a CSV',
