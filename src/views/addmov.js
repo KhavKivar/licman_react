@@ -1087,83 +1087,83 @@ const AddMovComponent = () => {
                         </RowTextField>
 
 
-                        <RowTextField>  
-                                            <ColumnFullElement>
-                                                                        <Autocomplete   
-                                value={obv}
+                        <RowTextField>
+                            <ColumnFullElement>
+                                <Autocomplete
+                                    value={obv}
 
-                                onChange={(event, newValue) => {
-                                    if (newValue == null || newValue == '') {
-                                        setError({ ...error, observaciones: { error: true, message: 'Este campo no puede ser vacio' } })
-                                    } else {
-                                        setError({ ...error, observaciones: { error: false, message: '' } });
-                                    }
-
-
-                                    if (typeof newValue === 'string') {
-                                        dispatch(setObv({
-                                            id: newValue,
-                                        }));
-
-                                    } else if (newValue && newValue.inputValue) {
-                                        dispatch(setObv({
-                                            id: newValue.inputValue,
-                                        }));
-                                    } else {
-
-                                        dispatch(setObv(newValue));
-
-                                    }
-                                }}
-                                filterOptions={(options, params) => {
-                                    const filtered = filter(options, params);
-                                    const { inputValue } = params;
-                                    const isExisting = options.some((option) => inputValue === option.id);
-                                    if (inputValue !== '' && !isExisting) {
-                                        filtered.push({
-                                            inputValue,
-                                            id: `Añadir ${inputValue}`,
-                                        });
-                                    }
-
-                                    return filtered;
-                                }}
-                                selectOnFocus
-                                clearOnBlur
-                                handleHomeEndKeys
-                                id="Observaciones"
-                                options={[{ id: 'Venta' }, { id: 'Termino Arriendo' },
-                                { id: 'Nuevo Arriendo' }, { id: 'Despacho Por Cambio' }, { id: 'Retiro Por Cambio' },
-                                { id: 'Retiro Por Reparacion' },
-
-                                { id: 'Despacho Por Reparacion' },
-                                ]}
-                                getOptionLabel={(option) => {
-
-                                    // Value selected with enter, right from the input
-                                    if (typeof option === 'string') {
-                                        return option;
-                                    }
-                                    // Add "xxx" option created dynamically
-                                    if (option.inputValue) {
-                                        return option.inputValue;
-                                    }
-                                    // Regular option
-                                    return option.id;
-                                }}
-                                renderOption={(props, option) => <li {...props}>{option.id}</li>}
-
-                                freeSolo
-                                renderInput={(params) => (
-
-                                    <TextField  {...params} error={error.observaciones.error} label="Observaciones"
+                                    onChange={(event, newValue) => {
+                                        if (newValue == null || newValue == '') {
+                                            setError({ ...error, observaciones: { error: true, message: 'Este campo no puede ser vacio' } })
+                                        } else {
+                                            setError({ ...error, observaciones: { error: false, message: '' } });
+                                        }
 
 
-                                    />
-                                )}
-                            />
-                            {error.observaciones.error && <ErrorDisplay> <span>{error.observaciones.message}</span></ErrorDisplay>}
-                    
+                                        if (typeof newValue === 'string') {
+                                            dispatch(setObv({
+                                                id: newValue,
+                                            }));
+
+                                        } else if (newValue && newValue.inputValue) {
+                                            dispatch(setObv({
+                                                id: newValue.inputValue,
+                                            }));
+                                        } else {
+
+                                            dispatch(setObv(newValue));
+
+                                        }
+                                    }}
+                                    filterOptions={(options, params) => {
+                                        const filtered = filter(options, params);
+                                        const { inputValue } = params;
+                                        const isExisting = options.some((option) => inputValue === option.id);
+                                        if (inputValue !== '' && !isExisting) {
+                                            filtered.push({
+                                                inputValue,
+                                                id: `Añadir ${inputValue}`,
+                                            });
+                                        }
+
+                                        return filtered;
+                                    }}
+                                    selectOnFocus
+                                    clearOnBlur
+                                    handleHomeEndKeys
+                                    id="Observaciones"
+                                    options={[{ id: 'Venta' }, { id: 'Termino Arriendo' },
+                                    { id: 'Nuevo Arriendo' }, { id: 'Despacho Por Cambio' }, { id: 'Retiro Por Cambio' },
+                                    { id: 'Retiro Por Reparacion' },
+
+                                    { id: 'Despacho Por Reparacion' },
+                                    ]}
+                                    getOptionLabel={(option) => {
+
+                                        // Value selected with enter, right from the input
+                                        if (typeof option === 'string') {
+                                            return option;
+                                        }
+                                        // Add "xxx" option created dynamically
+                                        if (option.inputValue) {
+                                            return option.inputValue;
+                                        }
+                                        // Regular option
+                                        return option.id;
+                                    }}
+                                    renderOption={(props, option) => <li {...props}>{option.id}</li>}
+
+                                    freeSolo
+                                    renderInput={(params) => (
+
+                                        <TextField  {...params} error={error.observaciones.error} label="Observaciones"
+
+
+                                        />
+                                    )}
+                                />
+                                {error.observaciones.error && <ErrorDisplay> <span>{error.observaciones.message}</span></ErrorDisplay>}
+
                             </ColumnFullElement>
 
                         </RowTextField>

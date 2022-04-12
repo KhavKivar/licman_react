@@ -25,9 +25,18 @@ import { useNavigate, useParams } from 'react-router-dom';
 import SwipeableViews from 'react-swipeable-views';
 import { format } from 'rut.js';
 import MotionHoc from "../services/motionhoc";
+import styled from 'styled-components';
+import Button from '@mui/material/Button';
+import PrintIcon from '@mui/icons-material/Print';
+
+import excelExport from './excelActa';
 
 
+const EndObject = styled.div`
+display:flex;
+justify-content:end;
 
+`;
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -71,6 +80,16 @@ const ActaComponent = () => {
 
     const acta = actaList.find((x) => x.idInspeccion == params.id);
 
+    const downloadExcel = () => {
+
+        excelExport(acta);
+        // const url = window.URL.createObjectURL(new Blob([response.data]));
+        // const link = document.createElement('a');
+        // link.href = url;
+        // link.setAttribute('download', 'distancia.xlsx');
+        // document.body.appendChild(link);
+        // link.click();    
+    }
 
 
     const handleChange = (event, newValue) => {
@@ -393,78 +412,83 @@ const ActaComponent = () => {
                 </Tabs>
             </AppBar>
 
-            {acta == undefined ? <></>:
-            <SwipeableViews
-                axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
-                index={value}
-                onChangeIndex={handleChangeIndex}
-            >
-                <TabPanel key={0} value={value} index={0} dir={theme.direction}>
-                </TabPanel>
-                <TabPanel key={1} value={value} index={1} dir={theme.direction}>
-                    {generatedItemList(1)}
-                </TabPanel>
-                <TabPanel key={2} value={value} index={2} dir={theme.direction}>
-                    {generatedItemList(2)}
-                </TabPanel>
-                <TabPanel key={3} value={value} index={3} dir={theme.direction}>
-                    {generatedItemList(3)}
-                </TabPanel>
-                <TabPanel key={4} value={value} index={4} dir={theme.direction}>
-                    {generatedItemList(4)}
-                </TabPanel>
-                <TabPanel key={5} value={value} index={5} dir={theme.direction}>
-                    {generatedItemList(5)}
-                </TabPanel>
-                <TabPanel key={6} value={value} index={6} dir={theme.direction}>
-                    <div style={{ paddingBottom: 20, paddingTop: 20 }}>
-                        <Box
-                            component="img"
-                            sx={{
+            {acta == undefined ? <></> :
+                <SwipeableViews
+                    axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
+                    index={value}
+                    onChangeIndex={handleChangeIndex}
+                >
+                    <TabPanel key={0} value={value} index={0} dir={theme.direction}>
+                    </TabPanel>
+                    <TabPanel key={1} value={value} index={1} dir={theme.direction}>
+                        {generatedItemList(1)}
+                    </TabPanel>
+                    <TabPanel key={2} value={value} index={2} dir={theme.direction}>
+                        {generatedItemList(2)}
+                    </TabPanel>
+                    <TabPanel key={3} value={value} index={3} dir={theme.direction}>
+                        {generatedItemList(3)}
+                    </TabPanel>
+                    <TabPanel key={4} value={value} index={4} dir={theme.direction}>
+                        {generatedItemList(4)}
+                    </TabPanel>
+                    <TabPanel key={5} value={value} index={5} dir={theme.direction}>
+                        {generatedItemList(5)}
+                    </TabPanel>
+                    <TabPanel key={6} value={value} index={6} dir={theme.direction}>
+                        <EndObject>
 
-                                maxHeight: { xs: 233, md: 167 },
-                                maxWidth: { xs: 350, md: 250 },
-                            }}
-                            alt="Firma"
-                            src={acta.firmaURL}
-                        />
-                    </div>
-                    <List>
-                        <ListItem disablePadding>
-                            <ListItemText primary={"Rut recepcionista"} ></ListItemText>
-                            { format(acta.rut)}
-                        </ListItem>
-                        <Divider></Divider>
-                        <ListItem disablePadding>
-                            <ListItemText primary={"Nombre recepcionista"} ></ListItemText>
-                            {acta.nombre}
-                        </ListItem>
-                        <Divider></Divider>
-                        <ListItem disablePadding>
-                            <ListItemText primary={"Observaciones"} ></ListItemText>
-                            {acta.observacion}
-                        </ListItem>
-                        <Divider></Divider>
-                        <ListItem disablePadding>
-                            <ListItemText primary={"Altura de levante"} ></ListItemText>
-                            {acta.alturaLevante} mm
-                        </ListItem>
-                        <Divider></Divider>
-                        <ListItem disablePadding>
-                            <ListItemText primary={"Mastil"} ></ListItemText>
-                            {acta.mastilEquipo} 
-                        </ListItem>
-                        <Divider></Divider>
-                        <ListItem disablePadding>
-                            <ListItemText primary={"Horometro registrado"} ></ListItemText>
-                            {acta.horometroActual}
-                        </ListItem>
+                            <Button variant='contained' onClick={downloadExcel} startIcon={<PrintIcon />}>Exportar</Button>
+                        </EndObject>
 
-                    </List>
-                 
+                        <div style={{ paddingBottom: 20, paddingTop: 20 }}>
+                            <Box
+                                component="img"
+                                sx={{
 
-                </TabPanel>
-            </SwipeableViews>
+                                    maxHeight: { xs: 233, md: 167 },
+                                    maxWidth: { xs: 350, md: 250 },
+                                }}
+                                alt="Firma"
+                                src={acta.firmaURL}
+                            />
+                        </div>
+                        <List>
+                            <ListItem disablePadding>
+                                <ListItemText primary={"Rut recepcionista"} ></ListItemText>
+                                {format(acta.rut)}
+                            </ListItem>
+                            <Divider></Divider>
+                            <ListItem disablePadding>
+                                <ListItemText primary={"Nombre recepcionista"} ></ListItemText>
+                                {acta.nombre}
+                            </ListItem>
+                            <Divider></Divider>
+                            <ListItem disablePadding>
+                                <ListItemText primary={"Observaciones"} ></ListItemText>
+                                {acta.observacion}
+                            </ListItem>
+                            <Divider></Divider>
+                            <ListItem disablePadding>
+                                <ListItemText primary={"Altura de levante"} ></ListItemText>
+                                {acta.alturaLevante} mm
+                            </ListItem>
+                            <Divider></Divider>
+                            <ListItem disablePadding>
+                                <ListItemText primary={"Mastil"} ></ListItemText>
+                                {acta.mastilEquipo}
+                            </ListItem>
+                            <Divider></Divider>
+                            <ListItem disablePadding>
+                                <ListItemText primary={"Horometro registrado"} ></ListItemText>
+                                {acta.horometroActual}
+                            </ListItem>
+
+                        </List>
+
+
+                    </TabPanel>
+                </SwipeableViews>
             }
         </Box>
     );
