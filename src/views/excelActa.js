@@ -38,7 +38,7 @@ export default function excelExport(acta) {
             }
 
             merge.push({ s: { r: j, c: 0 }, e: { r: j, c: 2 } },);
-            if (i == 0 && [6, 7, 8, 9, 10, 11].includes(j)) {
+            if (i == 0 && [6, 7, 8, 9, 10, 11,12].includes(j)) {
                 merge.push({ s: { r: j, c: 3 }, e: { r: j, c: 4 } },);
             }
 
