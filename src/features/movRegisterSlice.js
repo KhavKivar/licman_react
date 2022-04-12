@@ -52,7 +52,7 @@ export const movRegisterSlice = createSlice({
       state.fechaTermino = fecha_termino;
       state.selectedFile = null;
 
-      state.fechaMovimiento = action.payload.fechaMov;
+      state.fechaMovimiento = formatFecha(action.payload.fechaMov);
 
 
     },
