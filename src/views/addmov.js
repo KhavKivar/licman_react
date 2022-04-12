@@ -36,7 +36,7 @@ import styled from 'styled-components';
 import { v4 as uuidv4 } from 'uuid';
 import { addCliente } from '../features/clienteSlice';
 import { addMovimiento, editMovimiento } from '../features/movimientoSlice';
-import { cleanInput, setActa, setActaList, setCambio, setCodigo, setFechaTermino, setGuiaDespacho, setObv, setRut, setRutInputValue, setSelectFile, setTipo, setTransporte } from '../features/movRegisterSlice';
+import { cleanInput, setActa, setActaList, setFechaMovimiento, setCambio, setCodigo, setFechaTermino, setGuiaDespacho, setObv, setRut, setRutInputValue, setSelectFile, setTipo, setTransporte } from '../features/movRegisterSlice';
 import API from '../services/api';
 import MotionHoc from "../services/motionhoc";
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
@@ -162,6 +162,13 @@ flex-direction: column;
  display: flex;
  gap: 1rem;
  width: 49%;
+`;
+
+const ColumnFullElement = styled.div`
+flex-direction: column;
+ display: flex;
+ gap: 1rem;
+ width: 100%;
 `;
 
 const ErrorDisplay = styled.div`
@@ -372,7 +379,8 @@ const AddMovComponent = () => {
         fechaTermino: { error: false, message: '' }, observaciones: { error: false, message: '' },
 
         guiaDespacho: { error: false, message: '' },
-        file: { error: false, message: '' }
+        file: { error: false, message: '' },
+        fechaMovimiento: { error: false, message: '' },
     });
 
     const selectedFile = useSelector((state) => state.movRegister.selectedFile);
@@ -381,8 +389,12 @@ const AddMovComponent = () => {
     const tipo = useSelector((state) => state.movRegister.tipo);
     const cambio = useSelector((state) => state.movRegister.cambio);
     const fechaAux = useSelector((state) => state.movRegister.fechaTermino);
+
+    const fechaMovimiento = useSelector((state) => state.movRegister.fechaMovimiento);
+
+
     const fechaTermino = fechaAux == null ? null : fechaAux;
-    console.log(fechaTermino); 
+    console.log(fechaTermino);
 
     const guiaDespacho = useSelector((state) => state.movRegister.guiaDespacho);
     const obv = useSelector((state) => state.movRegister.obv);
@@ -427,19 +439,35 @@ const AddMovComponent = () => {
 
 
     const handleChangeFecha = (newValue) => {
-      
+
         if (newValue == "Invalid Date") {
             setError({ ...error, fechaTermino: { error: true, message: 'Fecha invalida' } })
         } else {
             setError({ ...error, fechaTermino: { error: false, message: '' } });
         }
-        if(newValue == null){
+        if (newValue == null) {
             dispatch(setFechaTermino(null));
-        }else{
-            dispatch(setFechaTermino( newValue.toString()));
+        } else {
+            dispatch(setFechaTermino(newValue.toString()));
         }
-     
+
     };
+
+    const handleChangeFechaMovimiento = (newValue) => {
+
+        if (newValue == "Invalid Date" || newValue == null || newValue == '') {
+            setError({ ...error, fechaMovimiento: { error: true, message: 'Fecha invalida' } })
+        } else {
+            setError({ ...error, fechaMovimiento: { error: false, message: '' } });
+        }
+        if (newValue == null) {
+            dispatch(setFechaMovimiento(null));
+        } else {
+            dispatch(setFechaMovimiento(newValue.toString()));
+        }
+
+    };
+
 
     const uploadFile = (file, name) => {
 
@@ -489,6 +517,9 @@ const AddMovComponent = () => {
         }
         if (fechaTermino == "Invalid Date") {
             error.fechaTermino = { error: true, message: 'Fecha invalida' };
+        }
+        if (fechaMovimiento == "Invalid Date" || fechaMovimiento == '' || fechaMovimiento == null) {
+            error.fechaMovimiento = { error: true, message: 'Fecha invalida' };
         }
 
         if (obv == null || obv == '') {
@@ -625,17 +656,19 @@ const AddMovComponent = () => {
             realRut = clienteList[index_cliente].rut;
         }
 
-     
-         
+
+
         const movimientoObject = {
             transporte: transporte == 10 ? "Marco" : "Externo",
             idInspeccion: acta.label,
             rut: realRut.replaceAll(".", ""),
             idGuiaDespacho: guiaDespacho,
-            cambio: cambio == null ? null : !isNaN(parseInt(cambio.id)) ? parseInt(cambio.id) : !isNaN(parseInt(cambio)) ?  parseInt(cambio) : null,
+            cambio: cambio == null ? null : !isNaN(parseInt(cambio.id)) ? parseInt(cambio.id) : !isNaN(parseInt(cambio)) ? parseInt(cambio) : null,
             tipo: tipo == 10 ? "ENVIO" : "RETIRO",
             observaciones: obv.id != null ? obv.id : obv,
-            fechaRetiro: fechaTermino != "" && fechaTermino != 'Invalid date' && fechaTermino != null ? moment(fechaTermino).format('YYYY-MM-DD') : null
+            fechaRetiro: fechaTermino != "" && fechaTermino != 'Invalid date' && fechaTermino != null ? moment(fechaTermino).format('YYYY-MM-DD') : null,
+            fechaMov: fechaMovimiento != "" && fechaMovimiento != 'Invalid date' && fechaMovimiento != null ? moment(fechaMovimiento).format('YYYY-MM-DD') : null,
+
         }
         console.log(movimientoObject);
 
@@ -706,8 +739,8 @@ const AddMovComponent = () => {
                     {errorServer.error ? <Card sx={{ backgroundColor: "red", marginBottom: 1 }}
                     >
 
-                        <div style={{ display: "flex", alignItems: "center", paddingLeft: 5 }}> 
-                        <ReportProblemIcon sx={{ color: "white" }}></ReportProblemIcon>
+                        <div style={{ display: "flex", alignItems: "center", paddingLeft: 5 }}>
+                            <ReportProblemIcon sx={{ color: "white" }}></ReportProblemIcon>
                             <TextWarning>{errorServer.message}</TextWarning> </div></Card > : <></>}
                     <Dialog
                         open={open}
@@ -873,7 +906,7 @@ const AddMovComponent = () => {
                                     disableClearable
                                     forcePopupIcon={false}
                                     onChange={(event, newValue, reason) => {
-                                     
+
                                         if (newValue == null || newValue == '') {
                                             setError({ ...error, acta: { error: true, message: 'Este campo no puede ser vacio' } })
                                         } else {
@@ -936,7 +969,25 @@ const AddMovComponent = () => {
                         <RowTextField>
                             <ColumnElement>
                                 <ThemeProvider theme={themeWithLocale}>
-                                    <LocalizationProvider  dateAdapter={AdapterDateFns}>
+                                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                        <DesktopDatePicker
+                                            value={fechaMovimiento}
+
+                                            label="Fecha Movimiento"
+                                            inputFormat="dd/MM/yyyy"
+
+                                            onChange={handleChangeFechaMovimiento}
+                                            renderInput={(params) => <TextField
+                                                {...params} error={error.fechaMovimiento.error} />}
+                                        />
+
+                                    </LocalizationProvider>
+                                </ThemeProvider>
+                                {error.fechaMovimiento.error && <ErrorDisplay> <span>{error.fechaMovimiento.message}</span></ErrorDisplay>}
+                            </ColumnElement>
+                            <ColumnElement>
+                                <ThemeProvider theme={themeWithLocale}>
+                                    <LocalizationProvider dateAdapter={AdapterDateFns}>
                                         <DesktopDatePicker
                                             value={fechaTermino}
 
@@ -952,85 +1003,12 @@ const AddMovComponent = () => {
                                 {error.fechaTermino.error && <ErrorDisplay> <span>{error.fechaTermino.message}</span></ErrorDisplay>}
                             </ColumnElement>
 
-                            <ColumnElement>
-
-                                <Autocomplete
-                                    value={obv}
-
-                                    onChange={(event, newValue) => {
-                                        if (newValue == null || newValue == '') {
-                                            setError({ ...error, observaciones: { error: true, message: 'Este campo no puede ser vacio' } })
-                                        } else {
-                                            setError({ ...error, observaciones: { error: false, message: '' } });
-                                        }
-
-
-                                        if (typeof newValue === 'string') {
-                                            dispatch(setObv({
-                                                id: newValue,
-                                            }));
-
-                                        } else if (newValue && newValue.inputValue) {
-                                            dispatch(setObv({
-                                                id: newValue.inputValue,
-                                            }));
-                                        } else {
-
-                                            dispatch(setObv(newValue));
-
-                                        }
-                                    }}
-                                    filterOptions={(options, params) => {
-                                        const filtered = filter(options, params);
-                                        const { inputValue } = params;
-                                        const isExisting = options.some((option) => inputValue === option.id);
-                                        if (inputValue !== '' && !isExisting) {
-                                            filtered.push({
-                                                inputValue,
-                                                id: `Añadir ${inputValue}`,
-                                            });
-                                        }
-
-                                        return filtered;
-                                    }}
-                                    selectOnFocus
-                                    clearOnBlur
-                                    handleHomeEndKeys
-                                    id="Observaciones"
-                                    options={[{ id: 'Venta' }, { id: 'Termino Arriendo' },
-                                    { id: 'Nuevo Arriendo' }, { id: 'Despacho Por Cambio' }, { id: 'Retiro Por Cambio' },
-                                    { id: 'Retiro Por Reparacion' },
-
-                                    { id: 'Despacho Por Reparacion' },
-                                    ]}
-                                    getOptionLabel={(option) => {
-
-                                        // Value selected with enter, right from the input
-                                        if (typeof option === 'string') {
-                                            return option;
-                                        }
-                                        // Add "xxx" option created dynamically
-                                        if (option.inputValue) {
-                                            return option.inputValue;
-                                        }
-                                        // Regular option
-                                        return option.id;
-                                    }}
-                                    renderOption={(props, option) => <li {...props}>{option.id}</li>}
-
-                                    freeSolo
-                                    renderInput={(params) => (
-
-                                        <TextField {...params} error={error.observaciones.error} label="Observaciones"
-
-
-                                        />
-                                    )}
-                                />
-                                {error.observaciones.error && <ErrorDisplay> <span>{error.observaciones.message}</span></ErrorDisplay>}
-                            </ColumnElement>
-
                         </RowTextField>
+
+
+
+
+
                         <RowTextField>
                             <ColumnElement>
                                 <TextField
@@ -1105,6 +1083,88 @@ const AddMovComponent = () => {
                                 {error.file.error && <ErrorDisplay> <span>{error.file.message}</span></ErrorDisplay>}
 
                             </ColumnElement>
+
+                        </RowTextField>
+
+
+                        <RowTextField>  
+                                            <ColumnFullElement>
+                                                                        <Autocomplete   
+                                value={obv}
+
+                                onChange={(event, newValue) => {
+                                    if (newValue == null || newValue == '') {
+                                        setError({ ...error, observaciones: { error: true, message: 'Este campo no puede ser vacio' } })
+                                    } else {
+                                        setError({ ...error, observaciones: { error: false, message: '' } });
+                                    }
+
+
+                                    if (typeof newValue === 'string') {
+                                        dispatch(setObv({
+                                            id: newValue,
+                                        }));
+
+                                    } else if (newValue && newValue.inputValue) {
+                                        dispatch(setObv({
+                                            id: newValue.inputValue,
+                                        }));
+                                    } else {
+
+                                        dispatch(setObv(newValue));
+
+                                    }
+                                }}
+                                filterOptions={(options, params) => {
+                                    const filtered = filter(options, params);
+                                    const { inputValue } = params;
+                                    const isExisting = options.some((option) => inputValue === option.id);
+                                    if (inputValue !== '' && !isExisting) {
+                                        filtered.push({
+                                            inputValue,
+                                            id: `Añadir ${inputValue}`,
+                                        });
+                                    }
+
+                                    return filtered;
+                                }}
+                                selectOnFocus
+                                clearOnBlur
+                                handleHomeEndKeys
+                                id="Observaciones"
+                                options={[{ id: 'Venta' }, { id: 'Termino Arriendo' },
+                                { id: 'Nuevo Arriendo' }, { id: 'Despacho Por Cambio' }, { id: 'Retiro Por Cambio' },
+                                { id: 'Retiro Por Reparacion' },
+
+                                { id: 'Despacho Por Reparacion' },
+                                ]}
+                                getOptionLabel={(option) => {
+
+                                    // Value selected with enter, right from the input
+                                    if (typeof option === 'string') {
+                                        return option;
+                                    }
+                                    // Add "xxx" option created dynamically
+                                    if (option.inputValue) {
+                                        return option.inputValue;
+                                    }
+                                    // Regular option
+                                    return option.id;
+                                }}
+                                renderOption={(props, option) => <li {...props}>{option.id}</li>}
+
+                                freeSolo
+                                renderInput={(params) => (
+
+                                    <TextField  {...params} error={error.observaciones.error} label="Observaciones"
+
+
+                                    />
+                                )}
+                            />
+                            {error.observaciones.error && <ErrorDisplay> <span>{error.observaciones.message}</span></ErrorDisplay>}
+                    
+                            </ColumnFullElement>
 
                         </RowTextField>
 

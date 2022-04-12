@@ -19,7 +19,8 @@ export const movRegisterSlice = createSlice({
   name: 'movRegister',
   initialState: {
     rut: "", codigo: "", acta: "", actaList: [], guiaDespacho: "", obv: "", transporte: "", tipo: "", cambio: "",
-    fechaTermino: null, selectedFile: null, rutInputValue: ""
+    fechaTermino: null, selectedFile: null, rutInputValue: "",fechaMovimiento: new Date().toLocaleDateString(),
+
   },
   reducers: {
     editValue: (state, action) => {
@@ -51,6 +52,9 @@ export const movRegisterSlice = createSlice({
       state.fechaTermino = fecha_termino;
       state.selectedFile = null;
 
+      state.fechaMovimiento = action.payload.fechaMov;
+
+
     },
 
     cleanInput: (state, action) => {
@@ -65,6 +69,7 @@ export const movRegisterSlice = createSlice({
       state.tipo = "";
       state.cambio = "";
       state.fechaTermino = null;
+      state.fechaMovimiento =  new Date().toLocaleDateString();
       state.selectedFile = null;
 
     },
@@ -108,7 +113,9 @@ export const movRegisterSlice = createSlice({
     setFechaTermino: (state, action) => {
       state.fechaTermino = action.payload;
     },
-
+    setFechaMovimiento: (state, action) => {
+      state.fechaMovimiento = action.payload;
+    }
 
   },
 })
@@ -116,7 +123,7 @@ export const movRegisterSlice = createSlice({
 // Action creators are generated for each case reducer function
 export const { setRut, setCodigo, setActa, setActaList, setGuiaDespacho, setObv
   , setTransporte, setTipo, setCambio, setFechaTermino, setSelectFile, cleanInput, editValue,
-  setRutInputValue
+  setRutInputValue,setFechaMovimiento
 } = movRegisterSlice.actions
 
 export default movRegisterSlice.reducer

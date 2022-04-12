@@ -140,7 +140,7 @@ const MovimientoComponent = () => {
   
     let fechaColumn = {
         title: 'Fecha Movimiento', field: 'fechaMov', render: x => {
-            return x.fechaMov.split("T")[0] + " " + x.fechaMov.split("T")[1].substr(0, 5);
+            return x.fechaMov.split("T")[0];
         }, defaultFilter: columnsFilter.fechaMov
     };
 
