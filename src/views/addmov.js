@@ -389,7 +389,7 @@ const AddMovComponent = () => {
 
 
     const fechaTermino = fechaAux == null ? null : fechaAux;
-    console.log(fechaTermino);
+    console.log(fechaMovimiento);
 
     const guiaDespacho = useSelector((state) => state.movRegister.guiaDespacho);
     const obv = useSelector((state) => state.movRegister.obv);
@@ -449,6 +449,7 @@ const AddMovComponent = () => {
     };
 
     const handleChangeFechaMovimiento = (newValue) => {
+        console.log(newValue);
 
         if (newValue == "Invalid Date" || newValue == null || newValue == '') {
             setError({ ...error, fechaMovimiento: { error: true, message: 'Fecha invalida' } })
@@ -964,7 +965,7 @@ const AddMovComponent = () => {
                         <RowTextField>
                             <ColumnElement>
                               
-                                    <LocalizationProvider locale={esLocale} dateAdapter={AdapterDateFns } >
+                                    <LocalizationProvider dateAdapter={AdapterDateFns }  locale={esLocale} >
                                         <DesktopDatePicker
                                        
                                             value={fechaMovimiento}

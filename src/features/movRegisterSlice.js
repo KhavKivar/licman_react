@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { useSelector, useDispatch } from 'react-redux';
-import moment from 'moment';
+  import moment from 'moment';
 
 function formatFecha(fechaTs) {
   try {
@@ -15,11 +15,15 @@ function formatFecha(fechaTs) {
   }
 
 }
+
+
 export const movRegisterSlice = createSlice({
   name: 'movRegister',
   initialState: {
     rut: "", codigo: "", acta: "", actaList: [], guiaDespacho: "", obv: "", transporte: "", tipo: "", cambio: "",
-    fechaTermino: null, selectedFile: null, rutInputValue: "",fechaMovimiento: new Date().toLocaleDateString(),
+    fechaTermino: null, selectedFile: null, rutInputValue: "",fechaMovimiento: 
+    
+    moment().format("MM/DD/YYYY").toString(),
 
   },
   reducers: {
@@ -69,7 +73,7 @@ export const movRegisterSlice = createSlice({
       state.tipo = "";
       state.cambio = "";
       state.fechaTermino = null;
-      state.fechaMovimiento =  new Date().toLocaleDateString();
+      state.fechaMovimiento =  moment().format("MM/DD/YYYY").toString();
       state.selectedFile = null;
 
     },
