@@ -134,23 +134,22 @@ function dataSheet(acta, rowIndex) {
             data.push([
                 [head[rowIndex]],
                 topArray,
-                ["Altenador", , ,].concat(stringToTicket(acta.altenador)),
+                ["Altenador", , ,].concat(stringToTicket(acta.alternador)),
                 ["Bateria", , ,].concat(stringToTicket(acta.bateria)),
                 ["Chapa de contacto", , ,].concat(stringToTicket(acta.chapaContacto)),
                 ["Sistema electrico", , ,].concat(stringToTicket(acta.sistemaElectrico)),
                 ["Horometro", , ,].concat(stringToTicket(acta.horometro)),
-                ["Palanca comandos", , ,].concat(stringToTicket(acta.palancaComandos)),
+                ["Palanca comandos", , ,].concat(stringToTicket(acta.palancaComando)),
                 ["Switch de luces", , ,].concat(stringToTicket(acta.switchLuces)),
-                ["Switch de marchas", , ,].concat(stringToTicket(acta.switchMarchas)),
+                ["Switch de marchas", , ,].concat(stringToTicket(acta.switchMarcha)),
             ]);
         }
         if (rowIndex == 3) {
-            data.push([[
+            data.push([
                 [head[rowIndex]],
                 topArray,
-                "Cadenas", , ,].concat(stringToTicket(acta.cadena)), [
+               [ "Cadenas", , ,].concat(stringToTicket(acta.cadena)), [
                     "Carro y su respaldo de carga", , ,].concat(["Respaldo de carga: " + (acta.carga == 1 ? "SI" : "NO")]).
-
                     concat(stringToTicketSpecialCamp(
                         acta.carro)), [
                             "Horquillas y seguros", , ,].concat(stringToTicket(

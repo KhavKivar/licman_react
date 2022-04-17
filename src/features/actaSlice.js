@@ -9,13 +9,26 @@ export const actaSlice = createSlice({
     initStateActa: (state, action) => {
       state.data = action.payload;
     },
+    addInspeccion: (state, action) => {
+      if(action.payload != undefined){
+        state.data.unshift(action.payload);
+      }
+    
+    },
+    editInspeccion: (state, action) => { 
+      const index = state.data.findIndex(x => x.idInspeccion === action.payload.idInspeccion);
+      if(index !== -1){
+        state.data[index] = action.payload;
+      }
+    
+    },
     deleteInspeccion: (state, action) => {
       const { id } = action.payload;
-      const index = state.data.findIndex((inspeccion) => inspeccion.idInspeccion === id);
-      if(index != -1){
+      console.log(id);
+      const index = state.data.findIndex((inspeccion) => inspeccion.idInspeccion == id);
+      if (index != -1) {
         state.data.splice(index, 1);
       }
-     
     },
     updateActaState: (state, action) => {
       const data = action.payload;
@@ -34,16 +47,16 @@ export const actaSlice = createSlice({
         }
       }
       //Add
-      const b_minus_a = difference(setB,setA);
-      for(let elem of b_minus_a){
+      const b_minus_a = difference(setB, setA);
+      for (let elem of b_minus_a) {
         const indexMov = data.findIndex(x => x.idInspeccion.toString() == elem.toString());
-        if(indexMov != -1){
+        if (indexMov != -1) {
           state.data.unshift(data[indexMov]);
         }
       }
       //Remove
-      const a_minus_b = difference(setA,setB);
-      for(let elem of a_minus_b){
+      const a_minus_b = difference(setA, setB);
+      for (let elem of a_minus_b) {
         const indexMov = data_prev.findIndex(x => x.idInspeccion.toString() == elem.toString());
         state.data.splice(indexMov, 1);
       }
@@ -54,6 +67,6 @@ export const actaSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { initStateActa,updateActaState,deleteInspeccion } = actaSlice.actions
+export const { initStateActa, updateActaState, deleteInspeccion,addInspeccion,editInspeccion } = actaSlice.actions
 
 export default actaSlice.reducer

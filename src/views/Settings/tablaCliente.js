@@ -117,7 +117,7 @@ const TablaCliente = () => {
                 }).then((response) => {
                   console.log(response.data);
                   if (response.status == 200) {
-                    dispatch(addCliente(newData));
+                    // dispatch(addCliente(newData));
                     resolve();
                   }
                 }).catch((error) => {
@@ -162,8 +162,8 @@ const TablaCliente = () => {
                 }).then((response) => {
                   console.log(response);
                   if (response.status == 200) {
-                    dispatch(editCliente({ data: newData, oldRut: oldData.rut }));
-                    dispatch(updateClientRut({ oldRut: oldData.rut, newRut: newData.rut }));
+                    // dispatch(editCliente({ data: newData, oldRut: oldData.rut }));
+                    // dispatch(updateClientRut({ oldRut: oldData.rut, newRut: newData.rut }));
                     resolve();
                   }
                 }).catch((error) => {
@@ -203,7 +203,7 @@ const TablaCliente = () => {
                 axios.delete(API.baseURL + "/api/cliente/id/" + oldData.rut).then((response) => {
                   console.log(response.data);
                   if (response.status == 200) {
-                    dispatch(removeCliente(oldData));
+                   // dispatch(removeCliente(oldData));
                     resolve();
                   }
                 }).catch((error) => {

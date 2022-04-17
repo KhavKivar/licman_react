@@ -14,6 +14,12 @@ export const clienteSlice = createSlice({
     addCliente: (state, action) => {
       state.data.unshift(action.payload);
     },
+    changeRut: (state, action) => {
+      const indexCliente = state.data.findIndex(x => x.rut == action.payload.oldRut);
+      if (indexCliente >= 0) {
+        state.data[indexCliente] = action.payload.cliente;
+      }
+    },
     updateClienteState: (state, action) => {
       const data = action.payload;
       const data_prev = state.data;
@@ -55,6 +61,14 @@ export const clienteSlice = createSlice({
         //editar las actas con ese rut broo
       }
     },
+    editNewCliente: (state, action) => {
+      const indexCliente = state.data.findIndex(x => x.rut == action.payload.rut);
+      
+      if (indexCliente >= 0) {
+        state.data[indexCliente] = action.payload;
+        //editar las actas con ese rut broo
+      }
+    },
     removeCliente: (state, action) => {
       const indexCliente = state.data.findIndex(x => x.rut == action.payload.rut);
       state.data.splice(indexCliente, 1);
@@ -65,6 +79,6 @@ export const clienteSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { initStateCliente, addCliente, editCliente, removeCliente,updateClienteState } = clienteSlice.actions
+export const { initStateCliente, addCliente, editCliente, removeCliente,editNewCliente,updateClienteState,changeRut } = clienteSlice.actions
 
 export default clienteSlice.reducer

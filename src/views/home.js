@@ -105,17 +105,25 @@ function numberToMonth(x) {
 
 function dataYear(data, year) {
     var data_parse = [];
-    if (year == "" || year == null) {
+    console.log("year:" ,year);
+   
+  
+    if (year == "" || year == null || data ==null) {
         return [];
     }
-
+  
+   
     for (let i = 1; i < 13; i++) {
+        console.log("data",data);
         let year_month = year.toString() + "-" + numberToMonth(i);
+       
         const monthData = data.filter(x => x.fechaMov.includes(year_month));
+        console.log("monthData",monthData);
         const enviados = monthData.filter(x => x.tipo == 'ENVIO').length;
         const retiros = monthData.filter(x => x.tipo == 'RETIRO').length;
         data_parse.push({ name: "2022-" + i < 10 ? "0" + i : i, envios: enviados, retiros: retiros })
     }
+    console.log("parse ",data_parse);
     return data_parse;
 }
 
@@ -184,7 +192,7 @@ function getModelos(data, data_equipo, data_acta) {
     var data_final = []
     for (let i = 0; i < 10; i++) {
         if (data_parse[i] != undefined) {
-            console.log(data_final);
+          
             data_final.push(data_parse[i]);
         }
 
@@ -233,10 +241,11 @@ const HomeComponent = () => {
     try {
         linea_tiempo = dataYear(movimientos, value.getFullYear());
     } catch (e) {
+        console.log(e);
         linea_tiempo = dataYear(movimientos, null);
     }
-    const data_modelos = getModelos(movimientos, inventario, actas)
 
+    const data_modelos = getModelos(movimientos, inventario, actas)
     const data_clientes = getClientes(movimientos, clientes);
 
     const inventarioData = [{ name: 'Disponibles', value: disponible },

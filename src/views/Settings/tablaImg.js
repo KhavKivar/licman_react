@@ -110,7 +110,7 @@ const TablaImg = () => {
                             axios.post(API.baseURL + "/api/modelo/", newData).then((response) => {
                                 console.log(response.data);
                                 if (response.status == 200) {
-                                    dispatch(addModelo(newData));
+                                    // dispatch(addModelo(newData));
                                     resolve();
                                 }
                             }).catch((error) => {
@@ -142,7 +142,7 @@ const TablaImg = () => {
                             }).then((response) => {
                                 console.log(response.data);
                                 if (response.status == 200) {
-                                    dispatch(editModelo(newData));
+                                    // dispatch(editModelo(newData));
                                     resolve();
                                 }
                             }).catch((error) => {
@@ -175,7 +175,7 @@ const TablaImg = () => {
                             axios.delete(API.baseURL + "/api/modelo/id/" + oldData.modelo).then((response) => {
                                 console.log(response.data);
                                 if (response.status == 200) {
-                                    dispatch(removeModelo(oldData));
+                                    // dispatch(removeModelo(oldData));
                                     resolve();
                                 }
                             }).catch((error) => {

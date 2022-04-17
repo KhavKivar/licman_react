@@ -535,28 +535,6 @@ const AddMovComponent = () => {
         setOpen(true);
     };
 
-    const handleClose = () => {
-        console.log(newName);
-        //Create
-        const rut_input = rut.id != null ? rut.id : rut;
-        const objCliente = {
-            rut: rut_input,
-            nombre: newName,
-            telefono: telefono
-        }
-
-        axios.post(API.baseURL + "/api/cliente/", objCliente).then((response) => {
-            if (response.status == 200) {
-                console.log(response.data);
-                sendLogic();
-                dispatch(addCliente(objCliente));
-            }
-
-        });
-
-
-
-    };
 
     const sendObjEdit = (obj) => {
         axios.patch(API.baseURL + '/api/movimiento/id/' + params.id, JSON.stringify(obj), {
@@ -568,14 +546,14 @@ const AddMovComponent = () => {
             if (response.status == 200) {
                 setButtonState({ state: "done" });
                 await delay(800);
-                dispatch(editMovimiento(response.data));
-                const [newEstado, newUbicacion] = obvToEstado(obj.observaciones);
-                if (newEstado != "NO UPDATE") {
-                    const acta = actaList.find(element => element.idInspeccion == obj.idInspeccion);
-                    if (acta != undefined) {
-                        dispatch(updateEstado({ idEquipo: acta.idEquipo, estado: newEstado, ubicacion: newUbicacion }));
-                    }
-                }
+                // dispatch(editMovimiento(response.data));
+                // const [newEstado, newUbicacion] = obvToEstado(obj.observaciones);
+                // if (newEstado != "NO UPDATE") {
+                //     const acta = actaList.find(element => element.idInspeccion == obj.idInspeccion);
+                //     if (acta != undefined) {
+                //         dispatch(updateEstado({ idEquipo: acta.idEquipo, estado: newEstado, ubicacion: newUbicacion }));
+                //     }
+                // }
                 dispatch(cleanInput());
                 navigate("/movimientos");
             }
@@ -607,14 +585,14 @@ const AddMovComponent = () => {
                 setButtonState({ state: "done" });
                 await delay(800);
 
-                dispatch(addMovimiento(response.data));
-                const [newEstado, newUbicacion] = obvToEstado(obj.observaciones);
-                if (newEstado != "NO UPDATE") {
-                    const acta = actaList.find(element => element.idInspeccion == obj.idInspeccion);
-                    if (acta != undefined) {
-                        dispatch(updateEstado({ idEquipo: acta.idEquipo, estado: newEstado, ubicacion: newUbicacion }));
-                    }
-                }
+                // dispatch(addMovimiento(response.data));
+                // const [newEstado, newUbicacion] = obvToEstado(obj.observaciones);
+                // if (newEstado != "NO UPDATE") {
+                //     const acta = actaList.find(element => element.idInspeccion == obj.idInspeccion);
+                //     if (acta != undefined) {
+                //         dispatch(updateEstado({ idEquipo: acta.idEquipo, estado: newEstado, ubicacion: newUbicacion }));
+                //     }
+                // }
                 dispatch(cleanInput());
                 navigate("/movimientos");
 
@@ -738,49 +716,7 @@ const AddMovComponent = () => {
                         <div style={{ display: "flex", alignItems: "center", paddingLeft: 5 }}>
                             <ReportProblemIcon sx={{ color: "white" }}></ReportProblemIcon>
                             <TextWarning>{errorServer.message}</TextWarning> </div></Card > : <></>}
-                    <Dialog
-                        open={open}
-                        onClose={handleClose}
-                        aria-labelledby="alert-dialog-title"
-                        aria-describedby="alert-dialog-description"
-                    >
-                        <DialogTitle id="alert-dialog-title">
-                            {"Rut empresa"}
-                        </DialogTitle>
-                        <DialogContent>
-                            <DialogContentText id="alert-dialog-description">
-                                El rut ingresado no existe el la base de datos. Por lo tanto, es necesario
-                                que ingrese el nombre de la empresa asociado al rut.
-
-                            </DialogContentText>
-                            <TextField
-                                autoFocus
-                                margin="dense"
-                                id="name"
-                                label="Nombre empresa"
-                                value={newName}
-                                onChange={handleNewName}
-                                fullWidth
-                                variant="standard"
-                            />
-                            <TextField
-                                autoFocus
-                                margin="dense"
-                                id="name"
-                                label="Telefono"
-                                value={telefono}
-                                onChange={handleTelefono}
-                                fullWidth
-                                variant="standard"
-                            />
-                        </DialogContent>
-                        <DialogActions>
-
-                            <Button onClick={handleClose} autoFocus>
-                                Aceptar
-                            </Button>
-                        </DialogActions>
-                    </Dialog>
+                  
 
                     <ColumnSpace>
                         <RowTextField>

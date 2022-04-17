@@ -190,7 +190,7 @@ const InventarioComponent = () => {
     axios.delete(API.baseURL + "/api/equipo/id/" + rowData.idEquipo).then((response) => {
       if (response.status == 200) {
         setOpenMessageOkdelete(true);
-        dispatch(deleteEquipo(rowData.idEquipo));
+        //dispatch(deleteEquipo(rowData.idEquipo));
         setTimeout(() => { setOpenMessageOkdelete(false) }, 3000);
       }
     }).catch((e) => {

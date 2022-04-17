@@ -371,7 +371,7 @@ export default function Registro() {
                 if (response.status == 200) {
                     setButtonState({ state: "done" });
                     await delay(800);
-                    dispatch(addEquipo(postData));
+                    //dispatch(addEquipo(postData));
                     console.log(response.data);
                     navigate('/inventario');
                 }
@@ -405,7 +405,7 @@ export default function Registro() {
                     setButtonState({ state: "done" });
                     await delay(800);
                     postData.idEquipo = parseInt(params.id);
-                    dispatch(editEquipo(postData));
+                    //dispatch(editEquipo(postData));
                     navigate('/inventario');
                 }
             }).catch((error) => {
