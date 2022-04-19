@@ -61,14 +61,7 @@ export const clienteSlice = createSlice({
         //editar las actas con ese rut broo
       }
     },
-    editNewCliente: (state, action) => {
-      const indexCliente = state.data.findIndex(x => x.rut == action.payload.rut);
-      
-      if (indexCliente >= 0) {
-        state.data[indexCliente] = action.payload;
-        //editar las actas con ese rut broo
-      }
-    },
+   
     removeCliente: (state, action) => {
       const indexCliente = state.data.findIndex(x => x.rut == action.payload.rut);
       state.data.splice(indexCliente, 1);

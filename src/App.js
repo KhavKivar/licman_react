@@ -164,16 +164,22 @@ function App() {
       socket.on("new cliente",(data)=>{
         ClientesServices.add(data);
       });
+
+
       socket.on("edit cliente",(data)=>{
-        console.log("edit cliente",data);
-        
-        ClientesServices.edit(data);
-      });
-      socket.on("edit cliente movimientos",(data)=>{
-        console.log("update" ,data);
-        
+        console.log("edit cliente",data.cliente);
+        //Edit el rut
+ 
+
+        //Editar los mov
         ClientesServices.updateMovAsWell(data);
+
       });
+      // socket.on("edit cliente movimientos",(data)=>{
+      //   console.log("update" ,data);
+        
+      //   ClientesServices.updateMovAsWell(data);
+      // });
 
      
       socket.on("remove cliente",(data)=>{

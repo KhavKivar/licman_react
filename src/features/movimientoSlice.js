@@ -63,8 +63,9 @@ export const movimientoSlice = createSlice({
    },
    updateClientRut:(state,action)=>{
     for (let i = 0; i < state.data.length; i++) {
-      if(state.data[i].rut ==action.payload.oldRut ){
-          state.data[i].rut = action.payload.newRut;
+      if(state.data[i].rut == action.payload.oldRut ){
+          state.data[i].rut = action.payload.cliente.rut;
+          state.data[i].nombre = action.payload.cliente.nombre;
       }
     } 
    },

@@ -71,9 +71,9 @@ export class ClienteSocketServices {
     add = (data) => {
         this.dispatch(addCliente(data));
     }
-    edit = (data) => {
-        this.dispatch(editNewCliente(data));
-    }
+    // edit = (data) => {
+    //     this.dispatch(editNewCliente(data));
+    // }
     remove = (rut) => {
         this.dispatch(removeCliente({rut:rut}));
 
