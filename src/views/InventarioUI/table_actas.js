@@ -164,7 +164,7 @@ const TablaActaComponent = () => {
                                 }
                             },
                             {
-                                title: 'Rut cliente', field: 'rut', render: x => {
+                                title: 'Rut cliente', field: 'rut',hidden:true, render: x => {
                                     return format(x.rut);
                                 }
                             },
@@ -174,7 +174,9 @@ const TablaActaComponent = () => {
                                     x.alturaLevante + " mm"
                             },
                             { title: 'Horometro registrado', field: 'horometroActual' },
-
+                            {
+            title: 'Observaciones', field: 'observacion'
+          },
                             {
                                 title: 'Fecha', field: 'ts', render: x => {
 

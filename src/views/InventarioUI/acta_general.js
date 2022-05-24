@@ -195,13 +195,17 @@ export default function ActaGeneral() {
                 ;
             }
           },
+         
           {
-            title: 'Rut cliente', field: 'rut', render: x => {
+            title: 'Rut cliente', field: 'rut', hidden:true,render: x => {
               return format(x.rut);
             }
           },
+        
           { title: 'Nombre cliente', field: 'nombre' },
-
+          {
+            title: 'Observaciones', field: 'observacion'
+          },
           {
             title: 'Fecha', field: 'ts', render: x => {
 
